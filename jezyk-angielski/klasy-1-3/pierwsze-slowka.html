@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Język angielski — Global Net School</title>
+<meta name="description" content="światy 3D do zwiedzania jak w grze,  quizy, VR , AR , gry angażujące w ćwiczenie wymowy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EC; --paper-2:#F5EFE0; --grid:#CBD9E6; --grid-soft:#DCE6EF;
+    --ink:#22304A; --ink-soft:#4B5875;
+    --accent:#7B4B8A; --accent-soft:#E7DCEC; --accent-dark:#4E2E5C;
+    --forest:#2F5D50; --forest-dark:#1E3C34;
+    --font-display:'Fraunces', serif; --font-body:'Atkinson Hyperlegible', sans-serif; --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; font-family:var(--font-body); color:var(--ink); background:linear-gradient(var(--grid-soft) 1px, transparent 1px) 0 0/100% 34px, var(--paper); background-attachment:fixed;}
+  a{color:inherit;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+  header.site{position:sticky; top:0; z-index:40; background:rgba(251,247,236,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--grid);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1120px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:12px; font-family:var(--font-display); font-weight:600; font-size:1.28rem; text-decoration:none; color:var(--ink);}
+  .brand-mark{width:38px; height:38px; border-radius:9px; background:var(--forest); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:0.95rem; transform:rotate(-4deg); box-shadow:3px 3px 0 var(--forest-dark);}
+  .brand small{display:block; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--ink-soft); font-weight:400; text-transform:uppercase;}
+  .btn-ghost{font-family:var(--font-mono); font-size:0.8rem; text-transform:uppercase; padding:10px 16px; border-radius:9px; border:2px solid var(--ink); text-decoration:none; color:var(--ink);}
+  .breadcrumb{padding:20px 0 0; font-family:var(--font-mono); font-size:0.78rem; color:var(--ink-soft);}
+  .breadcrumb a{text-decoration:none; color:var(--ink-soft); border-bottom:1px dashed var(--grid);}
+  .breadcrumb .sep{margin:0 8px; opacity:0.5;}
+  .breadcrumb .current{color:var(--ink);}
+  .subject-hero{padding:26px 0 40px;}
+  .subject-hero-inner{display:flex; align-items:flex-start; gap:22px; flex-wrap:wrap;}
+  .subject-icon-lg{width:64px; height:64px; border-radius:14px; flex-shrink:0; background:var(--accent-soft); color:var(--accent-dark); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:1.7rem; transform:rotate(-3deg);}
+  .kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-dark); background:var(--accent-soft); border:1px solid var(--accent); padding:6px 12px; border-radius:999px; margin-bottom:16px;}
+  h1{font-family:var(--font-display); font-weight:600; font-size:clamp(2rem, 4vw, 2.8rem); line-height:1.08; margin:0 0 14px; color:var(--ink);}
+  .subject-hero p.lede{font-size:1.05rem; line-height:1.65; color:var(--ink-soft); max-width:64ch; margin:0;}
+  section{padding:0 0 56px;}
+  .featured{display:flex; align-items:center; gap:26px; flex-wrap:wrap; background:var(--ink); color:var(--paper); border-radius:16px; padding:34px 36px; margin-bottom:52px;}
+  .featured .badge{font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent-dark); background:var(--accent-soft); padding:5px 11px; border-radius:999px; display:inline-block; margin-bottom:12px;}
+  .featured h3{font-family:var(--font-display); font-size:1.4rem; margin:0 0 8px;}
+  .featured p{margin:0; color:#C7CEDD; max-width:52ch; line-height:1.6; font-size:0.95rem;}
+  .btn-solid-feat{font-family:var(--font-mono); font-size:0.86rem; text-transform:uppercase; letter-spacing:0.03em; padding:14px 22px; border-radius:9px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; border:2px solid var(--paper); background:var(--paper); color:var(--ink); box-shadow:4px 4px 0 var(--accent); margin-left:auto; flex-shrink:0;}
+  .grade-block{margin-bottom:48px;}
+  .grade-label-row{display:flex; align-items:baseline; gap:14px; margin-bottom:22px; border-bottom:2px solid var(--ink); padding-bottom:10px; flex-wrap:wrap;}
+  .grade-label-row .grade-num{font-family:var(--font-mono); font-size:0.8rem; background:var(--ink); color:var(--paper); padding:5px 11px; border-radius:6px;}
+  .grade-label-row h2{margin:0; font-family:var(--font-display); font-weight:600; font-size:clamp(1.3rem,2.2vw,1.7rem); color:var(--ink);}
+  .grade-label-row .grade-sub{font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-soft); margin-left:auto;}
+  .resource-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:18px;}
+  .resource-card{position:relative; background:var(--paper-2); border:1px solid var(--grid); border-radius:4px 4px 10px 10px; padding:22px 20px 20px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column; gap:12px; transition:transform .16s ease, box-shadow .16s ease; box-shadow:5px 5px 0 rgba(34,48,74,0.06);}
+  .resource-card:hover{transform:translate(-3px,-3px); box-shadow:8px 8px 0 var(--accent);}
+  .resource-tab{position:absolute; top:-12px; left:20px; font-family:var(--font-mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:6px 6px 0 0; background:var(--accent); color:#fff;}
+  .resource-card .top-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .resource-card h3{font-family:var(--font-display); font-weight:600; font-size:1.08rem; margin:0;}
+  .resource-card .format{font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; color:var(--accent-dark); background:var(--accent-soft); padding:3px 9px; border-radius:999px; flex-shrink:0;}
+  .resource-card p{margin:0; color:var(--ink-soft); font-size:0.88rem; line-height:1.5; flex-grow:1;}
+  .resource-card .go{font-family:var(--font-mono); font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--accent-dark); display:inline-flex; align-items:center; gap:6px;}
+  footer{border-top:1px solid var(--grid); padding:34px 0 30px; margin-top:10px;}
+  .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-soft);}
+  .footer-bottom a{color:var(--ink-soft); text-decoration:none;}
+  @media (max-width: 700px){ .featured{flex-direction:column; align-items:flex-start;} .btn-solid-feat{margin-left:0;} }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="nav">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">GNS</span>
+      <span>Global Net School<small>materiały do nauki</small></span>
+    </a>
+    <a class="btn-ghost" href="../index.html">← Strona główna</a>
+  </div>
+</header>
+<main id="main">
+  <div class="wrap breadcrumb">
+    <a href="../index.html">Global Net School</a><span class="sep">/</span>
+    <a href="../index.html#przedmioty">Przedmioty</a><span class="sep">/</span>
+    <span class="current">Język angielski</span>
+  </div>
+  <section class="subject-hero">
+    <div class="wrap subject-hero-inner">
+      <div class="subject-icon-lg">A</div>
+      <div>
+        <span class="kicker">Klasy 1–3</span>
+        <h1>Materiały z jezyka angielskiego</h1>
+        <p class="lede">światy 3D do zwiedzania jak w grze,  quizy, VR , AR , gry angażujące w ćwiczenie wymowy</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <div class="grade-block">
+        <div class="grade-label-row">
+          <span class="grade-num">I–III</span>
+          <h2>Klasy 1–3</h2>
+          <span class="grade-sub">edukacja wczesnoszkolna</span>
+        </div>
+        <div class="resource-grid">
+        <a class="resource-card" href="jezyk-angielski/game1.html">
+          <span class="resource-tab">Do druku</span>
+          <div class="top-row"><h3>bajki 3D</h3><span class="format">PDF</span></div>
+          <p>bajka o jeżu</p>
+          <span class="go">Otwórz materiał <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card" href="jezyk-angielski/game1.html">
+          <span class="resource-tab">Ćwiczenie</span>
+          <div class="top-row"><h3>Pierwsze rytmy</h3><span class="format">HTML</span></div>
+          <p>Klaskanie do prostych rytmów z odtwarzaczem w przeglądarce.</p>
+          <span class="go">Otwórz materiał <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Global Net School — materiały dostępne bezpłatnie</span>
+    <a href="../index.html">← Wróć do strony głównej</a>
+  </div>
+</footer>
+</body>
+</html>
