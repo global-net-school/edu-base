@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jaką szkołę wybrać? — Global Net School</title>
+<meta name="description" content="Testy predyspozycji zawodowych i materiały pomagające ósmoklasistom wybrać liceum, technikum lub szkołę branżową. Bez kont, bez chmury, bez instalacji.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EC;
+    --paper-2:#F5EFE0;
+    --grid:#CBD9E6;
+    --grid-soft:#DCE6EF;
+    --margin-red:#D66A57;
+    --ink:#22304A;
+    --ink-soft:#4B5875;
+    --coral:#D6552F;
+    --coral-dark:#9C3C1E;
+    --amber:#E7A500;
+    --amber-dark:#7A5600;
+    --forest:#2F5D50;
+    --forest-dark:#1E3C34;
+    --sky:#3E7C9E;
+    --sky-dark:#254E63;
+    --teal:#1D8272;
+    --teal-dark:#12564C;
+    --font-display:'Fraunces', serif;
+    --font-body:'Atkinson Hyperlegible', sans-serif;
+    --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--ink);
+    background:linear-gradient(var(--grid-soft) 1px, transparent 1px) 0 0/100% 34px, var(--paper);
+    background-attachment:fixed;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--amber); color:var(--ink);}
+  .skip-link{position:absolute; left:-999px; top:0; background:var(--ink); color:var(--paper); padding:10px 16px; z-index:100; border-radius:0 0 8px 0;}
+  .skip-link:focus{left:0;}
+  a:focus-visible, button:focus-visible{outline:3px solid var(--sky); outline-offset:2px;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
+
+  header.site{position:sticky; top:0; z-index:40; background:rgba(251,247,236,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--grid);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1120px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:12px; font-family:var(--font-display); font-weight:600; font-size:1.28rem; text-decoration:none; color:var(--ink);}
+  .brand-mark{width:38px; height:38px; border-radius:9px; background:var(--forest); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:0.95rem; transform:rotate(-4deg); box-shadow:3px 3px 0 var(--forest-dark);}
+  .brand small{display:block; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--ink-soft); font-weight:400; text-transform:uppercase;}
+  nav.links{display:flex; gap:26px; font-family:var(--font-mono); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.04em;}
+  nav.links a{text-decoration:none; color:var(--ink-soft); padding-bottom:4px; border-bottom:2px solid transparent; transition:color .15s, border-color .15s;}
+  nav.links a:hover{color:var(--teal); border-color:var(--teal);}
+  .btn{font-family:var(--font-mono); font-size:0.86rem; text-transform:uppercase; letter-spacing:0.03em; padding:14px 24px; border-radius:9px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; border:2px solid var(--ink); transition:transform .12s ease, box-shadow .12s ease;}
+  .btn-solid{background:var(--ink); color:var(--paper); box-shadow:4px 4px 0 var(--teal);}
+  .btn-solid:hover{transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--teal);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--ink); box-shadow:3px 3px 0 var(--grid);}
+  .btn-ghost:hover{transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--grid);}
+
+  .breadcrumb{padding:20px 0 0; font-family:var(--font-mono); font-size:0.78rem; color:var(--ink-soft);}
+  .breadcrumb a{text-decoration:none; color:var(--ink-soft); border-bottom:1px dashed var(--grid);}
+  .breadcrumb a:hover{color:var(--teal);}
+  .breadcrumb .sep{margin:0 8px; opacity:0.5;}
+  .breadcrumb .current{color:var(--ink);}
+
+  .subject-hero{padding:26px 0 40px;}
+  .subject-hero-inner{display:flex; align-items:flex-start; gap:22px; flex-wrap:wrap;}
+  .subject-icon-lg{width:64px; height:64px; border-radius:14px; flex-shrink:0; background:#D3E9E4; color:var(--teal-dark); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:1.7rem; transform:rotate(-3deg);}
+  .kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--teal-dark); background:#E1F0EC; border:1px solid #BFDFD6; padding:6px 12px; border-radius:999px; margin-bottom:16px;}
+  .kicker::before{content:''; width:7px; height:7px; border-radius:50%; background:var(--teal);}
+  h1.headline{font-family:var(--font-display); font-weight:600; font-size:clamp(2rem, 4vw, 2.8rem); line-height:1.08; margin:0 0 14px; color:var(--ink);}
+  .subject-hero p.lede{font-size:1.05rem; line-height:1.65; color:var(--ink-soft); max-width:64ch; margin:0;}
+
+  section{padding:0 0 56px;}
+  .section-head{max-width:680px; margin:0 0 30px;}
+  .eyebrow{font-family:var(--font-mono); font-size:0.74rem; text-transform:uppercase; letter-spacing:0.09em; color:var(--teal-dark); margin:0 0 10px; display:block;}
+  h2{font-family:var(--font-display); font-weight:600; font-size:clamp(1.4rem, 2.4vw, 1.8rem); margin:0 0 10px; color:var(--ink);}
+  .section-head p{color:var(--ink-soft); font-size:0.98rem; line-height:1.6; margin:0;}
+
+  /* featured — big test CTA */
+  .featured{display:flex; align-items:center; gap:26px; flex-wrap:wrap; background:var(--ink); color:var(--paper); border-radius:16px; padding:36px 38px; margin-bottom:52px;}
+  .featured .badge{font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; color:#12564C; background:#8FE0CB; padding:5px 11px; border-radius:999px; display:inline-block; margin-bottom:12px;}
+  .featured h3{font-family:var(--font-display); font-size:1.5rem; margin:0 0 8px;}
+  .featured p{margin:0; color:#C7CEDD; max-width:54ch; line-height:1.6; font-size:0.96rem;}
+  .featured .btn-solid{background:var(--paper); color:var(--ink); box-shadow:4px 4px 0 var(--teal); margin-left:auto; flex-shrink:0;}
+
+  .resource-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:18px;}
+  .resource-card{position:relative; background:var(--paper-2); border:1px solid var(--grid); border-radius:4px 4px 10px 10px; padding:22px 20px 20px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column; gap:12px; transition:transform .16s ease, box-shadow .16s ease; box-shadow:5px 5px 0 rgba(34,48,74,0.06);}
+  .resource-card:hover, .resource-card:focus-visible{transform:translate(-3px,-3px); box-shadow:8px 8px 0 var(--tab-color, var(--teal));}
+  .resource-tab{position:absolute; top:-12px; left:20px; font-family:var(--font-mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:6px 6px 0 0; background:var(--tab-color, var(--teal)); color:#fff;}
+  .resource-card .top-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .resource-card h3{font-family:var(--font-display); font-weight:600; font-size:1.08rem; margin:0;}
+  .resource-card .format{font-family:var(--font-mono); font-size:0.66rem; text-transform:uppercase; color:var(--tab-color-dark, var(--teal-dark)); background:var(--tab-color-soft, #D3E9E4); padding:3px 9px; border-radius:999px; flex-shrink:0;}
+  .resource-card p{margin:0; color:var(--ink-soft); font-size:0.88rem; line-height:1.5; flex-grow:1;}
+  .resource-card .go{font-family:var(--font-mono); font-size:0.74rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--tab-color-dark, var(--teal-dark)); display:inline-flex; align-items:center; gap:6px;}
+  .resource-card .go .arrow{transition:transform .15s ease;}
+  .resource-card:hover .go .arrow{transform:translateX(4px);}
+
+  .t-teal{--tab-color:#1D8272; --tab-color-soft:#D3E9E4; --tab-color-dark:#12564C;}
+  .t-coral{--tab-color:#D6552F; --tab-color-soft:#F5DAD1; --tab-color-dark:#9C3C1E;}
+  .t-sky{--tab-color:#3E7C9E; --tab-color-soft:#DAE9F1; --tab-color-dark:#254E63;}
+  .t-amber{--tab-color:#C98A00; --tab-color-soft:#F6E6BE; --tab-color-dark:#7A5600;}
+  .t-plum{--tab-color:#7B4B8A; --tab-color-soft:#E7DCEC; --tab-color-dark:#4E2E5C;}
+  .t-forest{--tab-color:#2F5D50; --tab-color-soft:#D9E7E1; --tab-color-dark:#1E3C34;}
+
+  /* school-type comparison — notebook divider cards */
+  .path-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;}
+  .path-card{border:1px solid var(--grid); border-radius:10px; padding:24px 22px; background:var(--paper-2); position:relative; overflow:hidden;}
+  .path-card::before{content:attr(data-mark); position:absolute; right:12px; top:2px; font-family:var(--font-display); font-weight:700; font-size:3.2rem; color:var(--grid); z-index:0; line-height:1;}
+  .path-card > *{position:relative; z-index:1;}
+  .path-card h3{font-family:var(--font-display); font-size:1.16rem; margin:0 0 8px;}
+  .path-card p{margin:0 0 14px; color:var(--ink-soft); font-size:0.9rem; line-height:1.55;}
+  .path-card ul{margin:0; padding-left:18px; color:var(--ink-soft); font-size:0.86rem; line-height:1.6;}
+
+  /* steps / how-list */
+  .how-list{display:grid; grid-template-columns:repeat(4, 1fr); border:1px solid var(--grid); border-radius:12px; overflow:hidden; background:var(--paper-2);}
+  .how-item{padding:24px 20px; border-right:1px solid var(--grid);}
+  .how-item:last-child{border-right:none;}
+  .how-item .num{font-family:var(--font-mono); font-size:0.74rem; color:var(--teal-dark); margin-bottom:8px; display:block;}
+  .how-item h4{font-family:var(--font-display); font-size:1.0rem; margin:0 0 6px;}
+  .how-item p{margin:0; color:var(--ink-soft); font-size:0.85rem; line-height:1.5;}
+
+  .note-strip{
+    display:flex; gap:14px; align-items:flex-start; background:#FCEFD9; border:1px solid #EAD3A0;
+    border-radius:12px; padding:18px 20px; margin-top:44px;
+  }
+  .note-strip .mark{font-family:var(--font-display); font-weight:700; font-size:1.3rem; color:var(--amber-dark); flex-shrink:0;}
+  .note-strip p{margin:0; color:#5E4A17; font-size:0.9rem; line-height:1.55;}
+
+  footer{border-top:1px solid var(--grid); padding:34px 0 30px; margin-top:10px;}
+  .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-soft);}
+  .footer-bottom a{color:var(--ink-soft); text-decoration:none;}
+  .footer-bottom a:hover{color:var(--teal);}
+
+  @media (max-width: 880px){
+    .path-grid{grid-template-columns:1fr;}
+    .how-list{grid-template-columns:repeat(2,1fr);}
+    .how-item:nth-child(2n){border-right:none;}
+    .how-item{border-bottom:1px solid var(--grid);}
+  }
+  @media (max-width: 700px){
+    nav.links{display:none;}
+    .featured{flex-direction:column; align-items:flex-start;}
+    .featured .btn-solid{margin-left:0;}
+    .how-list{grid-template-columns:1fr;}
+    .how-item{border-right:none;}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Przejdź do treści</a>
+
+<header class="site">
+  <div class="nav">
+    <a href="../index.html" class="brand">
+      <span class="brand-mark">GNS</span>
+      <span>Global Net School<small>materiały do nauki</small></span>
+    </a>
+    <nav class="links" aria-label="Nawigacja główna">
+      <a href="../index.html#przedmioty">Przedmioty</a>
+      <a href="../index.html#klasy">Klasy</a>
+      <a href="../index.html#jak-to-dziala">Jak to działa</a>
+      <a href="../index.html#o-nas">O projekcie</a>
+    </nav>
+    <a class="btn btn-ghost" href="../index.html" style="padding:10px 18px;">← Strona główna</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <div class="wrap breadcrumb">
+    <a href="../index.html">Global Net School</a><span class="sep">/</span>
+    <a href="../index.html#klasy">Klasy 7–8</a><span class="sep">/</span>
+    <span class="current">Jaką szkołę wybrać?</span>
+  </div>
+
+  <section class="subject-hero">
+    <div class="wrap subject-hero-inner">
+      <div class="subject-icon-lg">?</div>
+      <div>
+        <span class="kicker">Klasa 8 · Doradztwo zawodowe</span>
+        <h1 class="headline">Jaką szkołę wybrać po ósmej klasie?</h1>
+        <p class="lede">Testy predyspozycji zawodowych, quiz zainteresowań i porównanie ścieżek edukacyjnych — żeby decyzję o liceum, technikum czy szkole branżowej podjąć świadomie, a nie na podstawie tego, gdzie idą koledzy.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+
+      <div class="featured">
+        <div>
+          <span class="badge">Zacznij tutaj</span>
+          <h3>Test predyspozycji zawodowych</h3>
+          <p>15-minutowy test, który na podstawie Twoich zainteresowań i mocnych stron podpowie, w jakich obszarach zawodowych możesz się dobrze odnaleźć. Wynik możesz zapisać i przedyskutować z rodzicem lub doradcą zawodowym.</p>
+        </div>
+        <a class="btn btn-solid" href="test-predyspozycji-zawodowych.html">Rozpocznij test<span aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="section-head">
+        <span class="eyebrow">Testy i quizy</span>
+        <h2>Sprawdź, co pasuje właśnie Tobie</h2>
+        <p>Każdy test działa offline i nie zapisuje żadnych danych poza Twoim urządzeniem — wynik możesz zapisać jako plik albo po prostu przeczytać na ekranie.</p>
+      </div>
+      <div class="resource-grid" style="margin-bottom:56px;">
+        <a class="resource-card t-teal" href="quiz-zainteresowan.html">
+          <span class="resource-tab">Quiz</span>
+          <div class="top-row"><h3>Quiz zainteresowań</h3><span class="format">HTML</span></div>
+          <p>30 pytań o to, co lubisz robić — wynik pokazuje, do jakich grup zawodów pasujesz najbardziej.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card t-coral" href="test-liceum-czy-technikum.html">
+          <span class="resource-tab">Test</span>
+          <div class="top-row"><h3>Liceum czy technikum?</h3><span class="format">HTML</span></div>
+          <p>Krótki test porównujący Twój styl nauki i plany z tym, czego uczą oba typy szkół.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card t-sky" href="kalkulator-punktow-rekrutacyjnych.html">
+          <span class="resource-tab">Kalkulator</span>
+          <div class="top-row"><h3>Kalkulator punktów rekrutacyjnych</h3><span class="format">HTML</span></div>
+          <p>Wpisz swoje oceny i wynik egzaminu ósmoklasisty — narzędzie policzy orientacyjną liczbę punktów.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card t-amber" href="quiz-mocne-strony.html">
+          <span class="resource-tab">Quiz</span>
+          <div class="top-row"><h3>Twoje mocne strony</h3><span class="format">HTML</span></div>
+          <p>Test samooceny umiejętności: analityczne, manualne, artystyczne, społeczne — i co z nich wynika.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card t-plum" href="quiz-przedmioty-ulubione.html">
+          <span class="resource-tab">Quiz</span>
+          <div class="top-row"><h3>Który przedmiot lubisz najbardziej?</h3><span class="format">HTML</span></div>
+          <p>Proste ćwiczenie porównujące Twoje ulubione przedmioty z profilami klas w liceach i technikach.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+        <a class="resource-card t-forest" href="checklist-dzien-otwarty.html">
+          <span class="resource-tab">Checklista</span>
+          <div class="top-row"><h3>Checklista: dzień otwarty szkoły</h3><span class="format">HTML</span></div>
+          <p>Lista pytań, które warto zadać na dniu otwartym, zanim zdecydujesz się na konkretną szkołę.</p>
+          <span class="go">Rozpocznij <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+      </div>
+
+      <div class="section-head">
+        <span class="eyebrow">Ścieżki edukacyjne</span>
+        <h2>Liceum, technikum czy szkoła branżowa</h2>
+        <p>Krótkie porównanie trzech głównych ścieżek po ósmej klasie — szczegóły warto zawsze zweryfikować w aktualnej ofercie szkół w swoim mieście.</p>
+      </div>
+      <div class="path-grid" style="margin-bottom:56px;">
+        <div class="path-card" data-mark="LO">
+          <h3>Liceum ogólnokształcące</h3>
+          <p>4 lata nauki, nacisk na przedmioty ogólne i przygotowanie do matury.</p>
+          <ul>
+            <li>Dobry wybór, gdy jeszcze nie wiesz, jaki zawód Cię interesuje</li>
+            <li>Klasy o profilach: mat-fiz, biol-chem, humanistyczna i inne</li>
+            <li>Kończy się maturą, otwiera drogę na studia</li>
+          </ul>
+        </div>
+        <div class="path-card" data-mark="T">
+          <h3>Technikum</h3>
+          <p>5 lat nauki — matura oraz tytuł technika w wybranym zawodzie.</p>
+          <ul>
+            <li>Łączy przedmioty ogólne z zawodowymi</li>
+            <li>Praktyki zawodowe już w trakcie nauki</li>
+            <li>Po maturze możliwość studiów lub od razu pracy w zawodzie</li>
+          </ul>
+        </div>
+        <div class="path-card" data-mark="SB">
+          <h3>Szkoła branżowa</h3>
+          <p>3 lata nauki, nacisk na praktyczne przygotowanie do konkretnego zawodu.</p>
+          <ul>
+            <li>Duży udział zajęć praktycznych i praktyk u pracodawcy</li>
+            <li>Szybka ścieżka do wejścia na rynek pracy</li>
+            <li>Możliwość kontynuacji nauki w szkole branżowej II stopnia</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <span class="eyebrow">Jak z tego korzystać</span>
+        <h2>Plan na najbliższe tygodnie</h2>
+      </div>
+      <div class="how-list">
+        <div class="how-item">
+          <span class="num">01</span>
+          <h4>Zrób testy</h4>
+          <p>Zacznij od testu predyspozycji i quizu zainteresowań.</p>
+        </div>
+        <div class="how-item">
+          <span class="num">02</span>
+          <h4>Porównaj ścieżki</h4>
+          <p>Zestaw wyniki z opisem liceum, technikum i szkoły branżowej.</p>
+        </div>
+        <div class="how-item">
+          <span class="num">03</span>
+          <h4>Policz punkty</h4>
+          <p>Sprawdź orientacyjną liczbę punktów rekrutacyjnych.</p>
+        </div>
+        <div class="how-item">
+          <span class="num">04</span>
+          <h4>Odwiedź dni otwarte</h4>
+          <p>Skorzystaj z checklisty pytań przed wizytą w szkole.</p>
+        </div>
+      </div>
+
+      <div class="note-strip">
+        <span class="mark">i</span>
+        <p>Wyniki testów mają charakter pomocniczy i orientacyjny — nie zastępują rozmowy ze szkolnym doradcą zawodowym ani aktualnych zasad rekrutacji obowiązujących w Twoim województwie. Ostateczne progi punktowe i terminy sprawdź na stronie kuratorium oświaty.</p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Global Net School — materiały dostępne bezpłatnie</span>
+    <a href="../index.html">← Wróć do strony głównej</a>
+  </div>
+</footer>
+
+</body>
+</html>
