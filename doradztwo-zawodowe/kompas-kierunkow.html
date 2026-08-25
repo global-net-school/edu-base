@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa Ścieżki — profil edukacyjno-zawodowy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f1b2b;
+    --panel:#132235;
+    --panel-2:#182b42;
+    --coral:#ff6b5e;
+    --coral-soft:#ff9086;
+    --teal:#2dd4c8;
+    --violet:#9d8cff;
+    --gold:#ffc857;
+    --paper:#eaf1f5;
+    --paper-dim:#8fa3b5;
+    --line: rgba(234,241,245,0.12);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 750px at 12% -8%, rgba(45,212,200,0.16), transparent 58%),
+      radial-gradient(1000px 700px at 105% 5%, rgba(255,107,94,0.14), transparent 55%),
+      var(--ink);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    display:flex; justify-content:center;
+    padding:32px 18px 60px;
+  }
+  .app{width:100%; max-width:820px;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; letter-spacing:-0.01em; margin:0;}
+  .card{
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding:32px 30px;
+    box-shadow: 0 20px 60px -25px rgba(0,0,0,0.6);
+  }
+  p{line-height:1.6; color:var(--paper); opacity:0.92;}
+
+  .eyebrow{font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--teal); font-weight:600; margin-bottom:10px;}
+
+  /* stepper */
+  .stepper{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap;}
+  .step{
+    flex:1; min-width:110px; padding:9px 12px; border-radius:10px;
+    background:rgba(234,241,245,0.03); border:1px solid var(--line);
+    font-size:11.5px; font-weight:600; color:var(--paper-dim);
+    display:flex; align-items:center; gap:7px; letter-spacing:0.01em;
+  }
+  .step .dot{width:7px; height:7px; border-radius:50%; background:var(--paper-dim); flex-shrink:0;}
+  .step.active{border-color:var(--coral); color:var(--paper); background:rgba(255,107,94,0.08);}
+  .step.active .dot{background:var(--coral);}
+  .step.done{color:var(--teal);}
+  .step.done .dot{background:var(--teal);}
+
+  /* intro */
+  .intro h1{font-size:34px; margin-bottom:14px;}
+  .intro .lede{font-size:16px; max-width:58ch;}
+  .module-preview{display:grid; gap:12px; margin-top:22px;}
+  .mp-row{
+    display:flex; gap:14px; align-items:flex-start;
+    padding:14px 16px; border-radius:12px; background:rgba(234,241,245,0.03); border:1px solid var(--line);
+  }
+  .mp-icon{font-size:22px; line-height:1;}
+  .mp-row h4{font-family:'Fraunces',serif; font-size:15.5px; font-weight:600; margin-bottom:3px;}
+  .mp-row p{font-size:13.5px; margin:0; opacity:0.8;}
+  .info-box{
+    margin-top:20px; padding:15px 16px; border-left:3px solid var(--teal);
+    background:rgba(45,212,200,0.07); border-radius:6px; font-size:13.5px;
+    color:var(--paper-dim); line-height:1.6;
+  }
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    background: var(--coral); color:#1a0a08;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15px;
+    padding:14px 26px; border-radius:999px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn:hover{background:var(--coral-soft); transform:translateY(-1px);}
+  .btn:focus-visible{outline:3px solid var(--teal); outline-offset:3px;}
+  .btn.ghost{background:transparent; color:var(--paper); border:1px solid var(--line); font-weight:500;}
+  .btn.ghost:hover{border-color:var(--coral); color:var(--coral-soft); background:transparent;}
+  .btn-row{margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;}
+
+  /* quiz */
+  .progress-wrap{display:flex; align-items:center; gap:12px; margin-bottom:22px;}
+  .progress-track{flex:1; height:6px; background:rgba(234,241,245,0.1); border-radius:99px; overflow:hidden;}
+  .progress-fill{height:100%; background:linear-gradient(90deg,var(--teal),var(--coral)); width:0%; transition:width .3s ease;}
+  .progress-label{font-size:12px; color:var(--paper-dim); white-space:nowrap;}
+
+  .q-dim{display:inline-block; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; font-weight:600;}
+  .q-text{font-size:20px; line-height:1.4; margin-bottom:22px; font-family:'Fraunces', serif; font-weight:500;}
+
+  .scale{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    display:flex; align-items:center; gap:14px;
+    padding:12px 16px; border:1px solid var(--line); border-radius:10px;
+    cursor:pointer; background:rgba(234,241,245,0.02);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .opt:hover{border-color:var(--coral); background:rgba(255,107,94,0.06);}
+  .opt input{accent-color:var(--coral); width:16px; height:16px; flex-shrink:0;}
+  .opt span{font-size:14.5px;}
+  .opt.selected{border-color:var(--coral); background:rgba(255,107,94,0.12);}
+
+  .nav-row{display:flex; justify-content:space-between; margin-top:24px; gap:12px;}
+
+  /* dashboard */
+  .dash-section{margin-top:30px;}
+  .dash-section:first-of-type{margin-top:6px;}
+  .section-title{font-size:13px; letter-spacing:0.1em; text-transform:uppercase; color:var(--teal); font-weight:600; margin-bottom:14px; display:flex; align-items:center; gap:8px;}
+
+  .result-code{font-weight:700; font-size:12.5px; letter-spacing:0.12em; color:var(--gold); text-transform:uppercase;}
+  .compass{display:flex; justify-content:center; margin:6px 0 10px;}
+
+  .badge-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .badge-name{font-size:22px; font-family:'Fraunces',serif; font-weight:600;}
+  .badge-tag{font-size:13px; color:var(--coral-soft);}
+
+  .bar-list{display:grid; gap:10px;}
+  .bar-row{display:grid; grid-template-columns:140px 1fr 32px; align-items:center; gap:10px;}
+  .bar-row .b-name{font-size:12.5px; color:var(--paper-dim);}
+  .bar-track{height:7px; background:rgba(234,241,245,0.08); border-radius:99px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px;}
+  .bar-fill.teal{background:linear-gradient(90deg,var(--teal),var(--gold));}
+  .bar-fill.violet{background:linear-gradient(90deg,var(--violet),var(--coral-soft));}
+  .bar-val{font-size:11.5px; color:var(--paper-dim); text-align:right;}
+
+  .pair-row{margin-bottom:16px;}
+  .pair-labels{display:flex; justify-content:space-between; font-size:12px; color:var(--paper-dim); margin-bottom:6px;}
+  .pair-labels .hi{color:var(--paper); font-weight:600;}
+  .pair-track{position:relative; height:8px; background:rgba(234,241,245,0.08); border-radius:99px;}
+  .pair-fill{position:absolute; top:0; left:0; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--violet),var(--coral));}
+  .pair-dot{position:absolute; top:50%; width:14px; height:14px; border-radius:50%; background:var(--gold); border:2px solid var(--ink); transform:translate(-50%,-50%);}
+
+  .type-card{margin-top:12px; padding:16px 18px; border-radius:12px; background:rgba(234,241,245,0.03); border:1px solid var(--line);}
+  .type-card h4{font-size:16px; font-family:'Fraunces',serif; font-weight:600; margin-bottom:6px;}
+  .type-card p{font-size:14px; margin:6px 0;}
+  .tag-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+  .tag{font-size:11.5px; background:rgba(45,212,200,0.12); color:var(--teal); padding:4px 10px; border-radius:999px; border:1px solid rgba(45,212,200,0.25);}
+  .tag.alt{background:rgba(157,140,255,0.14); color:var(--violet); border-color:rgba(157,140,255,0.3);}
+
+  .tip-list{display:grid; gap:8px; margin-top:8px;}
+  .tip{display:flex; gap:10px; font-size:13.5px; padding:11px 14px; border-radius:10px; background:rgba(255,200,87,0.06); border:1px solid rgba(255,200,87,0.2);}
+  .tip .ic{flex-shrink:0;}
+
+  footer{margin-top:28px; text-align:center; font-size:12px; color:var(--paper-dim); opacity:0.7;}
+
+  @media (max-width:560px){
+    .card{padding:24px 18px;}
+    .intro h1{font-size:27px;}
+    .q-text{font-size:18px;}
+    .bar-row{grid-template-columns:100px 1fr 28px;}
+    .step{min-width:80px; font-size:10.5px;}
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* =========================================================
+   MAPA ŚCIEŻKI — profil edukacyjno-zawodowy
+   Autorskie narzędzie inspirowane ideą platform doradztwa
+   zawodowego typu YouScience / Naviance / Xello, które łączą
+   kilka testów (zainteresowania, umiejętności, styl pracy)
+   w jeden profil pomagający zaplanować profil klasy, kierunek
+   nauki i kierunek zawodowy. Niezależna, uproszczona wersja
+   edukacyjna — nie odtwarza algorytmów ani treści tych platform.
+   ========================================================= */
+
+const SCALE_LABELS = [
+  'Zdecydowanie się nie zgadzam',
+  'Raczej się nie zgadzam',
+  'Trudno powiedzieć',
+  'Raczej się zgadzam',
+  'Zdecydowanie się zgadzam'
+];
+
+/* ---------- MODUŁ 1: ZAINTERESOWANIA (RIASEC) ---------- */
+const RIASEC_DIMS = [
+  {key:'R', name:'Realistyczny'}, {key:'I', name:'Badawczy'}, {key:'A', name:'Artystyczny'},
+  {key:'S', name:'Społeczny'}, {key:'E', name:'Przedsiębiorczy'}, {key:'C', name:'Konwencjonalny'}
+];
+const RIASEC_QUESTIONS = [
+  {dim:'R', text:'Lubię naprawiać, składać albo majsterkować przy różnych urządzeniach.'},
+  {dim:'R', text:'Interesuje mnie, jak działają maszyny, silniki albo instalacje.'},
+  {dim:'I', text:'Lubię szukać odpowiedzi na trudne pytania i rozwiązywać zagadki logiczne.'},
+  {dim:'I', text:'Lubię analizować dane, wyniki eksperymentów albo statystyki.'},
+  {dim:'A', text:'Lubię wyrażać siebie przez sztukę, muzykę, pisanie albo taniec.'},
+  {dim:'A', text:'Łatwo wpadam na nietypowe, niestandardowe pomysły.'},
+  {dim:'S', text:'Lubię pomagać innym rozwiązywać ich problemy.'},
+  {dim:'S', text:'Wolę pracować z ludźmi niż samemu z danymi albo maszynami.'},
+  {dim:'E', text:'Lubię przekonywać innych do swoich pomysłów.'},
+  {dim:'E', text:'Chętnie biorę na siebie rolę lidera w grupowych zadaniach.'},
+  {dim:'C', text:'Lubię, gdy wszystko ma swój porządek i jasno określone zasady.'},
+  {dim:'C', text:'Lubię prowadzić listy, plany, tabelki i zestawienia.'}
+];
+
+const TYPE_INFO = {
+  R: {name:'Realistyczny', emoji:'🔧', tag:'praktyk, który lubi działać rękami',
+    desc:'Dobrze czujesz się w konkretnych, namacalnych zadaniach — naprawianiu, budowaniu, majsterkowaniu.',
+    profile:['Technikum mechatroniczne', 'Technikum elektryczne', 'Technikum informatyczne (sieci, sprzęt)', 'Szkoła branżowa (mechanik, elektryk)'],
+    zawody:['Mechanik', 'Elektryk', 'Technik budownictwa', 'Informatyk sprzętowy', 'Technik lotniczy']},
+  I: {name:'Badawczy', emoji:'🔬', tag:'analityk, który lubi dochodzić do sedna',
+    desc:'Lubisz rozumieć, jak i dlaczego coś działa — analiza i logika to Twój żywioł.',
+    profile:['Liceum profil matematyczno-fizyczny', 'Liceum profil biologiczno-chemiczny', 'Technikum informatyczne (programowanie)'],
+    zawody:['Programista', 'Lekarz', 'Analityk danych', 'Inżynier', 'Naukowiec / badacz']},
+  A: {name:'Artystyczny', emoji:'🎨', tag:'twórca, który potrzebuje przestrzeni na oryginalność',
+    desc:'Cenisz wolność w wyrażaniu siebie i szukanie własnych, niestandardowych rozwiązań.',
+    profile:['Liceum plastyczne', 'Technikum fotograficzne', 'Technikum grafiki i poligrafii', 'Liceum profil humanistyczny ze sztuką'],
+    zawody:['Grafik / projektant', 'Architekt wnętrz', 'Muzyk', 'Pisarz / dziennikarz', 'Projektant gier']},
+  S: {name:'Społeczny', emoji:'🤝', tag:'osoba, dla której liczą się ludzie',
+    desc:'Naturalnie zauważasz potrzeby innych i chętnie pomagasz, uczysz czy wspierasz.',
+    profile:['Liceum profil humanistyczny', 'Technikum usług społecznych', 'Liceum profil pedagogiczny', 'Technikum medyczne'],
+    zawody:['Nauczyciel', 'Psycholog', 'Pielęgniarka / pielęgniarz', 'Pracownik socjalny', 'Trener / coach']},
+  E: {name:'Przedsiębiorczy', emoji:'📈', tag:'lider, który lubi przekonywać i działać',
+    desc:'Masz energię do przewodzenia, negocjowania i realizowania ambitnych celów.',
+    profile:['Liceum profil ekonomiczno-prawny', 'Technikum ekonomiczne', 'Technikum hotelarskie', 'Liceum profil menedżerski'],
+    zawody:['Przedsiębiorca', 'Menedżer', 'Prawnik', 'Specjalista ds. marketingu', 'Handlowiec']},
+  C: {name:'Konwencjonalny', emoji:'📊', tag:'organizator, który lubi porządek i precyzję',
+    desc:'Cenisz jasne zasady, dokładność i dobrze zorganizowaną pracę.',
+    profile:['Technikum ekonomiczne / rachunkowości', 'Technikum logistyczne', 'Liceum profil matematyczno-informatyczny', 'Technikum administracyjne'],
+    zawody:['Księgowy', 'Analityk finansowy', 'Logistyk', 'Specjalista ds. administracji', 'Kontroler jakości']}
+};
+
+/* ---------- MODUŁ 2: UMIEJĘTNOŚCI ---------- */
+const SKILL_DIMS = [
+  {key:'L', name:'Językowe'}, {key:'M', name:'Matematyczno-logiczne'}, {key:'T', name:'Przestrzenno-techniczne'},
+  {key:'I', name:'Interpersonalne'}, {key:'P', name:'Manualne / praktyczne'}, {key:'O', name:'Organizacyjne'}
+];
+const SKILL_QUESTIONS = [
+  {dim:'L', text:'Łatwo przychodzi mi pisanie wypracowań i opowiadanie historii.'},
+  {dim:'L', text:'Mam bogate słownictwo i łatwość w formułowaniu myśli.'},
+  {dim:'M', text:'Zadania z matematyki i logiki zwykle nie sprawiają mi trudności.'},
+  {dim:'M', text:'Łatwo dostrzegam wzory i zależności liczbowe.'},
+  {dim:'T', text:'Bez problemu wyobrażam sobie, jak coś wygląda w przestrzeni, np. z rysunku technicznego.'},
+  {dim:'T', text:'Dobrze radzę sobie ze składaniem, montowaniem albo naprawianiem rzeczy.'},
+  {dim:'I', text:'Łatwo nawiązuję kontakt z nowymi osobami.'},
+  {dim:'I', text:'Inni często proszą mnie o radę w swoich sprawach.'},
+  {dim:'P', text:'Dobrze wychodzą mi prace ręczne — majsterkowanie, gotowanie, prace plastyczne.'},
+  {dim:'P', text:'Wolę uczyć się przez praktykę niż przez samo czytanie teorii.'},
+  {dim:'O', text:'Łatwo przychodzi mi planowanie i organizowanie czasu — swojego i innych.'},
+  {dim:'O', text:'Dobrze radzę sobie z pilnowaniem terminów i szczegółów.'}
+];
+const SKILL_INFO = {
+  L: {emoji:'📝', note:'Świetna baza pod kierunki humanistyczne, prawnicze, dziennikarskie i każdą pracę opartą na komunikacji.'},
+  M: {emoji:'🧮', note:'Mocna strona przy kierunkach ścisłych, informatyce, inżynierii i naukach ekonomicznych.'},
+  T: {emoji:'📐', note:'Przydaje się w zawodach technicznych, architekturze, inżynierii i projektowaniu.'},
+  I: {emoji:'💬', note:'Kluczowa umiejętność w zawodach związanych z ludźmi — od sprzedaży po psychologię.'},
+  P: {emoji:'🛠️', note:'Dobrze rokuje w zawodach rzemieślniczych, technicznych i twórczych opartych na praktyce.'},
+  O: {emoji:'📅', note:'Cenna w zarządzaniu projektami, logistyce, administracji i księgowości.'}
+};
+
+/* ---------- MODUŁ 3: STYL PRACY (pary biegunowe) ---------- */
+const WORKSTYLE_PAIRS = [
+  {key:'team', left:'Praca samodzielna', right:'Praca zespołowa'},
+  {key:'structure', left:'Struktura i plan', right:'Elastyczność i improwizacja'},
+  {key:'risk', left:'Ostrożność', right:'Skłonność do ryzyka'},
+  {key:'pace', left:'Dokładność i namysł', right:'Szybkie działanie'},
+  {key:'variety', left:'Stałość i rutyna', right:'Zmienność i różnorodność'}
+];
+const WORKSTYLE_QUESTIONS = [
+  {dim:'team', reverse:false, text:'Wolę wspólnie z innymi rozwiązywać problem niż robić to sam/sama.'},
+  {dim:'team', reverse:true, text:'Najlepiej pracuje mi się, gdy mogę działać w swoim tempie, bez ciągłych uzgodnień z innymi.'},
+  {dim:'structure', reverse:true, text:'Wolę mieć dokładny plan działania, zanim zacznę zadanie.'},
+  {dim:'structure', reverse:false, text:'Dobrze radzę sobie, gdy plany zmieniają się w ostatniej chwili.'},
+  {dim:'risk', reverse:true, text:'Wolę pewne rozwiązanie od niepewnego, nawet jeśli to drugie mogłoby dać więcej.'},
+  {dim:'risk', reverse:false, text:'Chętnie próbuję czegoś nowego, nawet jeśli mogę ponieść porażkę.'},
+  {dim:'pace', reverse:true, text:'Wolę dobrze przemyśleć odpowiedź, nawet jeśli zajmie to więcej czasu.'},
+  {dim:'pace', reverse:false, text:'Wolę szybko zacząć działać i poprawiać po drodze, niż długo planować.'},
+  {dim:'variety', reverse:true, text:'Lubię, gdy mój dzień wygląda podobnie i jest przewidywalny.'},
+  {dim:'variety', reverse:false, text:'Szybko się nudzę, gdy codziennie robię to samo.'}
+];
+const WORKSTYLE_TIPS = {
+  team: {
+    low: 'Wolisz pracę samodzielną — szukaj zawodów i klas, gdzie dużą część zadań robi się indywidualnie (np. analiza, programowanie, twórczość własna).',
+    high: 'Wolisz pracę zespołową — zwróć uwagę na kierunki i zawody z dużą ilością projektów grupowych, np. zarządzanie, praca społeczna, organizacja wydarzeń.'
+  },
+  structure: {
+    low: 'Lubisz jasną strukturę i plan — dobrze poczujesz się w zawodach o przewidywalnych procedurach (np. księgowość, administracja, inżynieria procesowa).',
+    high: 'Dobrze radzisz sobie w zmiennych warunkach — sprawdzą się zawody, gdzie każdy dzień wygląda inaczej (np. dziennikarstwo, ratownictwo, projektowanie).'
+  },
+  risk: {
+    low: 'Cenisz stabilność i pewność — warto szukać zawodów o jasnej ścieżce rozwoju i przewidywalnych zasadach.',
+    high: 'Nie boisz się ryzyka — może Cię pociągać przedsiębiorczość, praca projektowa albo zawody z elementem rywalizacji.'
+  },
+  pace: {
+    low: 'Wolisz dokładność od pośpiechu — sprawdzisz się w zadaniach wymagających precyzji, np. analiza, badania, korekta, projektowanie techniczne.',
+    high: 'Działasz szybko i uczysz się w praktyce — dobrze poczujesz się tam, gdzie liczy się tempo reakcji, np. obsługa klienta, sprzedaż, sytuacje kryzysowe.'
+  },
+  variety: {
+    low: 'Cenisz stałość i rutynę — komfortowo poczujesz się w zawodach o powtarzalnej, przewidywalnej strukturze dnia.',
+    high: 'Potrzebujesz różnorodności — unikaj zawodów opartych wyłącznie na jednej, powtarzalnej czynności; szukaj pracy z wieloma rodzajami zadań.'
+  }
+};
+
+/* ---------- SILNIK ---------- */
+const MODULES = [
+  {id:'riasec', title:'Zainteresowania', icon:'🧭', questions: RIASEC_QUESTIONS},
+  {id:'skills', title:'Umiejętności', icon:'💡', questions: SKILL_QUESTIONS},
+  {id:'workstyle', title:'Styl pracy', icon:'⚙️', questions: WORKSTYLE_QUESTIONS}
+];
+MODULES.forEach(m => m.answers = new Array(m.questions.length).fill(null));
+
+let stage = 0; // 0 = intro, 1..3 = moduły, 4 = dashboard
+let qIndex = 0;
+
+const app = document.getElementById('app');
+
+function stepperHtml(){
+  const labels = ['Start', ...MODULES.map(m=>m.title), 'Wyniki'];
+  return `<div class="stepper">` + labels.map((l,i)=>{
+    let cls = '';
+    if(i===stage) cls='active';
+    else if(i<stage) cls='done';
+    return `<div class="step ${cls}"><span class="dot"></span>${l}</div>`;
+  }).join('') + `</div>`;
+}
+
+function render(){
+  if(stage===0) renderIntro();
+  else if(stage>=1 && stage<=3) renderQuiz(MODULES[stage-1]);
+  else renderDashboard();
+}
+
+function renderIntro(){
+  app.innerHTML = `
+    <div class="card intro">
+      ${stepperHtml()}
+      <div class="eyebrow">Profil edukacyjno-zawodowy</div>
+      <h1>Mapa Ścieżki</h1>
+      <p class="lede">Trzy krótkie moduły pomogą Ci zbudować pełniejszy obraz siebie przed wyborem szkoły ponadpodstawowej — podobnie jak robią to szkolne platformy doradztwa zawodowego w rodzaju YouScience, Naviance czy Xello.</p>
+      <div class="module-preview">
+        <div class="mp-row"><div class="mp-icon">🧭</div><div><h4>1. Zainteresowania (RIASEC)</h4><p>Co Cię naprawdę ciekawi — praca z ludźmi, danymi, ideami czy rzeczami.</p></div></div>
+        <div class="mp-row"><div class="mp-icon">💡</div><div><h4>2. Umiejętności</h4><p>W czym już teraz jesteś mocny/mocna — językowo, logicznie, manualnie, organizacyjnie.</p></div></div>
+        <div class="mp-row"><div class="mp-icon">⚙️</div><div><h4>3. Styl pracy</h4><p>Jak lubisz działać — samodzielnie czy w grupie, według planu czy na żywioł.</p></div></div>
+      </div>
+      <div class="info-box">
+        To autorskie narzędzie edukacyjne inspirowane ideą platform typu YouScience / Naviance / Xello, ale niezależne od nich i nieodtwarzające ich testów ani algorytmów. Wynik traktuj jako materiał do rozmowy z doradcą zawodowym w szkole, a nie ostateczną decyzję.
+      </div>
+      <div class="btn-row"><button class="btn" onclick="startModules()">Zaczynamy →</button></div>
+    </div>
+  `;
+}
+
+function startModules(){ stage=1; qIndex=0; render(); }
+
+function renderQuiz(mod){
+  const q = mod.questions[qIndex];
+  const dimLabel = (mod.id==='riasec') ? RIASEC_DIMS.find(d=>d.key===q.dim).name
+                  : (mod.id==='skills') ? SKILL_DIMS.find(d=>d.key===q.dim).name
+                  : WORKSTYLE_PAIRS.find(p=>p.key===q.dim).left + ' ↔ ' + WORKSTYLE_PAIRS.find(p=>p.key===q.dim).right;
+  const pct = Math.round((qIndex)/mod.questions.length*100);
+  const selected = mod.answers[qIndex];
+
+  let optsHtml = SCALE_LABELS.map((label,i)=>{
+    const val=i+1;
+    const isSel = selected===val;
+    return `
+      <label class="opt ${isSel?'selected':''}" onclick="selectAnswer(${val})">
+        <input type="radio" name="q" ${isSel?'checked':''} readonly />
+        <span>${label}</span>
+      </label>
+    `;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="card">
+      ${stepperHtml()}
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-label">${qIndex+1} / ${mod.questions.length}</div>
+      </div>
+      <div class="q-dim">${mod.icon} ${dimLabel}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="scale">${optsHtml}</div>
+      <div class="nav-row">
+        <button class="btn ghost" onclick="prevQ()" ${(stage===1 && qIndex===0)?'disabled style="opacity:0.35;cursor:default;"':''}>← Wstecz</button>
+        <button class="btn" onclick="nextQ()" ${selected===null?'disabled style="opacity:0.4;cursor:default;"':''}>${(stage===3 && qIndex===mod.questions.length-1)?'Zobacz wyniki':'Dalej →'}</button>
+      </div>
+    </div>
+  `;
+}
+
+function selectAnswer(val){ MODULES[stage-1].answers[qIndex]=val; render(); }
+
+function prevQ(){
+  if(qIndex>0){ qIndex--; render(); }
+  else if(stage>1){ stage--; qIndex=MODULES[stage-1].questions.length-1; render(); }
+}
+
+function nextQ(){
+  const mod = MODULES[stage-1];
+  if(mod.answers[qIndex]===null) return;
+  if(qIndex < mod.questions.length-1){ qIndex++; render(); }
+  else if(stage < 3){ stage++; qIndex=0; render(); }
+  else { stage=4; render(); }
+}
+
+/* ---------- SCORING ---------- */
+function computeRiasec(){
+  const sums={R:0,I:0,A:0,S:0,E:0,C:0}, counts={R:0,I:0,A:0,S:0,E:0,C:0};
+  RIASEC_QUESTIONS.forEach((q,i)=>{ sums[q.dim]+=MODULES[0].answers[i]; counts[q.dim]+=1; });
+  const vec={};
+  RIASEC_DIMS.forEach(d=>{ const avg=sums[d.key]/counts[d.key]; vec[d.key]=((avg-1)/4)*10; });
+  return vec;
+}
+function computeSkills(){
+  const sums={L:0,M:0,T:0,I:0,P:0,O:0}, counts={L:0,M:0,T:0,I:0,P:0,O:0};
+  SKILL_QUESTIONS.forEach((q,i)=>{ sums[q.dim]+=MODULES[1].answers[i]; counts[q.dim]+=1; });
+  const vec={};
+  SKILL_DIMS.forEach(d=>{ const avg=sums[d.key]/counts[d.key]; vec[d.key]=((avg-1)/4)*10; });
+  return vec;
+}
+function computeWorkstyle(){
+  const sums={}, counts={};
+  WORKSTYLE_PAIRS.forEach(p=>{ sums[p.key]=0; counts[p.key]=0; });
+  WORKSTYLE_QUESTIONS.forEach((q,i)=>{
+    const raw = MODULES[2].answers[i];
+    const contribution = q.reverse ? (6-raw) : raw;
+    sums[q.dim]+=contribution; counts[q.dim]+=1;
+  });
+  const vec={};
+  WORKSTYLE_PAIRS.forEach(p=>{ const avg=sums[p.key]/counts[p.key]; vec[p.key]=((avg-1)/4)*10; });
+  return vec;
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const riasecVec = computeRiasec();
+  const skillVec = computeSkills();
+  const workVec = computeWorkstyle();
+
+  const riasecRanked = RIASEC_DIMS.map(d=>({key:d.key,name:d.name,val:riasecVec[d.key]})).sort((a,b)=>b.val-a.val);
+  const skillRanked = SKILL_DIMS.map(d=>({key:d.key,name:d.name,val:skillVec[d.key]})).sort((a,b)=>b.val-a.val);
+  const topType = riasecRanked[0];
+  const topTypeInfo = TYPE_INFO[topType.key];
+  const code = riasecRanked.slice(0,3).map(t=>t.key).join('');
+  const topSkills = skillRanked.slice(0,2);
+
+  const skillBars = skillRanked.map(s=>{
+    const pct=(s.val/10*100).toFixed(0);
+    return `<div class="bar-row"><div class="b-name">${SKILL_INFO[s.key].emoji} ${s.name}</div><div class="bar-track"><div class="bar-fill teal" style="width:${pct}%"></div></div><div class="bar-val">${s.val.toFixed(1)}</div></div>`;
+  }).join('');
+
+  const riasecBars = riasecRanked.map(r=>{
+    const pct=(r.val/10*100).toFixed(0);
+    return `<div class="bar-row"><div class="b-name">${r.name}</div><div class="bar-track"><div class="bar-fill violet" style="width:${pct}%"></div></div><div class="bar-val">${r.val.toFixed(1)}</div></div>`;
+  }).join('');
+
+  const pairsHtml = WORKSTYLE_PAIRS.map(p=>{
+    const v = workVec[p.key];
+    const pct = (v/10*100);
+    const leaning = v<5 ? 'left' : 'right';
+    return `
+      <div class="pair-row">
+        <div class="pair-labels"><span class="${leaning==='left'?'hi':''}">${p.left}</span><span class="${leaning==='right'?'hi':''}">${p.right}</span></div>
+        <div class="pair-track">
+          <div class="pair-dot" style="left:${pct}%; top:50%;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const tipsHtml = WORKSTYLE_PAIRS.map(p=>{
+    const v = workVec[p.key];
+    const side = v<5 ? 'low' : 'high';
+    return `<div class="tip"><span class="ic">💡</span><span>${WORKSTYLE_TIPS[p.key][side]}</span></div>`;
+  }).join('');
+
+  const profileTags = topTypeInfo.profile.map(x=>`<span class="tag">${x}</span>`).join('');
+  const zawodyTags = topTypeInfo.zawody.map(x=>`<span class="tag alt">${x}</span>`).join('');
+  const skillNoteHtml = topSkills.map(s=>`<p><b>${SKILL_INFO[s.key].emoji} ${s.name}:</b> ${SKILL_INFO[s.key].note}</p>`).join('');
+
+  app.innerHTML = `
+    <div class="card">
+      ${stepperHtml()}
+      <div class="eyebrow">Twój profil</div>
+      <h1 style="font-size:28px; margin-bottom:6px;">Mapa Ścieżki — podsumowanie</h1>
+      <p style="font-size:14px; opacity:0.75; margin-bottom:6px;">Kod zainteresowań: <span class="result-code">${code}</span></p>
+
+      <div class="dash-section">
+        <div class="section-title">🧭 Zainteresowania</div>
+        <div class="compass" id="compass"></div>
+        <div class="badge-row">
+          <div class="badge-name">${topTypeInfo.emoji} ${topTypeInfo.name}</div>
+          <div class="badge-tag">${topTypeInfo.tag}</div>
+        </div>
+        <p>${topTypeInfo.desc}</p>
+        <div class="bar-list" style="margin-top:14px;">${riasecBars}</div>
+      </div>
+
+      <div class="dash-section">
+        <div class="section-title">💡 Umiejętności</div>
+        <div class="bar-list">${skillBars}</div>
+        <div style="margin-top:12px; font-size:14px;">${skillNoteHtml}</div>
+      </div>
+
+      <div class="dash-section">
+        <div class="section-title">⚙️ Styl pracy</div>
+        ${pairsHtml}
+      </div>
+
+      <div class="dash-section">
+        <div class="section-title">🎯 Rekomendacje</div>
+        <div class="type-card">
+          <h4>Pasujące profile / szkoły</h4>
+          <div class="tag-list">${profileTags}</div>
+          <h4 style="margin-top:14px;">Przykładowe zawody</h4>
+          <div class="tag-list">${zawodyTags}</div>
+        </div>
+        <div class="tip-list">${tipsHtml}</div>
+      </div>
+
+      <div class="btn-row"><button class="btn ghost" onclick="restart()">↺ Zrób test ponownie</button></div>
+      <footer>Mapa Ścieżki — narzędzie autorskie inspirowane ideą platform YouScience / Naviance / Xello, ale z nimi niezwiązane. Skonsultuj wynik z doradcą zawodowym w szkole.</footer>
+    </div>
+  `;
+
+  drawCompass('compass', riasecVec);
+}
+
+function restart(){
+  MODULES.forEach(m => m.answers = new Array(m.questions.length).fill(null));
+  stage=0; qIndex=0; render();
+}
+
+function drawCompass(containerId, vec){
+  const size=280, cx=size/2, cy=size/2, maxR=98;
+  const n=RIASEC_DIMS.length;
+  const angleFor = i => (Math.PI*2*i/n) - Math.PI/2;
+  function pt(i,r){ const a=angleFor(i); return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; }
+
+  let gridHtml='';
+  [0.25,0.5,0.75,1].forEach(frac=>{
+    const pts = RIASEC_DIMS.map((d,i)=>pt(i,maxR*frac).join(',')).join(' ');
+    gridHtml += `<polygon points="${pts}" fill="none" stroke="rgba(234,241,245,0.14)" stroke-width="1"/>`;
+  });
+
+  let axesHtml='';
+  RIASEC_DIMS.forEach((d,i)=>{
+    const [x,y]=pt(i,maxR);
+    axesHtml += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(234,241,245,0.14)" stroke-width="1"/>`;
+    const [lx,ly]=pt(i,maxR+22);
+    axesHtml += `<text x="${lx}" y="${ly}" fill="#8fa3b5" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="middle">${d.key}</text>`;
+  });
+
+  const dataPts = RIASEC_DIMS.map((d,i)=>pt(i,(vec[d.key]/10)*maxR).join(',')).join(' ');
+
+  const svg = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      ${gridHtml}
+      ${axesHtml}
+      <polygon points="${dataPts}" fill="rgba(255,107,94,0.25)" stroke="#ff6b5e" stroke-width="2"/>
+      ${RIASEC_DIMS.map((d,i)=>{
+        const r=(vec[d.key]/10)*maxR;
+        const [x,y]=pt(i,r);
+        return `<circle cx="${x}" cy="${y}" r="3.5" fill="#ffc857"/>`;
+      }).join('')}
+    </svg>
+  `;
+  document.getElementById(containerId).innerHTML = svg;
+}
+
+render();
+</script>
+</body>
+</html>
