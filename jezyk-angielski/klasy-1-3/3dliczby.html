@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="pl"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Generator Światów VR — Nauka przez Spacer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c1a1f;
+    --panel:#132c33;
+    --panel2:#16343c;
+    --parchment:#e9e0c8;
+    --brass:#c9a227;
+    --brass-dim:#9c7f22;
+    --sage:#6e9b85;
+    --text:#ede6d6;
+    --text-muted:#9fb3ae;
+    --danger:#c96a4a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--ink);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;}
+  ::selection{background:var(--brass);color:var(--ink);}
+
+  /* ===== EKRAN USTAWIEŃ ===== */
+  #setup-screen{display:none!important;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:48px 20px 80px;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(110,155,133,0.10), transparent 45%),
+      radial-gradient(circle at 85% 90%, rgba(201,162,39,0.08), transparent 45%),
+      var(--ink);
+  }
+  #setup-inner{width:100%;max-width:920px;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Spectral',serif;
+    font-weight:600;
+    font-size:clamp(28px,5vw,44px);
+    line-height:1.1;
+    margin:0 0 10px;
+    color:var(--text);
+  }
+  h1 em{font-style:italic;color:var(--sage);}
+  .subtitle{color:var(--text-muted);font-size:15px;max-width:560px;line-height:1.55;margin-bottom:36px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid rgba(233,224,200,0.10);
+    border-radius:4px;
+    padding:26px;
+    margin-bottom:22px;
+  }
+  .card-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--sage);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card-label::before{content:'';width:16px;height:1px;background:var(--brass);}
+
+  textarea{
+    width:100%;
+    min-height:190px;
+    background:var(--ink);
+    border:1px solid rgba(233,224,200,0.14);
+    border-radius:3px;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    padding:16px;
+    resize:vertical;
+  }
+  textarea:focus{outline:none;border-color:var(--brass-dim);}
+  textarea::placeholder{color:#5d726d;}
+
+  .stats-row{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-top:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--text-muted);
+  }
+  .stats-row b{color:var(--brass);font-weight:500;}
+
+  /* siatka motywów */
+  .theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+  .theme-card{
+    background:var(--ink);
+    border:1px solid rgba(233,224,200,0.12);
+    border-radius:3px;
+    padding:14px 12px;
+    cursor:pointer;
+    text-align:left;
+    transition:border-color .15s, transform .15s;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+  }
+  .theme-card:hover{border-color:var(--sage);}
+  .theme-card.selected{border-color:var(--brass);background:rgba(201,162,39,0.08);}
+  .theme-emoji{font-size:22px;margin-bottom:8px;display:block;}
+  .theme-name{font-size:13px;font-weight:500;}
+  .theme-swatch{display:flex;gap:3px;margin-top:8px;}
+  .theme-swatch span{width:14px;height:6px;border-radius:1px;display:block;}
+
+  .wordset-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .wordset-btn{
+    background:var(--ink);
+    border:1px solid rgba(233,224,200,0.16);
+    color:var(--text);
+    padding:8px 14px;
+    border-radius:20px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .wordset-btn:hover{border-color:var(--brass);color:var(--brass);}
+
+  .split-btn{
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid rgba(233,224,200,0.16);
+    padding:11px 18px;
+    border-radius:3px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    margin-top:6px;
+  }
+  .split-btn:hover{border-color:var(--brass);color:var(--brass);}
+
+  .station-edit-card{
+    background:var(--ink);
+    border:1px solid rgba(233,224,200,0.12);
+    border-radius:3px;
+    padding:16px;
+    margin-bottom:12px;
+  }
+  .station-edit-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .station-edit-num{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:var(--sage);text-transform:uppercase;}
+  .station-edit-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;}
+  .station-field-label{font-size:11px;color:var(--text-muted);margin:8px 0 4px;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;text-transform:uppercase;}
+  .station-input, .station-textarea{
+    width:100%;background:var(--panel);border:1px solid rgba(233,224,200,0.14);border-radius:3px;
+    color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:9px 11px;
+  }
+  .station-textarea{min-height:56px;resize:vertical;}
+  .station-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .station-mini-btn{
+    background:none;border:1px solid rgba(233,224,200,0.16);color:var(--text-muted);
+    padding:6px 12px;border-radius:14px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .station-mini-btn:hover{border-color:var(--brass);color:var(--brass);}
+  .word-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:8px;align-items:center;}
+  .word-grid input{background:var(--panel);border:1px solid rgba(233,224,200,0.14);border-radius:3px;color:var(--text);font-size:13px;padding:6px 8px;}
+  .word-grid .word-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;}
+  .empty-hint{color:var(--text-muted);font-size:13px;padding:10px 0;}
+
+  .image-lib-strip{display:flex;flex-wrap:wrap;gap:8px;}
+  .lib-thumb-img{
+    width:56px;height:56px;object-fit:cover;border-radius:3px;cursor:pointer;
+    border:2px solid rgba(233,224,200,0.16);display:block;
+  }
+  .lib-thumb-img:hover{border-color:var(--brass);}
+  .image-picker-popup{
+    position:absolute;z-index:500;max-width:260px;
+    background:var(--panel2);border:1px solid rgba(233,224,200,0.2);border-radius:4px;
+    padding:10px;display:flex;flex-wrap:wrap;gap:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  .slider-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .slider-row span{font-size:12px;color:var(--text-muted);white-space:nowrap;}
+  .slider-row input[type="range"]{flex:1;accent-color:var(--brass);}
+
+  .segmented{display:flex;gap:8px;}
+  .seg-btn{
+    flex:1;
+    background:var(--ink);
+    border:1px solid rgba(233,224,200,0.14);
+    color:var(--text-muted);
+    padding:12px;
+    border-radius:3px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    text-align:center;
+  }
+  .seg-btn.selected{border-color:var(--brass);color:var(--brass);background:rgba(201,162,39,0.06);}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid rgba(233,224,200,0.08);}
+  .toggle-row:first-child{border-top:none;padding-top:0;}
+  .toggle-row .t-label{font-size:14px;}
+  .toggle-row .t-desc{font-size:12px;color:var(--text-muted);margin-top:2px;}
+  .switch{position:relative;width:42px;height:24px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider-tog{position:absolute;cursor:pointer;inset:0;background:#2a4249;border-radius:24px;transition:.15s;}
+  .slider-tog::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--text-muted);border-radius:50%;transition:.15s;}
+  input:checked + .slider-tog{background:var(--sage);}
+  input:checked + .slider-tog::before{transform:translateX(18px);background:var(--ink);}
+
+  /* mapa trasy - element sygnaturowy */
+  #route-map-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+  #route-svg{width:220px;height:220px;flex-shrink:0;}
+  #route-caption{font-size:13px;color:var(--text-muted);line-height:1.6;flex:1;min-width:200px;}
+  #route-caption b{color:var(--parchment);}
+
+  .generate-btn{
+    width:100%;
+    background:var(--brass);
+    color:var(--ink);
+    border:none;
+    padding:18px;
+    border-radius:3px;
+    font-family:'Spectral',serif;
+    font-weight:600;
+    font-size:18px;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+  }
+  .generate-btn:hover{background:#ddb641;}
+  .generate-btn:active{transform:scale(0.99);}
+  .generate-btn:disabled{background:#4a4534;color:#8a8467;cursor:not-allowed;}
+  .hint-error{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;}
+
+  /* ===== KONTENER VR ===== */
+  #vr-container{visibility:hidden;pointer-events:none;position:fixed;inset:0;background:#000;z-index:30;}
+  #vr-container.visible{visibility:visible;pointer-events:auto;}
+  #vr-container a-scene{width:100%;height:100%;}
+  #loading-overlay{
+    position:fixed;inset:0;background:var(--ink);z-index:50;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  }
+  #loading-overlay .spin{width:34px;height:34px;border:2px solid rgba(233,224,200,0.15);border-top-color:var(--brass);border-radius:50%;animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #loading-overlay p{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;}
+
+  #exit-btn-2d{
+    position:fixed;top:16px;left:16px;z-index:40;
+    background:rgba(12,26,31,0.85);color:var(--text);
+    border:1px solid rgba(233,224,200,0.2);
+    padding:10px 16px;border-radius:3px;font-family:'Inter',sans-serif;font-size:13px;
+    cursor:pointer;backdrop-filter:blur(4px);
+  }
+  #enter-stereo-btn{
+    position:fixed;top:16px;right:16px;z-index:40;
+    background:var(--brass);color:var(--ink);
+    border:none;
+    padding:10px 18px;border-radius:3px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+    cursor:pointer;
+  }
+  #debug-panel{
+    display:none;
+    position:fixed;left:0;right:0;bottom:0;z-index:200;
+    max-height:38vh;overflow-y:auto;
+    background:rgba(0,0,0,0.88);color:#7fffb0;
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.5;
+    padding:8px 10px;white-space:pre-wrap;word-break:break-word;
+    border-top:1px solid rgba(127,255,176,0.3);
+  }
+  #debug-panel.visible{display:block;}
+  #debug-panel .err{color:#ff8a80;}
+  #debug-panel .warn{color:#ffd76e;}
+  #debug-panel .ok{color:#7fffb0;}
+
+  footer{text-align:center;color:var(--text-muted);font-size:12px;margin-top:30px;font-family:'JetBrains Mono',monospace;}
+
+  @media(max-width:600px){
+    #route-map-wrap{flex-direction:column;}
+  }
+</style>
+
+  <meta aframe-injected="" name="mobile-web-app-capable" content="yes"><meta aframe-injected="" name="theme-color" content="black"><script src="https://aframe.io/releases/1.7.1/aframe.min.js" crossorigin="anonymous"></script><style>/* .a-fullscreen means not embedded. */
+html.a-fullscreen {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+html.a-fullscreen body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  width: 100%;
+}
+
+/* Class is removed when doing <a-scene embedded>. */
+html.a-fullscreen .a-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  position: fixed !important;
+}
+
+html:not(.a-fullscreen) .a-enter-vr,
+html:not(.a-fullscreen) .a-enter-ar {
+  right: 5px;
+  bottom: 5px;
+}
+
+html:not(.a-fullscreen) .a-enter-ar {
+  right: 60px;
+}
+
+/* In chrome mobile the user agent stylesheet set it to white  */
+:-webkit-full-screen {
+  background-color: transparent;
+}
+
+.a-hidden {
+  display: none !important;
+}
+
+.a-canvas {
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.a-canvas.a-grab-cursor:hover {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+canvas.a-canvas.a-mouse-cursor-hover:hover {
+  cursor: pointer;
+}
+
+.a-inspector-loader {
+  background-color: #ed3160;
+  position: fixed;
+  left: 3px;
+  top: 3px;
+  padding: 6px 10px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-family: Roboto,sans-serif;
+  text-align: center;
+  z-index: 99999;
+  width: 204px;
+}
+
+/* Inspector loader animation */
+@keyframes dots-1 { from { opacity: 0; } 25% { opacity: 1; } }
+@keyframes dots-2 { from { opacity: 0; } 50% { opacity: 1; } }
+@keyframes dots-3 { from { opacity: 0; } 75% { opacity: 1; } }
+@-webkit-keyframes dots-1 { from { opacity: 0; } 25% { opacity: 1; } }
+@-webkit-keyframes dots-2 { from { opacity: 0; } 50% { opacity: 1; } }
+@-webkit-keyframes dots-3 { from { opacity: 0; } 75% { opacity: 1; } }
+
+.a-inspector-loader .dots span {
+  animation: dots-1 2s infinite steps(1);
+  -webkit-animation: dots-1 2s infinite steps(1);
+}
+
+.a-inspector-loader .dots span:first-child + span {
+  animation-name: dots-2;
+  -webkit-animation-name: dots-2;
+}
+
+.a-inspector-loader .dots span:first-child + span + span {
+  animation-name: dots-3;
+  -webkit-animation-name: dots-3;
+}
+
+a-scene {
+  display: block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+a-assets,
+a-scene video,
+a-scene img,
+a-scene audio {
+  display: none;
+}
+
+.a-enter-vr-modal,
+.a-orientation-modal {
+  font-family: Consolas, Andale Mono, Courier New, monospace;
+}
+
+.a-enter-vr-modal a {
+  border-bottom: 1px solid #fff;
+  padding: 2px 0;
+  text-decoration: none;
+  transition: .1s color ease-in;
+}
+
+.a-enter-vr-modal a:hover {
+  background-color: #fff;
+  color: #111;
+  padding: 2px 4px;
+  position: relative;
+  left: -4px;
+}
+
+.a-enter-vr,
+.a-enter-ar {
+  font-family: sans-serif, monospace;
+  font-size: 13px;
+  width: 100%;
+  font-weight: 200;
+  line-height: 16px;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+}
+
+.a-enter-ar.xr {
+  right: 90px;
+}
+
+.a-enter-vr-button,
+.a-enter-vr-modal,
+.a-enter-vr-modal a {
+  color: #fff;
+  user-select: none;
+  outline: none;
+}
+
+.a-enter-vr-button {
+  background: rgba(0, 0, 0, 0.35) url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27108%27 height=%2762%27 viewBox=%270 0 108 62%27%3E%3Ctitle%3Eaframe-vrmode-noborder-reduced-tracking%3C/title%3E%3Cpath d=%27M68.81,21.56H64.23v8.27h4.58a4.13,4.13,0,0,0,3.1-1.09,4.2,4.2,0,0,0,1-3,4.24,4.24,0,0,0-1-3A4.05,4.05,0,0,0,68.81,21.56Z%27 fill=%27%23fff%27/%3E%3Cpath d=%27M96,0H12A12,12,0,0,0,0,12V50A12,12,0,0,0,12,62H96a12,12,0,0,0,12-12V12A12,12,0,0,0,96,0ZM41.9,46H34L24,16h8l6,21.84,6-21.84H52Zm39.29,0H73.44L68.15,35.39H64.23V46H57V16H68.81q5.32,0,8.34,2.37a8,8,0,0,1,3,6.69,9.68,9.68,0,0,1-1.27,5.18,8.9,8.9,0,0,1-4,3.34l6.26,12.11Z%27 fill=%27%23fff%27/%3E%3C/svg%3E") 50% 50% no-repeat;
+}
+
+.a-enter-ar-button {
+  background: rgba(0, 0, 0, 0.20) url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27108%27 height=%2762%27 viewBox=%270 0 108 62%27%3E%3Ctitle%3Eaframe-armode-noborder-reduced-tracking%3C/title%3E%3Cpath d=%27M96,0H12A12,12,0,0,0,0,12V50A12,12,0,0,0,12,62H96a12,12,0,0,0,12-12V12A12,12,0,0,0,96,0Zm8,50a8,8,0,0,1-8,8H12a8,8,0,0,1-8-8V12a8,8,0,0,1,8-8H96a8,8,0,0,1,8,8Z%27 fill=%27%23fff%27/%3E%3Cpath d=%27M43.35,39.82H32.51L30.45,46H23.88L35,16h5.73L52,46H45.43Zm-9.17-5h7.5L37.91,23.58Z%27 fill=%27%23fff%27/%3E%3Cpath d=%27M68.11,35H63.18V46H57V16H68.15q5.31,0,8.2,2.37a8.18,8.18,0,0,1,2.88,6.7,9.22,9.22,0,0,1-1.33,5.12,9.09,9.09,0,0,1-4,3.26l6.49,12.26V46H73.73Zm-4.93-5h5a5.09,5.09,0,0,0,3.6-1.18,4.21,4.21,0,0,0,1.28-3.27,4.56,4.56,0,0,0-1.2-3.34A5,5,0,0,0,68.15,21h-5Z%27 fill=%27%23fff%27/%3E%3C/svg%3E") 50% 50% no-repeat;
+}
+
+.a-enter-vr.fullscreen .a-enter-vr-button {
+  background-image: url("data:image/svg+xml,%3C%3Fxml version=%271.0%27 encoding=%27UTF-8%27 standalone=%27no%27%3F%3E%3Csvg width=%27108%27 height=%2762%27 viewBox=%270 0 108 62%27 version=%271.1%27 id=%27svg320%27 sodipodi:docname=%27fullscreen-aframe.svg%27 xml:space=%27preserve%27 inkscape:version=%271.2.1 %289c6d41e  2022-07-14%29%27 xmlns:inkscape=%27http://www.inkscape.org/namespaces/inkscape%27 xmlns:sodipodi=%27http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd%27 xmlns=%27http://www.w3.org/2000/svg%27 xmlns:svg=%27http://www.w3.org/2000/svg%27 xmlns:rdf=%27http://www.w3.org/1999/02/22-rdf-syntax-ns%23%27 xmlns:cc=%27http://creativecommons.org/ns%23%27 xmlns:dc=%27http://purl.org/dc/elements/1.1/%27%3E%3Cdefs id=%27defs324%27 /%3E%3Csodipodi:namedview id=%27namedview322%27 pagecolor=%27%23ffffff%27 bordercolor=%27%23000000%27 borderopacity=%270.25%27 inkscape:showpageshadow=%272%27 inkscape:pageopacity=%270.0%27 inkscape:pagecheckerboard=%270%27 inkscape:deskcolor=%27%23d1d1d1%27 showgrid=%27false%27 inkscape:zoom=%273.8064516%27 inkscape:cx=%2791.423729%27 inkscape:cy=%27-1.4449153%27 inkscape:window-width=%271440%27 inkscape:window-height=%27847%27 inkscape:window-x=%2732%27 inkscape:window-y=%2725%27 inkscape:window-maximized=%270%27 inkscape:current-layer=%27svg320%27 /%3E%3Ctitle id=%27title312%27%3Eaframe-armode-noborder-reduced-tracking%3C/title%3E%3Cpath d=%27M96 0H12A12 12 0 0 0 0 12V50A12 12 0 0 0 12 62H96a12 12 0 0 0 12-12V12A12 12 0 0 0 96 0Zm8 50a8 8 0 0 1-8 8H12a8 8 0 0 1-8-8V12a8 8 0 0 1 8-8H96a8 8 0 0 1 8 8Z%27 fill=%27%23fff%27 id=%27path314%27 style=%27fill:%23ffffff%27 /%3E%3Cg id=%27g356%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g358%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g360%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g362%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g364%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g366%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g368%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g370%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g372%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g374%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g376%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g378%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g380%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g382%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cg id=%27g384%27 transform=%27translate%28-206.61017 -232.61864%29%27%3E%3C/g%3E%3Cmetadata id=%27metadata561%27%3E%3Crdf:RDF%3E%3Ccc:Work rdf:about=%27%27%3E%3Cdc:title%3Eaframe-armode-noborder-reduced-tracking%3C/dc:title%3E%3C/cc:Work%3E%3C/rdf:RDF%3E%3C/metadata%3E%3Cpath d=%27m 98.168511 40.083649 c 0 -1.303681 -0.998788 -2.358041 -2.239389 -2.358041 -1.230088 0.0031 -2.240892 1.05436 -2.240892 2.358041 v 4.881296 l -9.041661 -9.041662 c -0.874129 -0.875631 -2.288954 -0.875631 -3.16308 0 -0.874129 0.874126 -0.874129 2.293459 0 3.167585 l 8.995101 8.992101 h -4.858767 c -1.323206 0.0031 -2.389583 1.004796 -2.389583 2.239386 0 1.237598 1.066377 2.237888 2.389583 2.237888 h 10.154599 c 1.323206 0 2.388082 -0.998789 2.392587 -2.237888 -0.0044 -0.03305 -0.009 -0.05858 -0.0134 -0.09161 0.0046 -0.04207 0.0134 -0.08712 0.0134 -0.13066 V 40.085172 h -1.52e-4%27 id=%27path596%27 style=%27fill:%23ffffff%3Bstroke-width:1.50194%27 /%3E%3Cpath d=%27m 23.091002 35.921781 -9.026643 9.041662 v -4.881296 c 0 -1.303681 -1.009302 -2.355037 -2.242393 -2.358041 -1.237598 0 -2.237888 1.05436 -2.237888 2.358041 l -0.0031 10.016421 c 0 0.04356 0.01211 0.08862 0.0015 0.130659 -0.0031 0.03153 -0.009 0.05709 -0.01211 0.09161 0.0031 1.239099 1.069379 2.237888 2.391085 2.237888 h 10.156101 c 1.320202 0 2.388079 -1.000291 2.388079 -2.237888 0 -1.234591 -1.067877 -2.236383 -2.388079 -2.239387 h -4.858767 l 8.995101 -8.9921 c 0.871126 -0.874127 0.871126 -2.293459 0 -3.167586 -0.875628 -0.877132 -2.291957 -0.877132 -3.169087 -1.52e-4%27 id=%27path598%27 style=%27fill:%23ffffff%3Bstroke-width:1.50194%27 /%3E%3Cpath d=%27m 84.649572 25.978033 9.041662 -9.041664 v 4.881298 c 0 1.299176 1.010806 2.350532 2.240891 2.355037 1.240601 0 2.23939 -1.055861 2.23939 -2.355037 V 11.798242 c 0 -0.04356 -0.009 -0.08862 -0.0134 -0.127671 0.0044 -0.03153 0.009 -0.06157 0.0134 -0.09313 -0.0044 -1.240598 -1.069379 -2.2393873 -2.391085 -2.2393873 h -10.1546 c -1.323205 0 -2.38958 0.9987893 -2.38958 2.2393873 0 1.233091 1.066375 2.237887 2.38958 2.240891 h 4.858768 l -8.995102 8.9921 c -0.874129 0.872625 -0.874129 2.288954 0 3.161578 0.874127 0.880137 2.288951 0.880137 3.16308 1.5e-4%27 id=%27path600%27 style=%27fill:%23ffffff%3Bstroke-width:1.50194%27 /%3E%3Cpath d=%27m 17.264988 13.822853 h 4.857265 c 1.320202 -0.0031 2.388079 -1.0078 2.388079 -2.240889 0 -1.240601 -1.067877 -2.2393893 -2.388079 -2.2393893 H 11.967654 c -1.321707 0 -2.388082 0.9987883 -2.391085 2.2393893 0.0031 0.03153 0.009 0.06157 0.01211 0.09313 -0.0031 0.03905 -0.0015 0.08262 -0.0015 0.127671 l 0.0031 10.020926 c 0 1.299176 1.00029 2.355038 2.237887 2.355038 1.233092 -0.0044 2.242393 -1.055862 2.242393 -2.355038 v -4.881295 l 9.026644 9.041661 c 0.877132 0.878635 2.293459 0.878635 3.169087 0 0.871125 -0.872624 0.871125 -2.288953 0 -3.161577 l -8.995282 -8.993616%27 id=%27path602%27 style=%27fill:%23ffffff%3Bstroke-width:1.50194%27 /%3E%3C/svg%3E");
+}
+
+.a-enter-vr-button,
+.a-enter-ar-button {
+  background-size: 90% 90%;
+  border: 0;
+  bottom: 0;
+  cursor: pointer;
+  min-width: 58px;
+  min-height: 34px;
+  /* 1.74418604651 */
+  /*
+    In order to keep the aspect ratio when resizing
+    padding-top percentages are relative to the containing block's width.
+    http://stackoverflow.com/questions/12121090/responsively-change-div-size-keeping-aspect-ratio
+  */
+  padding-right: 0;
+  padding-top: 0;
+  position: absolute;
+  right: 0;
+  transition: background-color .05s ease;
+  -webkit-transition: background-color .05s ease;
+  z-index: 9999;
+  border-radius: 8px;
+  touch-action: manipulation; /* Prevent iOS double tap zoom on the button */
+}
+
+.a-enter-ar-button {
+  background-size: 100% 90%;
+  border-radius: 7px;
+}
+
+.a-enter-ar-button:active,
+.a-enter-ar-button:hover,
+.a-enter-vr-button:active,
+.a-enter-vr-button:hover {
+  background-color: #ef2d5e;
+}
+
+.a-enter-vr-button.resethover {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.a-enter-vr-modal {
+  background-color: #666;
+  border-radius: 0;
+  display: none;
+  min-height: 32px;
+  margin-right: 70px;
+  padding: 9px;
+  width: 280px;
+  right: 2%;
+  position: absolute;
+}
+
+.a-enter-vr-modal:after {
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid #666;
+  border-top: 10px solid transparent;
+  display: inline-block;
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 5px;
+  width: 0;
+  height: 0;
+}
+
+.a-enter-vr-modal p,
+.a-enter-vr-modal a {
+  display: inline;
+}
+
+.a-enter-vr-modal p {
+  margin: 0;
+}
+
+.a-enter-vr-modal p:after {
+  content: ' ';
+}
+
+.a-orientation-modal {
+  background: rgba(244, 244, 244, 1) url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%20version%3D%221.1%22%20x%3D%220px%22%20y%3D%220px%22%20viewBox%3D%220%200%2090%2090%22%20enable-background%3D%22new%200%200%2090%2090%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpolygon%20points%3D%220%2C0%200%2C0%200%2C0%20%22%3E%3C/polygon%3E%3Cg%3E%3Cpath%20d%3D%22M71.545%2C48.145h-31.98V20.743c0-2.627-2.138-4.765-4.765-4.765H18.456c-2.628%2C0-4.767%2C2.138-4.767%2C4.765v42.789%20%20%20c0%2C2.628%2C2.138%2C4.766%2C4.767%2C4.766h5.535v0.959c0%2C2.628%2C2.138%2C4.765%2C4.766%2C4.765h42.788c2.628%2C0%2C4.766-2.137%2C4.766-4.765V52.914%20%20%20C76.311%2C50.284%2C74.173%2C48.145%2C71.545%2C48.145z%20M18.455%2C16.935h16.344c2.1%2C0%2C3.808%2C1.708%2C3.808%2C3.808v27.401H37.25V22.636%20%20%20c0-0.264-0.215-0.478-0.479-0.478H16.482c-0.264%2C0-0.479%2C0.214-0.479%2C0.478v36.585c0%2C0.264%2C0.215%2C0.478%2C0.479%2C0.478h7.507v7.644%20%20%20h-5.534c-2.101%2C0-3.81-1.709-3.81-3.81V20.743C14.645%2C18.643%2C16.354%2C16.935%2C18.455%2C16.935z%20M16.96%2C23.116h19.331v25.031h-7.535%20%20%20c-2.628%2C0-4.766%2C2.139-4.766%2C4.768v5.828h-7.03V23.116z%20M71.545%2C73.064H28.757c-2.101%2C0-3.81-1.708-3.81-3.808V52.914%20%20%20c0-2.102%2C1.709-3.812%2C3.81-3.812h42.788c2.1%2C0%2C3.809%2C1.71%2C3.809%2C3.812v16.343C75.354%2C71.356%2C73.645%2C73.064%2C71.545%2C73.064z%22%3E%3C/path%3E%3Cpath%20d%3D%22M28.919%2C58.424c-1.466%2C0-2.659%2C1.193-2.659%2C2.66c0%2C1.466%2C1.193%2C2.658%2C2.659%2C2.658c1.468%2C0%2C2.662-1.192%2C2.662-2.658%20%20%20C31.581%2C59.617%2C30.387%2C58.424%2C28.919%2C58.424z%20M28.919%2C62.786c-0.939%2C0-1.703-0.764-1.703-1.702c0-0.939%2C0.764-1.704%2C1.703-1.704%20%20%20c0.94%2C0%2C1.705%2C0.765%2C1.705%2C1.704C30.623%2C62.022%2C29.858%2C62.786%2C28.919%2C62.786z%22%3E%3C/path%3E%3Cpath%20d%3D%22M69.654%2C50.461H33.069c-0.264%2C0-0.479%2C0.215-0.479%2C0.479v20.288c0%2C0.264%2C0.215%2C0.478%2C0.479%2C0.478h36.585%20%20%20c0.263%2C0%2C0.477-0.214%2C0.477-0.478V50.939C70.131%2C50.676%2C69.917%2C50.461%2C69.654%2C50.461z%20M69.174%2C51.417V70.75H33.548V51.417H69.174z%22%3E%3C/path%3E%3Cpath%20d%3D%22M45.201%2C30.296c6.651%2C0%2C12.233%2C5.351%2C12.551%2C11.977l-3.033-2.638c-0.193-0.165-0.507-0.142-0.675%2C0.048%20%20%20c-0.174%2C0.198-0.153%2C0.501%2C0.045%2C0.676l3.883%2C3.375c0.09%2C0.075%2C0.198%2C0.115%2C0.312%2C0.115c0.141%2C0%2C0.273-0.061%2C0.362-0.166%20%20%20l3.371-3.877c0.173-0.2%2C0.151-0.502-0.047-0.675c-0.194-0.166-0.508-0.144-0.676%2C0.048l-2.592%2C2.979%20%20%20c-0.18-3.417-1.629-6.605-4.099-9.001c-2.538-2.461-5.877-3.817-9.404-3.817c-0.264%2C0-0.479%2C0.215-0.479%2C0.479%20%20%20C44.72%2C30.083%2C44.936%2C30.296%2C45.201%2C30.296z%22%3E%3C/path%3E%3C/g%3E%3C/svg%3E") center no-repeat;
+  background-size: 50% 50%;
+  bottom: 0;
+  font-size: 14px;
+  font-weight: 600;
+  left: 0;
+  line-height: 20px;
+  right: 0;
+  position: fixed;
+  top: 0;
+  z-index: 9999999;
+}
+
+.a-orientation-modal:after {
+  color: #666;
+  content: "Insert phone into Cardboard holder.";
+  display: block;
+  position: absolute;
+  text-align: center;
+  top: 70%;
+  transform: translateY(-70%);
+  width: 100%;
+}
+
+.a-orientation-modal button {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%20version%3D%221.1%22%20x%3D%220px%22%20y%3D%220px%22%20viewBox%3D%220%200%20100%20100%22%20enable-background%3D%22new%200%200%20100%20100%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M55.209%2C50l17.803-17.803c1.416-1.416%2C1.416-3.713%2C0-5.129c-1.416-1.417-3.713-1.417-5.129%2C0L50.08%2C44.872%20%20L32.278%2C27.069c-1.416-1.417-3.714-1.417-5.129%2C0c-1.417%2C1.416-1.417%2C3.713%2C0%2C5.129L44.951%2C50L27.149%2C67.803%20%20c-1.417%2C1.416-1.417%2C3.713%2C0%2C5.129c0.708%2C0.708%2C1.636%2C1.062%2C2.564%2C1.062c0.928%2C0%2C1.856-0.354%2C2.564-1.062L50.08%2C55.13l17.803%2C17.802%20%20c0.708%2C0.708%2C1.637%2C1.062%2C2.564%2C1.062s1.856-0.354%2C2.564-1.062c1.416-1.416%2C1.416-3.713%2C0-5.129L55.209%2C50z%22%3E%3C/path%3E%3C/svg%3E") no-repeat;
+  border: none;
+  height: 50px;
+  text-indent: -9999px;
+  width: 50px;
+}
+
+.a-loader-title {
+  background-color: rgba(0, 0, 0, 0.6);
+  font-family: sans-serif, monospace;
+  text-align: center;
+  font-size: 20px;
+  height: 50px;
+  font-weight: 300;
+  line-height: 50px;
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  top: 0px;
+  color: white;
+}
+
+.a-modal {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.60);
+  background-size: 50% 50%;
+  bottom: 0;
+  font-size: 14px;
+  font-weight: 600;
+  left: 0;
+  line-height: 20px;
+  right: 0;
+  position: fixed;
+  top: 0;
+  z-index: 9999999;
+}
+
+.a-dialog {
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 199995;
+  width: 300px;
+  height: 200px;
+  background-size: contain;
+  background-color: white;
+  font-family: sans-serif, monospace;
+  font-size: 20px;
+  border-radius: 3px;
+  padding: 6px;
+}
+
+.a-dialog-text-container {
+  width: 100%;
+  height: 70%;
+  align-self: flex-start;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.a-dialog-text {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 14pt;
+  margin: 8px;
+}
+
+.a-dialog-buttons-container {
+  display: inline-flex;
+  align-self: flex-end;
+  width: 100%;
+  height: 30%;
+}
+
+.a-dialog-button {
+  cursor: pointer;
+  align-self: center;
+  opacity: 0.9;
+  height: 80%;
+  width: 50%;
+  font-size: 12pt;
+  margin: 4px;
+  border-radius: 2px;
+  text-align:center;
+  border: none;
+  display: inline-block;
+  -webkit-transition: all 0.25s ease-in-out;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.20);
+  user-select: none;
+}
+
+.a-dialog-permission-button:hover {
+  box-shadow: 0 7px 14px rgba(0,0,0,0.20), 0 2px 2px rgba(0,0,0,0.20);
+}
+
+.a-dialog-allow-button {
+  background-color: #00ceff;
+}
+
+.a-dialog-deny-button {
+  background-color: #ff005b;
+}
+
+.a-dialog-ok-button {
+  background-color: #00ceff;
+  width: 100%;
+}
+
+.a-dom-overlay:not(.a-no-style) {
+  overflow: hidden;
+  position: absolute;
+  pointer-events: none;
+  box-sizing: border-box;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  padding: 1em;
+}
+
+.a-dom-overlay:not(.a-no-style)>* {
+  pointer-events: auto;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3NyYy9zdHlsZS9hZnJhbWUuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLHNDQUFzQztBQUN0QztFQUNFLFNBQVM7RUFDVCxPQUFPO0VBQ1AsZUFBZTtFQUNmLFFBQVE7RUFDUixNQUFNO0FBQ1I7O0FBRUE7RUFDRSxZQUFZO0VBQ1osU0FBUztFQUNULGdCQUFnQjtFQUNoQixVQUFVO0VBQ1YsV0FBVztBQUNiOztBQUVBLG9EQUFvRDtBQUNwRDtFQUNFLHNCQUFzQjtFQUN0Qix1QkFBdUI7RUFDdkIsaUJBQWlCO0VBQ2pCLGtCQUFrQjtFQUNsQixtQkFBbUI7RUFDbkIsb0JBQW9CO0VBQ3BCLDBCQUEwQjtBQUM1Qjs7QUFFQTs7RUFFRSxVQUFVO0VBQ1YsV0FBVztBQUNiOztBQUVBO0VBQ0UsV0FBVztBQUNiOztBQUVBLGdFQUFnRTtBQUNoRTtFQUNFLDZCQUE2QjtBQUMvQjs7QUFFQTtFQUNFLHdCQUF3QjtBQUMxQjs7QUFFQTtFQUNFLFlBQVk7RUFDWixPQUFPO0VBQ1Asa0JBQWtCO0VBQ2xCLE1BQU07RUFDTixXQUFXO0FBQ2I7O0FBRUE7RUFDRSxZQUFZO0VBQ1osaUJBQWlCO0VBQ2pCLG9CQUFvQjtBQUN0Qjs7QUFFQTtFQUNFLGVBQWU7QUFDakI7O0FBRUE7RUFDRSx5QkFBeUI7RUFDekIsZUFBZTtFQUNmLFNBQVM7RUFDVCxRQUFRO0VBQ1IsaUJBQWlCO0VBQ2pCLFdBQVc7RUFDWCxxQkFBcUI7RUFDckIsZUFBZTtFQUNmLDhCQUE4QjtFQUM5QixrQkFBa0I7RUFDbEIsY0FBYztFQUNkLFlBQVk7QUFDZDs7QUFFQSwrQkFBK0I7QUFDL0Isb0JBQW9CLE9BQU8sVUFBVSxFQUFFLEVBQUUsTUFBTSxVQUFVLEVBQUUsRUFBRTtBQUM3RCxvQkFBb0IsT0FBTyxVQUFVLEVBQUUsRUFBRSxNQUFNLFVBQVUsRUFBRSxFQUFFO0FBQzdELG9CQUFvQixPQUFPLFVBQVUsRUFBRSxFQUFFLE1BQU0sVUFBVSxFQUFFLEVBQUU7QUFDN0QsNEJBQTRCLE9BQU8sVUFBVSxFQUFFLEVBQUUsTUFBTSxVQUFVLEVBQUUsRUFBRTtBQUNyRSw0QkFBNEIsT0FBTyxVQUFVLEVBQUUsRUFBRSxNQUFNLFVBQVUsRUFBRSxFQUFFO0FBQ3JFLDRCQUE0QixPQUFPLFVBQVUsRUFBRSxFQUFFLE1BQU0sVUFBVSxFQUFFLEVBQUU7O0FBRXJFO0VBQ0Usc0NBQXNDO0VBQ3RDLDhDQUE4QztBQUNoRDs7QUFFQTtFQUNFLHNCQUFzQjtFQUN0Qiw4QkFBOEI7QUFDaEM7O0FBRUE7RUFDRSxzQkFBc0I7RUFDdEIsOEJBQThCO0FBQ2hDOztBQUVBO0VBQ0UsY0FBYztFQUNkLGtCQUFrQjtFQUNsQixZQUFZO0VBQ1osV0FBVztBQUNiOztBQUVBOzs7O0VBSUUsYUFBYTtBQUNmOztBQUVBOztFQUVFLDBEQUEwRDtBQUM1RDs7QUFFQTtFQUNFLDZCQUE2QjtFQUM3QixjQUFjO0VBQ2QscUJBQXFCO0VBQ3JCLDZCQUE2QjtBQUMvQjs7QUFFQTtFQUNFLHNCQUFzQjtFQUN0QixXQUFXO0VBQ1gsZ0JBQWdCO0VBQ2hCLGtCQUFrQjtFQUNsQixVQUFVO0FBQ1o7O0FBRUE7O0VBRUUsa0NBQWtDO0VBQ2xDLGVBQWU7RUFDZixXQUFXO0VBQ1gsZ0JBQWdCO0VBQ2hCLGlCQUFpQjtFQUNqQixrQkFBa0I7RUFDbEIsV0FBVztFQUNYLFlBQVk7QUFDZDs7QUFFQTtFQUNFLFdBQVc7QUFDYjs7QUFFQTs7O0VBR0UsV0FBVztFQUNYLGlCQUFpQjtFQUNqQixhQUFhO0FBQ2Y7O0FBRUE7RUFDRSx5RkFBNHFCO0FBQzlxQjs7QUFFQTtFQUNFLHlGQUFrekI7QUFDcHpCOztBQUVBO0VBQ0UseURBQTJxSztBQUM3cUs7O0FBRUE7O0VBRUUsd0JBQXdCO0VBQ3hCLFNBQVM7RUFDVCxTQUFTO0VBQ1QsZUFBZTtFQUNmLGVBQWU7RUFDZixnQkFBZ0I7RUFDaEIsa0JBQWtCO0VBQ2xCOzs7O0dBSUM7RUFDRCxnQkFBZ0I7RUFDaEIsY0FBYztFQUNkLGtCQUFrQjtFQUNsQixRQUFRO0VBQ1Isc0NBQXNDO0VBQ3RDLDhDQUE4QztFQUM5QyxhQUFhO0VBQ2Isa0JBQWtCO0VBQ2xCLDBCQUEwQixFQUFFLDhDQUE4QztBQUM1RTs7QUFFQTtFQUNFLHlCQUF5QjtFQUN6QixrQkFBa0I7QUFDcEI7O0FBRUE7Ozs7RUFJRSx5QkFBeUI7QUFDM0I7O0FBRUE7RUFDRSxxQ0FBcUM7QUFDdkM7O0FBRUE7RUFDRSxzQkFBc0I7RUFDdEIsZ0JBQWdCO0VBQ2hCLGFBQWE7RUFDYixnQkFBZ0I7RUFDaEIsa0JBQWtCO0VBQ2xCLFlBQVk7RUFDWixZQUFZO0VBQ1osU0FBUztFQUNULGtCQUFrQjtBQUNwQjs7QUFFQTtFQUNFLHFDQUFxQztFQUNyQyw0QkFBNEI7RUFDNUIsa0NBQWtDO0VBQ2xDLHFCQUFxQjtFQUNyQixXQUFXO0VBQ1gsa0JBQWtCO0VBQ2xCLFdBQVc7RUFDWCxRQUFRO0VBQ1IsUUFBUTtFQUNSLFNBQVM7QUFDWDs7QUFFQTs7RUFFRSxlQUFlO0FBQ2pCOztBQUVBO0VBQ0UsU0FBUztBQUNYOztBQUVBO0VBQ0UsWUFBWTtBQUNkOztBQUVBO0VBQ0UsMkZBQWl2RjtFQUNqdkYsd0JBQXdCO0VBQ3hCLFNBQVM7RUFDVCxlQUFlO0VBQ2YsZ0JBQWdCO0VBQ2hCLE9BQU87RUFDUCxpQkFBaUI7RUFDakIsUUFBUTtFQUNSLGVBQWU7RUFDZixNQUFNO0VBQ04sZ0JBQWdCO0FBQ2xCOztBQUVBO0VBQ0UsV0FBVztFQUNYLDhDQUE4QztFQUM5QyxjQUFjO0VBQ2Qsa0JBQWtCO0VBQ2xCLGtCQUFrQjtFQUNsQixRQUFRO0VBQ1IsMkJBQTJCO0VBQzNCLFdBQVc7QUFDYjs7QUFFQTtFQUNFLDZEQUEyNUI7RUFDMzVCLFlBQVk7RUFDWixZQUFZO0VBQ1osb0JBQW9CO0VBQ3BCLFdBQVc7QUFDYjs7QUFFQTtFQUNFLG9DQUFvQztFQUNwQyxrQ0FBa0M7RUFDbEMsa0JBQWtCO0VBQ2xCLGVBQWU7RUFDZixZQUFZO0VBQ1osZ0JBQWdCO0VBQ2hCLGlCQUFpQjtFQUNqQixrQkFBa0I7RUFDbEIsVUFBVTtFQUNWLFNBQVM7RUFDVCxRQUFRO0VBQ1IsWUFBWTtBQUNkOztBQUVBO0VBQ0Usa0JBQWtCO0VBQ2xCLCtCQUErQjtFQUMvQix3QkFBd0I7RUFDeEIsU0FBUztFQUNULGVBQWU7RUFDZixnQkFBZ0I7RUFDaEIsT0FBTztFQUNQLGlCQUFpQjtFQUNqQixRQUFRO0VBQ1IsZUFBZTtFQUNmLE1BQU07RUFDTixnQkFBZ0I7QUFDbEI7O0FBRUE7RUFDRSxrQkFBa0I7RUFDbEIsU0FBUztFQUNULFFBQVE7RUFDUixnQ0FBZ0M7RUFDaEMsZUFBZTtFQUNmLFlBQVk7RUFDWixhQUFhO0VBQ2Isd0JBQXdCO0VBQ3hCLHVCQUF1QjtFQUN2QixrQ0FBa0M7RUFDbEMsZUFBZTtFQUNmLGtCQUFrQjtFQUNsQixZQUFZO0FBQ2Q7O0FBRUE7RUFDRSxXQUFXO0VBQ1gsV0FBVztFQUNYLHNCQUFzQjtFQUN0QixhQUFhO0VBQ2IsdUJBQXVCO0VBQ3ZCLHFCQUFxQjtFQUNyQixzQkFBc0I7QUFDeEI7O0FBRUE7RUFDRSxxQkFBcUI7RUFDckIsbUJBQW1CO0VBQ25CLGVBQWU7RUFDZixXQUFXO0FBQ2I7O0FBRUE7RUFDRSxvQkFBb0I7RUFDcEIsb0JBQW9CO0VBQ3BCLFdBQVc7RUFDWCxXQUFXO0FBQ2I7O0FBRUE7RUFDRSxlQUFlO0VBQ2Ysa0JBQWtCO0VBQ2xCLFlBQVk7RUFDWixXQUFXO0VBQ1gsVUFBVTtFQUNWLGVBQWU7RUFDZixXQUFXO0VBQ1gsa0JBQWtCO0VBQ2xCLGlCQUFpQjtFQUNqQixZQUFZO0VBQ1oscUJBQXFCO0VBQ3JCLHlDQUF5QztFQUN6QyxpQ0FBaUM7RUFDakMsd0VBQXdFO0VBQ3hFLGlCQUFpQjtBQUNuQjs7QUFFQTtFQUNFLG1FQUFtRTtBQUNyRTs7QUFFQTtFQUNFLHlCQUF5QjtBQUMzQjs7QUFFQTtFQUNFLHlCQUF5QjtBQUMzQjs7QUFFQTtFQUNFLHlCQUF5QjtFQUN6QixXQUFXO0FBQ2I7O0FBRUE7RUFDRSxnQkFBZ0I7RUFDaEIsa0JBQWtCO0VBQ2xCLG9CQUFvQjtFQUNwQixzQkFBc0I7RUFDdEIsU0FBUztFQUNULE9BQU87RUFDUCxRQUFRO0VBQ1IsTUFBTTtFQUNOLFlBQVk7QUFDZDs7QUFFQTtFQUNFLG9CQUFvQjtBQUN0QiIsInNvdXJjZXNDb250ZW50IjpbIi8qIC5hLWZ1bGxzY3JlZW4gbWVhbnMgbm90IGVtYmVkZGVkLiAqL1xuaHRtbC5hLWZ1bGxzY3JlZW4ge1xuICBib3R0b206IDA7XG4gIGxlZnQ6IDA7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgcmlnaHQ6IDA7XG4gIHRvcDogMDtcbn1cblxuaHRtbC5hLWZ1bGxzY3JlZW4gYm9keSB7XG4gIGhlaWdodDogMTAwJTtcbiAgbWFyZ2luOiAwO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBwYWRkaW5nOiAwO1xuICB3aWR0aDogMTAwJTtcbn1cblxuLyogQ2xhc3MgaXMgcmVtb3ZlZCB3aGVuIGRvaW5nIDxhLXNjZW5lIGVtYmVkZGVkPi4gKi9cbmh0bWwuYS1mdWxsc2NyZWVuIC5hLWNhbnZhcyB7XG4gIHdpZHRoOiAxMDAlICFpbXBvcnRhbnQ7XG4gIGhlaWdodDogMTAwJSAhaW1wb3J0YW50O1xuICB0b3A6IDAgIWltcG9ydGFudDtcbiAgbGVmdDogMCAhaW1wb3J0YW50O1xuICByaWdodDogMCAhaW1wb3J0YW50O1xuICBib3R0b206IDAgIWltcG9ydGFudDtcbiAgcG9zaXRpb246IGZpeGVkICFpbXBvcnRhbnQ7XG59XG5cbmh0bWw6bm90KC5hLWZ1bGxzY3JlZW4pIC5hLWVudGVyLXZyLFxuaHRtbDpub3QoLmEtZnVsbHNjcmVlbikgLmEtZW50ZXItYXIge1xuICByaWdodDogNXB4O1xuICBib3R0b206IDVweDtcbn1cblxuaHRtbDpub3QoLmEtZnVsbHNjcmVlbikgLmEtZW50ZXItYXIge1xuICByaWdodDogNjBweDtcbn1cblxuLyogSW4gY2hyb21lIG1vYmlsZSB0aGUgdXNlciBhZ2VudCBzdHlsZXNoZWV0IHNldCBpdCB0byB3aGl0ZSAgKi9cbjotd2Via2l0LWZ1bGwtc2NyZWVuIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQ7XG59XG5cbi5hLWhpZGRlbiB7XG4gIGRpc3BsYXk6IG5vbmUgIWltcG9ydGFudDtcbn1cblxuLmEtY2FudmFzIHtcbiAgaGVpZ2h0OiAxMDAlO1xuICBsZWZ0OiAwO1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIHRvcDogMDtcbiAgd2lkdGg6IDEwMCU7XG59XG5cbi5hLWNhbnZhcy5hLWdyYWItY3Vyc29yOmhvdmVyIHtcbiAgY3Vyc29yOiBncmFiO1xuICBjdXJzb3I6IC1tb3otZ3JhYjtcbiAgY3Vyc29yOiAtd2Via2l0LWdyYWI7XG59XG5cbmNhbnZhcy5hLWNhbnZhcy5hLW1vdXNlLWN1cnNvci1ob3Zlcjpob3ZlciB7XG4gIGN1cnNvcjogcG9pbnRlcjtcbn1cblxuLmEtaW5zcGVjdG9yLWxvYWRlciB7XG4gIGJhY2tncm91bmQtY29sb3I6ICNlZDMxNjA7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgbGVmdDogM3B4O1xuICB0b3A6IDNweDtcbiAgcGFkZGluZzogNnB4IDEwcHg7XG4gIGNvbG9yOiAjZmZmO1xuICB0ZXh0LWRlY29yYXRpb246IG5vbmU7XG4gIGZvbnQtc2l6ZTogMTJweDtcbiAgZm9udC1mYW1pbHk6IFJvYm90byxzYW5zLXNlcmlmO1xuICB0ZXh0LWFsaWduOiBjZW50ZXI7XG4gIHotaW5kZXg6IDk5OTk5O1xuICB3aWR0aDogMjA0cHg7XG59XG5cbi8qIEluc3BlY3RvciBsb2FkZXIgYW5pbWF0aW9uICovXG5Aa2V5ZnJhbWVzIGRvdHMtMSB7IGZyb20geyBvcGFjaXR5OiAwOyB9IDI1JSB7IG9wYWNpdHk6IDE7IH0gfVxuQGtleWZyYW1lcyBkb3RzLTIgeyBmcm9tIHsgb3BhY2l0eTogMDsgfSA1MCUgeyBvcGFjaXR5OiAxOyB9IH1cbkBrZXlmcmFtZXMgZG90cy0zIHsgZnJvbSB7IG9wYWNpdHk6IDA7IH0gNzUlIHsgb3BhY2l0eTogMTsgfSB9XG5ALXdlYmtpdC1rZXlmcmFtZXMgZG90cy0xIHsgZnJvbSB7IG9wYWNpdHk6IDA7IH0gMjUlIHsgb3BhY2l0eTogMTsgfSB9XG5ALXdlYmtpdC1rZXlmcmFtZXMgZG90cy0yIHsgZnJvbSB7IG9wYWNpdHk6IDA7IH0gNTAlIHsgb3BhY2l0eTogMTsgfSB9XG5ALXdlYmtpdC1rZXlmcmFtZXMgZG90cy0zIHsgZnJvbSB7IG9wYWNpdHk6IDA7IH0gNzUlIHsgb3BhY2l0eTogMTsgfSB9XG5cbi5hLWluc3BlY3Rvci1sb2FkZXIgLmRvdHMgc3BhbiB7XG4gIGFuaW1hdGlvbjogZG90cy0xIDJzIGluZmluaXRlIHN0ZXBzKDEpO1xuICAtd2Via2l0LWFuaW1hdGlvbjogZG90cy0xIDJzIGluZmluaXRlIHN0ZXBzKDEpO1xufVxuXG4uYS1pbnNwZWN0b3ItbG9hZGVyIC5kb3RzIHNwYW46Zmlyc3QtY2hpbGQgKyBzcGFuIHtcbiAgYW5pbWF0aW9uLW5hbWU6IGRvdHMtMjtcbiAgLXdlYmtpdC1hbmltYXRpb24tbmFtZTogZG90cy0yO1xufVxuXG4uYS1pbnNwZWN0b3ItbG9hZGVyIC5kb3RzIHNwYW46Zmlyc3QtY2hpbGQgKyBzcGFuICsgc3BhbiB7XG4gIGFuaW1hdGlvbi1uYW1lOiBkb3RzLTM7XG4gIC13ZWJraXQtYW5pbWF0aW9uLW5hbWU6IGRvdHMtMztcbn1cblxuYS1zY2VuZSB7XG4gIGRpc3BsYXk6IGJsb2NrO1xuICBwb3NpdGlvbjogcmVsYXRpdmU7XG4gIGhlaWdodDogMTAwJTtcbiAgd2lkdGg6IDEwMCU7XG59XG5cbmEtYXNzZXRzLFxuYS1zY2VuZSB2aWRlbyxcbmEtc2NlbmUgaW1nLFxuYS1zY2VuZSBhdWRpbyB7XG4gIGRpc3BsYXk6IG5vbmU7XG59XG5cbi5hLWVudGVyLXZyLW1vZGFsLFxuLmEtb3JpZW50YXRpb24tbW9kYWwge1xuICBmb250LWZhbWlseTogQ29uc29sYXMsIEFuZGFsZSBNb25vLCBDb3VyaWVyIE5ldywgbW9ub3NwYWNlO1xufVxuXG4uYS1lbnRlci12ci1tb2RhbCBhIHtcbiAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkICNmZmY7XG4gIHBhZGRpbmc6IDJweCAwO1xuICB0ZXh0LWRlY29yYXRpb246IG5vbmU7XG4gIHRyYW5zaXRpb246IC4xcyBjb2xvciBlYXNlLWluO1xufVxuXG4uYS1lbnRlci12ci1tb2RhbCBhOmhvdmVyIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogI2ZmZjtcbiAgY29sb3I6ICMxMTE7XG4gIHBhZGRpbmc6IDJweCA0cHg7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgbGVmdDogLTRweDtcbn1cblxuLmEtZW50ZXItdnIsXG4uYS1lbnRlci1hciB7XG4gIGZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmLCBtb25vc3BhY2U7XG4gIGZvbnQtc2l6ZTogMTNweDtcbiAgd2lkdGg6IDEwMCU7XG4gIGZvbnQtd2VpZ2h0OiAyMDA7XG4gIGxpbmUtaGVpZ2h0OiAxNnB4O1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIHJpZ2h0OiAyMHB4O1xuICBib3R0b206IDIwcHg7XG59XG5cbi5hLWVudGVyLWFyLnhyIHtcbiAgcmlnaHQ6IDkwcHg7XG59XG5cbi5hLWVudGVyLXZyLWJ1dHRvbixcbi5hLWVudGVyLXZyLW1vZGFsLFxuLmEtZW50ZXItdnItbW9kYWwgYSB7XG4gIGNvbG9yOiAjZmZmO1xuICB1c2VyLXNlbGVjdDogbm9uZTtcbiAgb3V0bGluZTogbm9uZTtcbn1cblxuLmEtZW50ZXItdnItYnV0dG9uIHtcbiAgYmFja2dyb3VuZDogcmdiYSgwLCAwLCAwLCAwLjM1KSB1cmwoXCJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgd2lkdGg9JzEwOCcgaGVpZ2h0PSc2Micgdmlld0JveD0nMCAwIDEwOCA2MiclM0UlM0N0aXRsZSUzRWFmcmFtZS12cm1vZGUtbm9ib3JkZXItcmVkdWNlZC10cmFja2luZyUzQy90aXRsZSUzRSUzQ3BhdGggZD0nTTY4LjgxLDIxLjU2SDY0LjIzdjguMjdoNC41OGE0LjEzLDQuMTMsMCwwLDAsMy4xLTEuMDksNC4yLDQuMiwwLDAsMCwxLTMsNC4yNCw0LjI0LDAsMCwwLTEtM0E0LjA1LDQuMDUsMCwwLDAsNjguODEsMjEuNTZaJyBmaWxsPSclMjNmZmYnLyUzRSUzQ3BhdGggZD0nTTk2LDBIMTJBMTIsMTIsMCwwLDAsMCwxMlY1MEExMiwxMiwwLDAsMCwxMiw2Mkg5NmExMiwxMiwwLDAsMCwxMi0xMlYxMkExMiwxMiwwLDAsMCw5NiwwWk00MS45LDQ2SDM0TDI0LDE2aDhsNiwyMS44NCw2LTIxLjg0SDUyWm0zOS4yOSwwSDczLjQ0TDY4LjE1LDM1LjM5SDY0LjIzVjQ2SDU3VjE2SDY4LjgxcTUuMzIsMCw4LjM0LDIuMzdhOCw4LDAsMCwxLDMsNi42OSw5LjY4LDkuNjgsMCwwLDEtMS4yNyw1LjE4LDguOSw4LjksMCwwLDEtNCwzLjM0bDYuMjYsMTIuMTFaJyBmaWxsPSclMjNmZmYnLyUzRSUzQy9zdmclM0VcIikgNTAlIDUwJSBuby1yZXBlYXQ7XG59XG5cbi5hLWVudGVyLWFyLWJ1dHRvbiB7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC4yMCkgdXJsKFwiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMDgnIGhlaWdodD0nNjInIHZpZXdCb3g9JzAgMCAxMDggNjInJTNFJTNDdGl0bGUlM0VhZnJhbWUtYXJtb2RlLW5vYm9yZGVyLXJlZHVjZWQtdHJhY2tpbmclM0MvdGl0bGUlM0UlM0NwYXRoIGQ9J005NiwwSDEyQTEyLDEyLDAsMCwwLDAsMTJWNTBBMTIsMTIsMCwwLDAsMTIsNjJIOTZhMTIsMTIsMCwwLDAsMTItMTJWMTJBMTIsMTIsMCwwLDAsOTYsMFptOCw1MGE4LDgsMCwwLDEtOCw4SDEyYTgsOCwwLDAsMS04LThWMTJhOCw4LDAsMCwxLDgtOEg5NmE4LDgsMCwwLDEsOCw4WicgZmlsbD0nJTIzZmZmJy8lM0UlM0NwYXRoIGQ9J000My4zNSwzOS44MkgzMi41MUwzMC40NSw0NkgyMy44OEwzNSwxNmg1LjczTDUyLDQ2SDQ1LjQzWm0tOS4xNy01aDcuNUwzNy45MSwyMy41OFonIGZpbGw9JyUyM2ZmZicvJTNFJTNDcGF0aCBkPSdNNjguMTEsMzVINjMuMThWNDZINTdWMTZINjguMTVxNS4zMSwwLDguMiwyLjM3YTguMTgsOC4xOCwwLDAsMSwyLjg4LDYuNyw5LjIyLDkuMjIsMCwwLDEtMS4zMyw1LjEyLDkuMDksOS4wOSwwLDAsMS00LDMuMjZsNi40OSwxMi4yNlY0Nkg3My43M1ptLTQuOTMtNWg1YTUuMDksNS4wOSwwLDAsMCwzLjYtMS4xOCw0LjIxLDQuMjEsMCwwLDAsMS4yOC0zLjI3LDQuNTYsNC41NiwwLDAsMC0xLjItMy4zNEE1LDUsMCwwLDAsNjguMTUsMjFoLTVaJyBmaWxsPSclMjNmZmYnLyUzRSUzQy9zdmclM0VcIikgNTAlIDUwJSBuby1yZXBlYXQ7XG59XG5cbi5hLWVudGVyLXZyLmZ1bGxzY3JlZW4gLmEtZW50ZXItdnItYnV0dG9uIHtcbiAgYmFja2dyb3VuZC1pbWFnZTogdXJsKFwiZGF0YTppbWFnZS9zdmcreG1sLCUzQyUzRnhtbCB2ZXJzaW9uPScxLjAnIGVuY29kaW5nPSdVVEYtOCcgc3RhbmRhbG9uZT0nbm8nJTNGJTNFJTNDc3ZnIHdpZHRoPScxMDgnIGhlaWdodD0nNjInIHZpZXdCb3g9JzAgMCAxMDggNjInIHZlcnNpb249JzEuMScgaWQ9J3N2ZzMyMCcgc29kaXBvZGk6ZG9jbmFtZT0nZnVsbHNjcmVlbi1hZnJhbWUuc3ZnJyB4bWw6c3BhY2U9J3ByZXNlcnZlJyBpbmtzY2FwZTp2ZXJzaW9uPScxLjIuMSAoOWM2ZDQxZSAgMjAyMi0wNy0xNCknIHhtbG5zOmlua3NjYXBlPSdodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlJyB4bWxuczpzb2RpcG9kaT0naHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZycgeG1sbnM6c3ZnPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZycgeG1sbnM6cmRmPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMlMjMnIHhtbG5zOmNjPSdodHRwOi8vY3JlYXRpdmVjb21tb25zLm9yZy9ucyUyMycgeG1sbnM6ZGM9J2h0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvJyUzRSUzQ2RlZnMgaWQ9J2RlZnMzMjQnIC8lM0UlM0Nzb2RpcG9kaTpuYW1lZHZpZXcgaWQ9J25hbWVkdmlldzMyMicgcGFnZWNvbG9yPSclMjNmZmZmZmYnIGJvcmRlcmNvbG9yPSclMjMwMDAwMDAnIGJvcmRlcm9wYWNpdHk9JzAuMjUnIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PScyJyBpbmtzY2FwZTpwYWdlb3BhY2l0eT0nMC4wJyBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPScwJyBpbmtzY2FwZTpkZXNrY29sb3I9JyUyM2QxZDFkMScgc2hvd2dyaWQ9J2ZhbHNlJyBpbmtzY2FwZTp6b29tPSczLjgwNjQ1MTYnIGlua3NjYXBlOmN4PSc5MS40MjM3MjknIGlua3NjYXBlOmN5PSctMS40NDQ5MTUzJyBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9JzE0NDAnIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9Jzg0NycgaW5rc2NhcGU6d2luZG93LXg9JzMyJyBpbmtzY2FwZTp3aW5kb3cteT0nMjUnIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9JzAnIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9J3N2ZzMyMCcgLyUzRSUzQ3RpdGxlIGlkPSd0aXRsZTMxMiclM0VhZnJhbWUtYXJtb2RlLW5vYm9yZGVyLXJlZHVjZWQtdHJhY2tpbmclM0MvdGl0bGUlM0UlM0NwYXRoIGQ9J005NiAwSDEyQTEyIDEyIDAgMCAwIDAgMTJWNTBBMTIgMTIgMCAwIDAgMTIgNjJIOTZhMTIgMTIgMCAwIDAgMTItMTJWMTJBMTIgMTIgMCAwIDAgOTYgMFptOCA1MGE4IDggMCAwIDEtOCA4SDEyYTggOCAwIDAgMS04LThWMTJhOCA4IDAgMCAxIDgtOEg5NmE4IDggMCAwIDEgOCA4WicgZmlsbD0nJTIzZmZmJyBpZD0ncGF0aDMxNCcgc3R5bGU9J2ZpbGw6JTIzZmZmZmZmJyAvJTNFJTNDZyBpZD0nZzM1NicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTIwNi42MTAxNyAtMjMyLjYxODY0KSclM0UlM0MvZyUzRSUzQ2cgaWQ9J2czNTgnIHRyYW5zZm9ybT0ndHJhbnNsYXRlKC0yMDYuNjEwMTcgLTIzMi42MTg2NCknJTNFJTNDL2clM0UlM0NnIGlkPSdnMzYwJyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgtMjA2LjYxMDE3IC0yMzIuNjE4NjQpJyUzRSUzQy9nJTNFJTNDZyBpZD0nZzM2MicgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTIwNi42MTAxNyAtMjMyLjYxODY0KSclM0UlM0MvZyUzRSUzQ2cgaWQ9J2czNjQnIHRyYW5zZm9ybT0ndHJhbnNsYXRlKC0yMDYuNjEwMTcgLTIzMi42MTg2NCknJTNFJTNDL2clM0UlM0NnIGlkPSdnMzY2JyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgtMjA2LjYxMDE3IC0yMzIuNjE4NjQpJyUzRSUzQy9nJTNFJTNDZyBpZD0nZzM2OCcgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTIwNi42MTAxNyAtMjMyLjYxODY0KSclM0UlM0MvZyUzRSUzQ2cgaWQ9J2czNzAnIHRyYW5zZm9ybT0ndHJhbnNsYXRlKC0yMDYuNjEwMTcgLTIzMi42MTg2NCknJTNFJTNDL2clM0UlM0NnIGlkPSdnMzcyJyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgtMjA2LjYxMDE3IC0yMzIuNjE4NjQpJyUzRSUzQy9nJTNFJTNDZyBpZD0nZzM3NCcgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTIwNi42MTAxNyAtMjMyLjYxODY0KSclM0UlM0MvZyUzRSUzQ2cgaWQ9J2czNzYnIHRyYW5zZm9ybT0ndHJhbnNsYXRlKC0yMDYuNjEwMTcgLTIzMi42MTg2NCknJTNFJTNDL2clM0UlM0NnIGlkPSdnMzc4JyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgtMjA2LjYxMDE3IC0yMzIuNjE4NjQpJyUzRSUzQy9nJTNFJTNDZyBpZD0nZzM4MCcgdHJhbnNmb3JtPSd0cmFuc2xhdGUoLTIwNi42MTAxNyAtMjMyLjYxODY0KSclM0UlM0MvZyUzRSUzQ2cgaWQ9J2czODInIHRyYW5zZm9ybT0ndHJhbnNsYXRlKC0yMDYuNjEwMTcgLTIzMi42MTg2NCknJTNFJTNDL2clM0UlM0NnIGlkPSdnMzg0JyB0cmFuc2Zvcm09J3RyYW5zbGF0ZSgtMjA2LjYxMDE3IC0yMzIuNjE4NjQpJyUzRSUzQy9nJTNFJTNDbWV0YWRhdGEgaWQ9J21ldGFkYXRhNTYxJyUzRSUzQ3JkZjpSREYlM0UlM0NjYzpXb3JrIHJkZjphYm91dD0nJyUzRSUzQ2RjOnRpdGxlJTNFYWZyYW1lLWFybW9kZS1ub2JvcmRlci1yZWR1Y2VkLXRyYWNraW5nJTNDL2RjOnRpdGxlJTNFJTNDL2NjOldvcmslM0UlM0MvcmRmOlJERiUzRSUzQy9tZXRhZGF0YSUzRSUzQ3BhdGggZD0nbSA5OC4xNjg1MTEgNDAuMDgzNjQ5IGMgMCAtMS4zMDM2ODEgLTAuOTk4Nzg4IC0yLjM1ODA0MSAtMi4yMzkzODkgLTIuMzU4MDQxIC0xLjIzMDA4OCAwLjAwMzEgLTIuMjQwODkyIDEuMDU0MzYgLTIuMjQwODkyIDIuMzU4MDQxIHYgNC44ODEyOTYgbCAtOS4wNDE2NjEgLTkuMDQxNjYyIGMgLTAuODc0MTI5IC0wLjg3NTYzMSAtMi4yODg5NTQgLTAuODc1NjMxIC0zLjE2MzA4IDAgLTAuODc0MTI5IDAuODc0MTI2IC0wLjg3NDEyOSAyLjI5MzQ1OSAwIDMuMTY3NTg1IGwgOC45OTUxMDEgOC45OTIxMDEgaCAtNC44NTg3NjcgYyAtMS4zMjMyMDYgMC4wMDMxIC0yLjM4OTU4MyAxLjAwNDc5NiAtMi4zODk1ODMgMi4yMzkzODYgMCAxLjIzNzU5OCAxLjA2NjM3NyAyLjIzNzg4OCAyLjM4OTU4MyAyLjIzNzg4OCBoIDEwLjE1NDU5OSBjIDEuMzIzMjA2IDAgMi4zODgwODIgLTAuOTk4Nzg5IDIuMzkyNTg3IC0yLjIzNzg4OCAtMC4wMDQ0IC0wLjAzMzA1IC0wLjAwOSAtMC4wNTg1OCAtMC4wMTM0IC0wLjA5MTYxIDAuMDA0NiAtMC4wNDIwNyAwLjAxMzQgLTAuMDg3MTIgMC4wMTM0IC0wLjEzMDY2IFYgNDAuMDg1MTcyIGggLTEuNTJlLTQnIGlkPSdwYXRoNTk2JyBzdHlsZT0nZmlsbDolMjNmZmZmZmYlM0JzdHJva2Utd2lkdGg6MS41MDE5NCcgLyUzRSUzQ3BhdGggZD0nbSAyMy4wOTEwMDIgMzUuOTIxNzgxIC05LjAyNjY0MyA5LjA0MTY2MiB2IC00Ljg4MTI5NiBjIDAgLTEuMzAzNjgxIC0xLjAwOTMwMiAtMi4zNTUwMzcgLTIuMjQyMzkzIC0yLjM1ODA0MSAtMS4yMzc1OTggMCAtMi4yMzc4ODggMS4wNTQzNiAtMi4yMzc4ODggMi4zNTgwNDEgbCAtMC4wMDMxIDEwLjAxNjQyMSBjIDAgMC4wNDM1NiAwLjAxMjExIDAuMDg4NjIgMC4wMDE1IDAuMTMwNjU5IC0wLjAwMzEgMC4wMzE1MyAtMC4wMDkgMC4wNTcwOSAtMC4wMTIxMSAwLjA5MTYxIDAuMDAzMSAxLjIzOTA5OSAxLjA2OTM3OSAyLjIzNzg4OCAyLjM5MTA4NSAyLjIzNzg4OCBoIDEwLjE1NjEwMSBjIDEuMzIwMjAyIDAgMi4zODgwNzkgLTEuMDAwMjkxIDIuMzg4MDc5IC0yLjIzNzg4OCAwIC0xLjIzNDU5MSAtMS4wNjc4NzcgLTIuMjM2MzgzIC0yLjM4ODA3OSAtMi4yMzkzODcgaCAtNC44NTg3NjcgbCA4Ljk5NTEwMSAtOC45OTIxIGMgMC44NzExMjYgLTAuODc0MTI3IDAuODcxMTI2IC0yLjI5MzQ1OSAwIC0zLjE2NzU4NiAtMC44NzU2MjggLTAuODc3MTMyIC0yLjI5MTk1NyAtMC44NzcxMzIgLTMuMTY5MDg3IC0xLjUyZS00JyBpZD0ncGF0aDU5OCcgc3R5bGU9J2ZpbGw6JTIzZmZmZmZmJTNCc3Ryb2tlLXdpZHRoOjEuNTAxOTQnIC8lM0UlM0NwYXRoIGQ9J20gODQuNjQ5NTcyIDI1Ljk3ODAzMyA5LjA0MTY2MiAtOS4wNDE2NjQgdiA0Ljg4MTI5OCBjIDAgMS4yOTkxNzYgMS4wMTA4MDYgMi4zNTA1MzIgMi4yNDA4OTEgMi4zNTUwMzcgMS4yNDA2MDEgMCAyLjIzOTM5IC0xLjA1NTg2MSAyLjIzOTM5IC0yLjM1NTAzNyBWIDExLjc5ODI0MiBjIDAgLTAuMDQzNTYgLTAuMDA5IC0wLjA4ODYyIC0wLjAxMzQgLTAuMTI3NjcxIDAuMDA0NCAtMC4wMzE1MyAwLjAwOSAtMC4wNjE1NyAwLjAxMzQgLTAuMDkzMTMgLTAuMDA0NCAtMS4yNDA1OTggLTEuMDY5Mzc5IC0yLjIzOTM4NzMgLTIuMzkxMDg1IC0yLjIzOTM4NzMgaCAtMTAuMTU0NiBjIC0xLjMyMzIwNSAwIC0yLjM4OTU4IDAuOTk4Nzg5MyAtMi4zODk1OCAyLjIzOTM4NzMgMCAxLjIzMzA5MSAxLjA2NjM3NSAyLjIzNzg4NyAyLjM4OTU4IDIuMjQwODkxIGggNC44NTg3NjggbCAtOC45OTUxMDIgOC45OTIxIGMgLTAuODc0MTI5IDAuODcyNjI1IC0wLjg3NDEyOSAyLjI4ODk1NCAwIDMuMTYxNTc4IDAuODc0MTI3IDAuODgwMTM3IDIuMjg4OTUxIDAuODgwMTM3IDMuMTYzMDggMS41ZS00JyBpZD0ncGF0aDYwMCcgc3R5bGU9J2ZpbGw6JTIzZmZmZmZmJTNCc3Ryb2tlLXdpZHRoOjEuNTAxOTQnIC8lM0UlM0NwYXRoIGQ9J20gMTcuMjY0OTg4IDEzLjgyMjg1MyBoIDQuODU3MjY1IGMgMS4zMjAyMDIgLTAuMDAzMSAyLjM4ODA3OSAtMS4wMDc4IDIuMzg4MDc5IC0yLjI0MDg4OSAwIC0xLjI0MDYwMSAtMS4wNjc4NzcgLTIuMjM5Mzg5MyAtMi4zODgwNzkgLTIuMjM5Mzg5MyBIIDExLjk2NzY1NCBjIC0xLjMyMTcwNyAwIC0yLjM4ODA4MiAwLjk5ODc4ODMgLTIuMzkxMDg1IDIuMjM5Mzg5MyAwLjAwMzEgMC4wMzE1MyAwLjAwOSAwLjA2MTU3IDAuMDEyMTEgMC4wOTMxMyAtMC4wMDMxIDAuMDM5MDUgLTAuMDAxNSAwLjA4MjYyIC0wLjAwMTUgMC4xMjc2NzEgbCAwLjAwMzEgMTAuMDIwOTI2IGMgMCAxLjI5OTE3NiAxLjAwMDI5IDIuMzU1MDM4IDIuMjM3ODg3IDIuMzU1MDM4IDEuMjMzMDkyIC0wLjAwNDQgMi4yNDIzOTMgLTEuMDU1ODYyIDIuMjQyMzkzIC0yLjM1NTAzOCB2IC00Ljg4MTI5NSBsIDkuMDI2NjQ0IDkuMDQxNjYxIGMgMC44NzcxMzIgMC44Nzg2MzUgMi4yOTM0NTkgMC44Nzg2MzUgMy4xNjkwODcgMCAwLjg3MTEyNSAtMC44NzI2MjQgMC44NzExMjUgLTIuMjg4OTUzIDAgLTMuMTYxNTc3IGwgLTguOTk1MjgyIC04Ljk5MzYxNicgaWQ9J3BhdGg2MDInIHN0eWxlPSdmaWxsOiUyM2ZmZmZmZiUzQnN0cm9rZS13aWR0aDoxLjUwMTk0JyAvJTNFJTNDL3N2ZyUzRVwiKTtcbn1cblxuLmEtZW50ZXItdnItYnV0dG9uLFxuLmEtZW50ZXItYXItYnV0dG9uIHtcbiAgYmFja2dyb3VuZC1zaXplOiA5MCUgOTAlO1xuICBib3JkZXI6IDA7XG4gIGJvdHRvbTogMDtcbiAgY3Vyc29yOiBwb2ludGVyO1xuICBtaW4td2lkdGg6IDU4cHg7XG4gIG1pbi1oZWlnaHQ6IDM0cHg7XG4gIC8qIDEuNzQ0MTg2MDQ2NTEgKi9cbiAgLypcbiAgICBJbiBvcmRlciB0byBrZWVwIHRoZSBhc3BlY3QgcmF0aW8gd2hlbiByZXNpemluZ1xuICAgIHBhZGRpbmctdG9wIHBlcmNlbnRhZ2VzIGFyZSByZWxhdGl2ZSB0byB0aGUgY29udGFpbmluZyBibG9jaydzIHdpZHRoLlxuICAgIGh0dHA6Ly9zdGFja292ZXJmbG93LmNvbS9xdWVzdGlvbnMvMTIxMjEwOTAvcmVzcG9uc2l2ZWx5LWNoYW5nZS1kaXYtc2l6ZS1rZWVwaW5nLWFzcGVjdC1yYXRpb1xuICAqL1xuICBwYWRkaW5nLXJpZ2h0OiAwO1xuICBwYWRkaW5nLXRvcDogMDtcbiAgcG9zaXRpb246IGFic29sdXRlO1xuICByaWdodDogMDtcbiAgdHJhbnNpdGlvbjogYmFja2dyb3VuZC1jb2xvciAuMDVzIGVhc2U7XG4gIC13ZWJraXQtdHJhbnNpdGlvbjogYmFja2dyb3VuZC1jb2xvciAuMDVzIGVhc2U7XG4gIHotaW5kZXg6IDk5OTk7XG4gIGJvcmRlci1yYWRpdXM6IDhweDtcbiAgdG91Y2gtYWN0aW9uOiBtYW5pcHVsYXRpb247IC8qIFByZXZlbnQgaU9TIGRvdWJsZSB0YXAgem9vbSBvbiB0aGUgYnV0dG9uICovXG59XG5cbi5hLWVudGVyLWFyLWJ1dHRvbiB7XG4gIGJhY2tncm91bmQtc2l6ZTogMTAwJSA5MCU7XG4gIGJvcmRlci1yYWRpdXM6IDdweDtcbn1cblxuLmEtZW50ZXItYXItYnV0dG9uOmFjdGl2ZSxcbi5hLWVudGVyLWFyLWJ1dHRvbjpob3Zlcixcbi5hLWVudGVyLXZyLWJ1dHRvbjphY3RpdmUsXG4uYS1lbnRlci12ci1idXR0b246aG92ZXIge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjZWYyZDVlO1xufVxuXG4uYS1lbnRlci12ci1idXR0b24ucmVzZXRob3ZlciB7XG4gIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC4zNSk7XG59XG5cbi5hLWVudGVyLXZyLW1vZGFsIHtcbiAgYmFja2dyb3VuZC1jb2xvcjogIzY2NjtcbiAgYm9yZGVyLXJhZGl1czogMDtcbiAgZGlzcGxheTogbm9uZTtcbiAgbWluLWhlaWdodDogMzJweDtcbiAgbWFyZ2luLXJpZ2h0OiA3MHB4O1xuICBwYWRkaW5nOiA5cHg7XG4gIHdpZHRoOiAyODBweDtcbiAgcmlnaHQ6IDIlO1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG59XG5cbi5hLWVudGVyLXZyLW1vZGFsOmFmdGVyIHtcbiAgYm9yZGVyLWJvdHRvbTogMTBweCBzb2xpZCB0cmFuc3BhcmVudDtcbiAgYm9yZGVyLWxlZnQ6IDEwcHggc29saWQgIzY2NjtcbiAgYm9yZGVyLXRvcDogMTBweCBzb2xpZCB0cmFuc3BhcmVudDtcbiAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICBjb250ZW50OiAnJztcbiAgcG9zaXRpb246IGFic29sdXRlO1xuICByaWdodDogLTVweDtcbiAgdG9wOiA1cHg7XG4gIHdpZHRoOiAwO1xuICBoZWlnaHQ6IDA7XG59XG5cbi5hLWVudGVyLXZyLW1vZGFsIHAsXG4uYS1lbnRlci12ci1tb2RhbCBhIHtcbiAgZGlzcGxheTogaW5saW5lO1xufVxuXG4uYS1lbnRlci12ci1tb2RhbCBwIHtcbiAgbWFyZ2luOiAwO1xufVxuXG4uYS1lbnRlci12ci1tb2RhbCBwOmFmdGVyIHtcbiAgY29udGVudDogJyAnO1xufVxuXG4uYS1vcmllbnRhdGlvbi1tb2RhbCB7XG4gIGJhY2tncm91bmQ6IHJnYmEoMjQ0LCAyNDQsIDI0NCwgMSkgdXJsKGRhdGE6aW1hZ2Uvc3ZnK3htbCwlM0NzdmclMjB4bWxucyUzRCUyMmh0dHAlM0EvL3d3dy53My5vcmcvMjAwMC9zdmclMjIlMjB4bWxucyUzQXhsaW5rJTNEJTIyaHR0cCUzQS8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJTIyJTIwdmVyc2lvbiUzRCUyMjEuMSUyMiUyMHglM0QlMjIwcHglMjIlMjB5JTNEJTIyMHB4JTIyJTIwdmlld0JveCUzRCUyMjAlMjAwJTIwOTAlMjA5MCUyMiUyMGVuYWJsZS1iYWNrZ3JvdW5kJTNEJTIybmV3JTIwMCUyMDAlMjA5MCUyMDkwJTIyJTIweG1sJTNBc3BhY2UlM0QlMjJwcmVzZXJ2ZSUyMiUzRSUzQ3BvbHlnb24lMjBwb2ludHMlM0QlMjIwJTJDMCUyMDAlMkMwJTIwMCUyQzAlMjAlMjIlM0UlM0MvcG9seWdvbiUzRSUzQ2clM0UlM0NwYXRoJTIwZCUzRCUyMk03MS41NDUlMkM0OC4xNDVoLTMxLjk4VjIwLjc0M2MwLTIuNjI3LTIuMTM4LTQuNzY1LTQuNzY1LTQuNzY1SDE4LjQ1NmMtMi42MjglMkMwLTQuNzY3JTJDMi4xMzgtNC43NjclMkM0Ljc2NXY0Mi43ODklMjAlMjAlMjBjMCUyQzIuNjI4JTJDMi4xMzglMkM0Ljc2NiUyQzQuNzY3JTJDNC43NjZoNS41MzV2MC45NTljMCUyQzIuNjI4JTJDMi4xMzglMkM0Ljc2NSUyQzQuNzY2JTJDNC43NjVoNDIuNzg4YzIuNjI4JTJDMCUyQzQuNzY2LTIuMTM3JTJDNC43NjYtNC43NjVWNTIuOTE0JTIwJTIwJTIwQzc2LjMxMSUyQzUwLjI4NCUyQzc0LjE3MyUyQzQ4LjE0NSUyQzcxLjU0NSUyQzQ4LjE0NXolMjBNMTguNDU1JTJDMTYuOTM1aDE2LjM0NGMyLjElMkMwJTJDMy44MDglMkMxLjcwOCUyQzMuODA4JTJDMy44MDh2MjcuNDAxSDM3LjI1VjIyLjYzNiUyMCUyMCUyMGMwLTAuMjY0LTAuMjE1LTAuNDc4LTAuNDc5LTAuNDc4SDE2LjQ4MmMtMC4yNjQlMkMwLTAuNDc5JTJDMC4yMTQtMC40NzklMkMwLjQ3OHYzNi41ODVjMCUyQzAuMjY0JTJDMC4yMTUlMkMwLjQ3OCUyQzAuNDc5JTJDMC40NzhoNy41MDd2Ny42NDQlMjAlMjAlMjBoLTUuNTM0Yy0yLjEwMSUyQzAtMy44MS0xLjcwOS0zLjgxLTMuODFWMjAuNzQzQzE0LjY0NSUyQzE4LjY0MyUyQzE2LjM1NCUyQzE2LjkzNSUyQzE4LjQ1NSUyQzE2LjkzNXolMjBNMTYuOTYlMkMyMy4xMTZoMTkuMzMxdjI1LjAzMWgtNy41MzUlMjAlMjAlMjBjLTIuNjI4JTJDMC00Ljc2NiUyQzIuMTM5LTQuNzY2JTJDNC43Njh2NS44MjhoLTcuMDNWMjMuMTE2eiUyME03MS41NDUlMkM3My4wNjRIMjguNzU3Yy0yLjEwMSUyQzAtMy44MS0xLjcwOC0zLjgxLTMuODA4VjUyLjkxNCUyMCUyMCUyMGMwLTIuMTAyJTJDMS43MDktMy44MTIlMkMzLjgxLTMuODEyaDQyLjc4OGMyLjElMkMwJTJDMy44MDklMkMxLjcxJTJDMy44MDklMkMzLjgxMnYxNi4zNDNDNzUuMzU0JTJDNzEuMzU2JTJDNzMuNjQ1JTJDNzMuMDY0JTJDNzEuNTQ1JTJDNzMuMDY0eiUyMiUzRSUzQy9wYXRoJTNFJTNDcGF0aCUyMGQlM0QlMjJNMjguOTE5JTJDNTguNDI0Yy0xLjQ2NiUyQzAtMi42NTklMkMxLjE5My0yLjY1OSUyQzIuNjZjMCUyQzEuNDY2JTJDMS4xOTMlMkMyLjY1OCUyQzIuNjU5JTJDMi42NThjMS40NjglMkMwJTJDMi42NjItMS4xOTIlMkMyLjY2Mi0yLjY1OCUyMCUyMCUyMEMzMS41ODElMkM1OS42MTclMkMzMC4zODclMkM1OC40MjQlMkMyOC45MTklMkM1OC40MjR6JTIwTTI4LjkxOSUyQzYyLjc4NmMtMC45MzklMkMwLTEuNzAzLTAuNzY0LTEuNzAzLTEuNzAyYzAtMC45MzklMkMwLjc2NC0xLjcwNCUyQzEuNzAzLTEuNzA0JTIwJTIwJTIwYzAuOTQlMkMwJTJDMS43MDUlMkMwLjc2NSUyQzEuNzA1JTJDMS43MDRDMzAuNjIzJTJDNjIuMDIyJTJDMjkuODU4JTJDNjIuNzg2JTJDMjguOTE5JTJDNjIuNzg2eiUyMiUzRSUzQy9wYXRoJTNFJTNDcGF0aCUyMGQlM0QlMjJNNjkuNjU0JTJDNTAuNDYxSDMzLjA2OWMtMC4yNjQlMkMwLTAuNDc5JTJDMC4yMTUtMC40NzklMkMwLjQ3OXYyMC4yODhjMCUyQzAuMjY0JTJDMC4yMTUlMkMwLjQ3OCUyQzAuNDc5JTJDMC40NzhoMzYuNTg1JTIwJTIwJTIwYzAuMjYzJTJDMCUyQzAuNDc3LTAuMjE0JTJDMC40NzctMC40NzhWNTAuOTM5QzcwLjEzMSUyQzUwLjY3NiUyQzY5LjkxNyUyQzUwLjQ2MSUyQzY5LjY1NCUyQzUwLjQ2MXolMjBNNjkuMTc0JTJDNTEuNDE3VjcwLjc1SDMzLjU0OFY1MS40MTdINjkuMTc0eiUyMiUzRSUzQy9wYXRoJTNFJTNDcGF0aCUyMGQlM0QlMjJNNDUuMjAxJTJDMzAuMjk2YzYuNjUxJTJDMCUyQzEyLjIzMyUyQzUuMzUxJTJDMTIuNTUxJTJDMTEuOTc3bC0zLjAzMy0yLjYzOGMtMC4xOTMtMC4xNjUtMC41MDctMC4xNDItMC42NzUlMkMwLjA0OCUyMCUyMCUyMGMtMC4xNzQlMkMwLjE5OC0wLjE1MyUyQzAuNTAxJTJDMC4wNDUlMkMwLjY3NmwzLjg4MyUyQzMuMzc1YzAuMDklMkMwLjA3NSUyQzAuMTk4JTJDMC4xMTUlMkMwLjMxMiUyQzAuMTE1YzAuMTQxJTJDMCUyQzAuMjczLTAuMDYxJTJDMC4zNjItMC4xNjYlMjAlMjAlMjBsMy4zNzEtMy44NzdjMC4xNzMtMC4yJTJDMC4xNTEtMC41MDItMC4wNDctMC42NzVjLTAuMTk0LTAuMTY2LTAuNTA4LTAuMTQ0LTAuNjc2JTJDMC4wNDhsLTIuNTkyJTJDMi45NzklMjAlMjAlMjBjLTAuMTgtMy40MTctMS42MjktNi42MDUtNC4wOTktOS4wMDFjLTIuNTM4LTIuNDYxLTUuODc3LTMuODE3LTkuNDA0LTMuODE3Yy0wLjI2NCUyQzAtMC40NzklMkMwLjIxNS0wLjQ3OSUyQzAuNDc5JTIwJTIwJTIwQzQ0LjcyJTJDMzAuMDgzJTJDNDQuOTM2JTJDMzAuMjk2JTJDNDUuMjAxJTJDMzAuMjk2eiUyMiUzRSUzQy9wYXRoJTNFJTNDL2clM0UlM0Mvc3ZnJTNFKSBjZW50ZXIgbm8tcmVwZWF0O1xuICBiYWNrZ3JvdW5kLXNpemU6IDUwJSA1MCU7XG4gIGJvdHRvbTogMDtcbiAgZm9udC1zaXplOiAxNHB4O1xuICBmb250LXdlaWdodDogNjAwO1xuICBsZWZ0OiAwO1xuICBsaW5lLWhlaWdodDogMjBweDtcbiAgcmlnaHQ6IDA7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgdG9wOiAwO1xuICB6LWluZGV4OiA5OTk5OTk5O1xufVxuXG4uYS1vcmllbnRhdGlvbi1tb2RhbDphZnRlciB7XG4gIGNvbG9yOiAjNjY2O1xuICBjb250ZW50OiBcIkluc2VydCBwaG9uZSBpbnRvIENhcmRib2FyZCBob2xkZXIuXCI7XG4gIGRpc3BsYXk6IGJsb2NrO1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgdG9wOiA3MCU7XG4gIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgtNzAlKTtcbiAgd2lkdGg6IDEwMCU7XG59XG5cbi5hLW9yaWVudGF0aW9uLW1vZGFsIGJ1dHRvbiB7XG4gIGJhY2tncm91bmQ6IHVybChkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnMlM0QlMjJodHRwJTNBLy93d3cudzMub3JnLzIwMDAvc3ZnJTIyJTIweG1sbnMlM0F4bGluayUzRCUyMmh0dHAlM0EvL3d3dy53My5vcmcvMTk5OS94bGluayUyMiUyMHZlcnNpb24lM0QlMjIxLjElMjIlMjB4JTNEJTIyMHB4JTIyJTIweSUzRCUyMjBweCUyMiUyMHZpZXdCb3glM0QlMjIwJTIwMCUyMDEwMCUyMDEwMCUyMiUyMGVuYWJsZS1iYWNrZ3JvdW5kJTNEJTIybmV3JTIwMCUyMDAlMjAxMDAlMjAxMDAlMjIlMjB4bWwlM0FzcGFjZSUzRCUyMnByZXNlcnZlJTIyJTNFJTNDcGF0aCUyMGZpbGwlM0QlMjIlMjMwMDAwMDAlMjIlMjBkJTNEJTIyTTU1LjIwOSUyQzUwbDE3LjgwMy0xNy44MDNjMS40MTYtMS40MTYlMkMxLjQxNi0zLjcxMyUyQzAtNS4xMjljLTEuNDE2LTEuNDE3LTMuNzEzLTEuNDE3LTUuMTI5JTJDMEw1MC4wOCUyQzQ0Ljg3MiUyMCUyMEwzMi4yNzglMkMyNy4wNjljLTEuNDE2LTEuNDE3LTMuNzE0LTEuNDE3LTUuMTI5JTJDMGMtMS40MTclMkMxLjQxNi0xLjQxNyUyQzMuNzEzJTJDMCUyQzUuMTI5TDQ0Ljk1MSUyQzUwTDI3LjE0OSUyQzY3LjgwMyUyMCUyMGMtMS40MTclMkMxLjQxNi0xLjQxNyUyQzMuNzEzJTJDMCUyQzUuMTI5YzAuNzA4JTJDMC43MDglMkMxLjYzNiUyQzEuMDYyJTJDMi41NjQlMkMxLjA2MmMwLjkyOCUyQzAlMkMxLjg1Ni0wLjM1NCUyQzIuNTY0LTEuMDYyTDUwLjA4JTJDNTUuMTNsMTcuODAzJTJDMTcuODAyJTIwJTIwYzAuNzA4JTJDMC43MDglMkMxLjYzNyUyQzEuMDYyJTJDMi41NjQlMkMxLjA2MnMxLjg1Ni0wLjM1NCUyQzIuNTY0LTEuMDYyYzEuNDE2LTEuNDE2JTJDMS40MTYtMy43MTMlMkMwLTUuMTI5TDU1LjIwOSUyQzUweiUyMiUzRSUzQy9wYXRoJTNFJTNDL3N2ZyUzRSkgbm8tcmVwZWF0O1xuICBib3JkZXI6IG5vbmU7XG4gIGhlaWdodDogNTBweDtcbiAgdGV4dC1pbmRlbnQ6IC05OTk5cHg7XG4gIHdpZHRoOiA1MHB4O1xufVxuXG4uYS1sb2FkZXItdGl0bGUge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuNik7XG4gIGZvbnQtZmFtaWx5OiBzYW5zLXNlcmlmLCBtb25vc3BhY2U7XG4gIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgZm9udC1zaXplOiAyMHB4O1xuICBoZWlnaHQ6IDUwcHg7XG4gIGZvbnQtd2VpZ2h0OiAzMDA7XG4gIGxpbmUtaGVpZ2h0OiA1MHB4O1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIHJpZ2h0OiAwcHg7XG4gIGxlZnQ6IDBweDtcbiAgdG9wOiAwcHg7XG4gIGNvbG9yOiB3aGl0ZTtcbn1cblxuLmEtbW9kYWwge1xuICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gIGJhY2tncm91bmQ6IHJnYmEoMCwgMCwgMCwgMC42MCk7XG4gIGJhY2tncm91bmQtc2l6ZTogNTAlIDUwJTtcbiAgYm90dG9tOiAwO1xuICBmb250LXNpemU6IDE0cHg7XG4gIGZvbnQtd2VpZ2h0OiA2MDA7XG4gIGxlZnQ6IDA7XG4gIGxpbmUtaGVpZ2h0OiAyMHB4O1xuICByaWdodDogMDtcbiAgcG9zaXRpb246IGZpeGVkO1xuICB0b3A6IDA7XG4gIHotaW5kZXg6IDk5OTk5OTk7XG59XG5cbi5hLWRpYWxvZyB7XG4gIHBvc2l0aW9uOiByZWxhdGl2ZTtcbiAgbGVmdDogNTAlO1xuICB0b3A6IDUwJTtcbiAgdHJhbnNmb3JtOiB0cmFuc2xhdGUoLTUwJSwgLTUwJSk7XG4gIHotaW5kZXg6IDE5OTk5NTtcbiAgd2lkdGg6IDMwMHB4O1xuICBoZWlnaHQ6IDIwMHB4O1xuICBiYWNrZ3JvdW5kLXNpemU6IGNvbnRhaW47XG4gIGJhY2tncm91bmQtY29sb3I6IHdoaXRlO1xuICBmb250LWZhbWlseTogc2Fucy1zZXJpZiwgbW9ub3NwYWNlO1xuICBmb250LXNpemU6IDIwcHg7XG4gIGJvcmRlci1yYWRpdXM6IDNweDtcbiAgcGFkZGluZzogNnB4O1xufVxuXG4uYS1kaWFsb2ctdGV4dC1jb250YWluZXIge1xuICB3aWR0aDogMTAwJTtcbiAgaGVpZ2h0OiA3MCU7XG4gIGFsaWduLXNlbGY6IGZsZXgtc3RhcnQ7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICBhbGlnbi1jb250ZW50OiBjZW50ZXI7XG4gIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47XG59XG5cbi5hLWRpYWxvZy10ZXh0IHtcbiAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICBmb250LXdlaWdodDogbm9ybWFsO1xuICBmb250LXNpemU6IDE0cHQ7XG4gIG1hcmdpbjogOHB4O1xufVxuXG4uYS1kaWFsb2ctYnV0dG9ucy1jb250YWluZXIge1xuICBkaXNwbGF5OiBpbmxpbmUtZmxleDtcbiAgYWxpZ24tc2VsZjogZmxleC1lbmQ7XG4gIHdpZHRoOiAxMDAlO1xuICBoZWlnaHQ6IDMwJTtcbn1cblxuLmEtZGlhbG9nLWJ1dHRvbiB7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgYWxpZ24tc2VsZjogY2VudGVyO1xuICBvcGFjaXR5OiAwLjk7XG4gIGhlaWdodDogODAlO1xuICB3aWR0aDogNTAlO1xuICBmb250LXNpemU6IDEycHQ7XG4gIG1hcmdpbjogNHB4O1xuICBib3JkZXItcmFkaXVzOiAycHg7XG4gIHRleHQtYWxpZ246Y2VudGVyO1xuICBib3JkZXI6IG5vbmU7XG4gIGRpc3BsYXk6IGlubGluZS1ibG9jaztcbiAgLXdlYmtpdC10cmFuc2l0aW9uOiBhbGwgMC4yNXMgZWFzZS1pbi1vdXQ7XG4gIHRyYW5zaXRpb246IGFsbCAwLjI1cyBlYXNlLWluLW91dDtcbiAgYm94LXNoYWRvdzogMCAxcHggM3B4IHJnYmEoMCwgMCwgMCwgMC4xMCksIDAgMXB4IDJweCByZ2JhKDAsIDAsIDAsIDAuMjApO1xuICB1c2VyLXNlbGVjdDogbm9uZTtcbn1cblxuLmEtZGlhbG9nLXBlcm1pc3Npb24tYnV0dG9uOmhvdmVyIHtcbiAgYm94LXNoYWRvdzogMCA3cHggMTRweCByZ2JhKDAsMCwwLDAuMjApLCAwIDJweCAycHggcmdiYSgwLDAsMCwwLjIwKTtcbn1cblxuLmEtZGlhbG9nLWFsbG93LWJ1dHRvbiB7XG4gIGJhY2tncm91bmQtY29sb3I6ICMwMGNlZmY7XG59XG5cbi5hLWRpYWxvZy1kZW55LWJ1dHRvbiB7XG4gIGJhY2tncm91bmQtY29sb3I6ICNmZjAwNWI7XG59XG5cbi5hLWRpYWxvZy1vay1idXR0b24ge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjMDBjZWZmO1xuICB3aWR0aDogMTAwJTtcbn1cblxuLmEtZG9tLW92ZXJsYXk6bm90KC5hLW5vLXN0eWxlKSB7XG4gIG92ZXJmbG93OiBoaWRkZW47XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgcG9pbnRlci1ldmVudHM6IG5vbmU7XG4gIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG4gIGJvdHRvbTogMDtcbiAgbGVmdDogMDtcbiAgcmlnaHQ6IDA7XG4gIHRvcDogMDtcbiAgcGFkZGluZzogMWVtO1xufVxuXG4uYS1kb20tb3ZlcmxheTpub3QoLmEtbm8tc3R5bGUpPioge1xuICBwb2ludGVyLWV2ZW50czogYXV0bztcbn1cbiJdLCJzb3VyY2VSb290IjoiIn0= */</style><style>.rs-base {
+  background-color: #333;
+  color: #fafafa;
+  border-radius: 0;
+  font: 10px monospace;
+  left: 5px;
+  line-height: 1em;
+  opacity: 0.85;
+  overflow: hidden;
+  padding: 10px;
+  position: fixed;
+  top: 5px;
+  width: 300px;
+  z-index: 10000;
+}
+
+.rs-base div.hidden {
+  display: none;
+}
+
+.rs-base h1 {
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.4em;
+  font-weight: 300;
+  margin: 0 0 5px;
+  padding: 0;
+}
+
+.rs-group {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column-reverse;
+  flex-direction: column-reverse;
+  margin-bottom: 5px;
+}
+
+.rs-group:last-child {
+  margin-bottom: 0;
+}
+
+.rs-counter-base {
+  align-items: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  height: 10px;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  margin: 2px 0;
+}
+
+.rs-counter-base.alarm {
+  color: #b70000;
+  text-shadow: 0 0 0 #b70000,
+               0 0 1px #fff,
+               0 0 1px #fff,
+               0 0 2px #fff,
+               0 0 2px #fff,
+               0 0 3px #fff,
+               0 0 3px #fff,
+               0 0 4px #fff,
+               0 0 4px #fff;
+}
+
+.rs-counter-id {
+  font-weight: 300;
+  -webkit-box-ordinal-group: 0;
+  -webkit-order: 0;
+  order: 0;
+  width: 54px;
+}
+
+.rs-counter-value {
+  font-weight: 300;
+  -webkit-box-ordinal-group: 1;
+  -webkit-order: 1;
+  order: 1;
+  text-align: right;
+  width: 35px;
+}
+
+.rs-canvas {
+  -webkit-box-ordinal-group: 2;
+  -webkit-order: 2;
+  order: 2;
+}
+
+@media (min-width: 480px) {
+  .rs-base {
+    left: 20px;
+    top: 20px;
+  }
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8uL3NyYy9zdHlsZS9yU3RhdHMuY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0Usc0JBQXNCO0VBQ3RCLGNBQWM7RUFDZCxnQkFBZ0I7RUFDaEIsb0JBQW9CO0VBQ3BCLFNBQVM7RUFDVCxnQkFBZ0I7RUFDaEIsYUFBYTtFQUNiLGdCQUFnQjtFQUNoQixhQUFhO0VBQ2IsZUFBZTtFQUNmLFFBQVE7RUFDUixZQUFZO0VBQ1osY0FBYztBQUNoQjs7QUFFQTtFQUNFLGFBQWE7QUFDZjs7QUFFQTtFQUNFLFdBQVc7RUFDWCxlQUFlO0VBQ2YsZ0JBQWdCO0VBQ2hCLGdCQUFnQjtFQUNoQixlQUFlO0VBQ2YsVUFBVTtBQUNaOztBQUVBO0VBQ0Usb0JBQW9CO0VBQ3BCLHFCQUFxQjtFQUNyQixhQUFhO0VBQ2Isc0NBQXNDO0VBQ3RDLDhCQUE4QjtFQUM5QixrQkFBa0I7QUFDcEI7O0FBRUE7RUFDRSxnQkFBZ0I7QUFDbEI7O0FBRUE7RUFDRSxtQkFBbUI7RUFDbkIsb0JBQW9CO0VBQ3BCLHFCQUFxQjtFQUNyQixhQUFhO0VBQ2IsWUFBWTtFQUNaLHNDQUFzQztFQUN0Qyw4QkFBOEI7RUFDOUIsYUFBYTtBQUNmOztBQUVBO0VBQ0UsY0FBYztFQUNkOzs7Ozs7OzsyQkFReUI7QUFDM0I7O0FBRUE7RUFDRSxnQkFBZ0I7RUFDaEIsNEJBQTRCO0VBQzVCLGdCQUFnQjtFQUNoQixRQUFRO0VBQ1IsV0FBVztBQUNiOztBQUVBO0VBQ0UsZ0JBQWdCO0VBQ2hCLDRCQUE0QjtFQUM1QixnQkFBZ0I7RUFDaEIsUUFBUTtFQUNSLGlCQUFpQjtFQUNqQixXQUFXO0FBQ2I7O0FBRUE7RUFDRSw0QkFBNEI7RUFDNUIsZ0JBQWdCO0VBQ2hCLFFBQVE7QUFDVjs7QUFFQTtFQUNFO0lBQ0UsVUFBVTtJQUNWLFNBQVM7RUFDWDtBQUNGIiwic291cmNlc0NvbnRlbnQiOlsiLnJzLWJhc2Uge1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjMzMzO1xuICBjb2xvcjogI2ZhZmFmYTtcbiAgYm9yZGVyLXJhZGl1czogMDtcbiAgZm9udDogMTBweCBtb25vc3BhY2U7XG4gIGxlZnQ6IDVweDtcbiAgbGluZS1oZWlnaHQ6IDFlbTtcbiAgb3BhY2l0eTogMC44NTtcbiAgb3ZlcmZsb3c6IGhpZGRlbjtcbiAgcGFkZGluZzogMTBweDtcbiAgcG9zaXRpb246IGZpeGVkO1xuICB0b3A6IDVweDtcbiAgd2lkdGg6IDMwMHB4O1xuICB6LWluZGV4OiAxMDAwMDtcbn1cblxuLnJzLWJhc2UgZGl2LmhpZGRlbiB7XG4gIGRpc3BsYXk6IG5vbmU7XG59XG5cbi5ycy1iYXNlIGgxIHtcbiAgY29sb3I6ICNmZmY7XG4gIGN1cnNvcjogcG9pbnRlcjtcbiAgZm9udC1zaXplOiAxLjRlbTtcbiAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgbWFyZ2luOiAwIDAgNXB4O1xuICBwYWRkaW5nOiAwO1xufVxuXG4ucnMtZ3JvdXAge1xuICBkaXNwbGF5OiAtd2Via2l0LWJveDtcbiAgZGlzcGxheTogLXdlYmtpdC1mbGV4O1xuICBkaXNwbGF5OiBmbGV4O1xuICAtd2Via2l0LWZsZXgtZGlyZWN0aW9uOiBjb2x1bW4tcmV2ZXJzZTtcbiAgZmxleC1kaXJlY3Rpb246IGNvbHVtbi1yZXZlcnNlO1xuICBtYXJnaW4tYm90dG9tOiA1cHg7XG59XG5cbi5ycy1ncm91cDpsYXN0LWNoaWxkIHtcbiAgbWFyZ2luLWJvdHRvbTogMDtcbn1cblxuLnJzLWNvdW50ZXItYmFzZSB7XG4gIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gIGRpc3BsYXk6IC13ZWJraXQtYm94O1xuICBkaXNwbGF5OiAtd2Via2l0LWZsZXg7XG4gIGRpc3BsYXk6IGZsZXg7XG4gIGhlaWdodDogMTBweDtcbiAgLXdlYmtpdC1qdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47XG4gIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjtcbiAgbWFyZ2luOiAycHggMDtcbn1cblxuLnJzLWNvdW50ZXItYmFzZS5hbGFybSB7XG4gIGNvbG9yOiAjYjcwMDAwO1xuICB0ZXh0LXNoYWRvdzogMCAwIDAgI2I3MDAwMCxcbiAgICAgICAgICAgICAgIDAgMCAxcHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCAxcHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCAycHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCAycHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCAzcHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCAzcHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCA0cHggI2ZmZixcbiAgICAgICAgICAgICAgIDAgMCA0cHggI2ZmZjtcbn1cblxuLnJzLWNvdW50ZXItaWQge1xuICBmb250LXdlaWdodDogMzAwO1xuICAtd2Via2l0LWJveC1vcmRpbmFsLWdyb3VwOiAwO1xuICAtd2Via2l0LW9yZGVyOiAwO1xuICBvcmRlcjogMDtcbiAgd2lkdGg6IDU0cHg7XG59XG5cbi5ycy1jb3VudGVyLXZhbHVlIHtcbiAgZm9udC13ZWlnaHQ6IDMwMDtcbiAgLXdlYmtpdC1ib3gtb3JkaW5hbC1ncm91cDogMTtcbiAgLXdlYmtpdC1vcmRlcjogMTtcbiAgb3JkZXI6IDE7XG4gIHRleHQtYWxpZ246IHJpZ2h0O1xuICB3aWR0aDogMzVweDtcbn1cblxuLnJzLWNhbnZhcyB7XG4gIC13ZWJraXQtYm94LW9yZGluYWwtZ3JvdXA6IDI7XG4gIC13ZWJraXQtb3JkZXI6IDI7XG4gIG9yZGVyOiAyO1xufVxuXG5AbWVkaWEgKG1pbi13aWR0aDogNDgwcHgpIHtcbiAgLnJzLWJhc2Uge1xuICAgIGxlZnQ6IDIwcHg7XG4gICAgdG9wOiAyMHB4O1xuICB9XG59XG4iXSwic291cmNlUm9vdCI6IiJ9 */</style>
+<script>window.__AUTOSTART_WORLD__ = {
+  "theme": "las",
+  "stations": [
+    {
+      "en": "In the evening Janek looked at the sky and counted stars.",
+      "pl": "Wieczorem Janek patrzył na niebo i liczył gwiazdy.",
+      "image": "",
+      "words": [
+        {"en": "In the evening", "pl": "Wieczorem"},
+        {"en": "Janek", "pl": "Janek"},
+        {"en": "looked at the sky", "pl": "patrzył na niebo"},
+        {"en": "and counted", "pl": "i liczył"},
+        {"en": "stars", "pl": "gwiazdy"}
+      ]
+    },
+    {
+      "en": "He counted fifteen, and then the sixteenth star: 'Sixteen!'",
+      "pl": "Naliczył piętnaście, a potem szesnastą gwiazdę: 'Sixteen!'",
+      "image": "",
+      "words": [
+        {"en": "He counted fifteen", "pl": "Naliczył piętnaście"},
+        {"en": "and then", "pl": "a potem"},
+        {"en": "the sixteenth star", "pl": "szesnastą gwiazdę"},
+        {"en": "Sixteen", "pl": "Sixteen"}
+      ]
+    },
+    {
+      "en": "'Sixteen' means 'sixteen'.",
+      "pl": "'Sixteen' znaczy 'szesnaście'.",
+      "image": "",
+      "words": [
+        {"en": "Sixteen", "pl": "Sixteen"},
+        {"en": "means", "pl": "znaczy"},
+        {"en": "sixteen", "pl": "szesnaście"}
+      ]
+    },
+    {
+      "en": "The seventeenth star: 'Seventeen!'",
+      "pl": "Siedemnasta gwiazda: 'Seventeen!'",
+      "image": "",
+      "words": [
+        {"en": "The seventeenth star", "pl": "Siedemnasta gwiazda"},
+        {"en": "Seventeen", "pl": "Seventeen"}
+      ]
+    },
+    {
+      "en": "'Seventeen' means 'seventeen'.",
+      "pl": "'Seventeen' znaczy 'siedemnaście'.",
+      "image": "",
+      "words": [
+        {"en": "Seventeen", "pl": "Seventeen"},
+        {"en": "means", "pl": "znaczy"},
+        {"en": "seventeen", "pl": "siedemnaście"}
+      ]
+    },
+    {
+      "en": "The eighteenth star: 'Eighteen!'",
+      "pl": "Osiemnasta gwiazda: 'Eighteen!'",
+      "image": "",
+      "words": [
+        {"en": "The eighteenth star", "pl": "Osiemnasta gwiazda"},
+        {"en": "Eighteen", "pl": "Eighteen"}
+      ]
+    },
+    {
+      "en": "'Eighteen' means 'eighteen'.",
+      "pl": "'Eighteen' znaczy 'osiemnaście'.",
+      "image": "",
+      "words": [
+        {"en": "Eighteen", "pl": "Eighteen"},
+        {"en": "means", "pl": "znaczy"},
+        {"en": "eighteen", "pl": "osiemnaście"}
+      ]
+    },
+    {
+      "en": "The nineteenth star: 'Nineteen!'",
+      "pl": "Dziewiętnasta gwiazda: 'Nineteen!'",
+      "image": "",
+      "words": [
+        {"en": "The nineteenth star", "pl": "Dziewiętnasta gwiazda"},
+        {"en": "Nineteen", "pl": "Nineteen"}
+      ]
+    },
+    {
+      "en": "'Nineteen' means 'nineteen'.",
+      "pl": "'Nineteen' znaczy 'dziewiętnaście'.",
+      "image": "",
+      "words": [
+        {"en": "Nineteen", "pl": "Nineteen"},
+        {"en": "means", "pl": "znaczy"},
+        {"en": "nineteen", "pl": "dziewiętnaście"}
+      ]
+    },
+    {
+      "en": "The twentieth star: 'Twenty!'",
+      "pl": "Dwudziesta gwiazda: 'Twenty!'",
+      "image": "",
+      "words": [
+        {"en": "The twentieth star", "pl": "Dwudziesta gwiazda"},
+        {"en": "Twenty", "pl": "Twenty"}
+      ]
+    },
+    {
+      "en": "'Twenty' means 'twenty'. Janek learned to count to twenty!",
+      "pl": "'Twenty' znaczy 'dwadzieścia'. Janek nauczył się liczyć do dwudziestu!",
+      "image": "",
+      "words": [
+        {"en": "Twenty", "pl": "Twenty"},
+        {"en": "means", "pl": "znaczy"},
+        {"en": "twenty", "pl": "dwadzieścia"},
+        {"en": "Janek", "pl": "Janek"},
+        {"en": "learned to count", "pl": "nauczył się liczyć"},
+        {"en": "to twenty", "pl": "do dwudziestu"}
+      ]
+    }
+  ],
+  "opts": {
+    "tts": true,
+    "autoAdvance": true,
+    "freeWalk": true,
+    "lockPitch": true,
+    "layout": "spiral",
+    "moveSpeed": 0.6,
+    "spacing": 1.3,
+    "langPair": "en_pl",
+    "hideHud": true
+  }
+};
+window.__CLEAN_EXPORT__ = true;
+</script>
+</head>
+<body>
+
+<!-- ============ EKRAN USTAWIEŃ ============ -->
+<div id="setup-screen">
+  <div id="setup-inner">
+    <div class="eyebrow">Global Net School · Angielski dla Klasy 1</div>
+    <h1>Angielska Kraina <em>VR</em><br>Nauki z Kontekstem</h1>
+    <p class="subtitle">Wklej dłuższy tekst (np. prostą bajkę) — podzielimy go na przystanki. Do każdego możesz dopisać tłumaczenie, obrazek i rozbić zdanie na pojedyncze słówka. Możesz też dodać przystanek ręcznie od zera. Dziecko spaceruje po kolorowej krainie 3D, słucha wymowy i uczy się w kontekście.</p>
+
+    <div class="card">
+      <div class="card-label">📷 Biblioteka zdjęć</div>
+      <div class="t-desc" style="margin-bottom:10px;">Wgraj z dysku kilka lub kilkanaście zdjęć naraz — potem przy każdym przystanku wystarczy kliknąć „Z biblioteki” i wybrać jedno z nich, bez wpisywania adresu URL.</div>
+      <input type="file" id="image-library-input" accept="image/*" multiple="" style="margin-bottom:10px;color:var(--text-muted);font-size:13px;">
+      <div id="image-library-strip" class="image-lib-strip"><div class="empty-hint">Brak wgranych zdjęć — wybierz pliki powyżej (można zaznaczyć kilka lub kilkanaście naraz).</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">01 · Import gotowej bajki (JSON)</div>
+      <div class="t-desc" style="margin-bottom:10px;">Wklej strukturę JSON ze zdaniami i słówkami, albo wczytaj plik .json. Na każde zdanie powstanie jeden przystanek: zdanie z tłumaczeniem (i obrazkiem, jeśli podany), a jego słówka są czytane pojedynczo zaraz po zdaniu. Pola "en"/"pl" w strukturze to tylko nazwy — możesz wpisać tam dowolną parę języków (np. niemiecki/polski), o ile ustawisz odpowiednią „Parę językową” w opcjach spaceru poniżej.</div>
+      <input type="file" id="json-file-input" accept=".json,application/json" style="margin-bottom:10px;color:var(--text-muted);font-size:13px;">
+      <textarea id="json-paste" placeholder="Wklej tutaj JSON, np.:
+{
+  &quot;sentences&quot;: [
+    { &quot;pl&quot;: &quot;Mały jeżyk Janek mieszkał w lesie.&quot;, &quot;en&quot;: &quot;Little hedgehog Janek lived in the forest.&quot;, &quot;image&quot;: null,
+      &quot;words&quot;: [ { &quot;pl&quot;: &quot;Mały&quot;, &quot;en&quot;: &quot;Little&quot; }, { &quot;pl&quot;: &quot;jeżyk&quot;, &quot;en&quot;: &quot;hedgehog&quot; } ] }
+  ]
+}"></textarea>
+      <button class="split-btn" id="json-import-btn" type="button">📥 Importuj JSON i dodaj przystanki</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">02 · Wklej tekst (np. bajkę)</div>
+      <div class="wordset-row" id="wordset-row"><button type="button" class="wordset-btn">Kolory 🎨</button><button type="button" class="wordset-btn">Zwierzęta 🐾</button><button type="button" class="wordset-btn">Liczby 🔢</button><button type="button" class="wordset-btn">Rodzina 👪</button><button type="button" class="wordset-btn">Powitania 👋</button></div>
+      <textarea id="lesson-text" placeholder="Wklej tutaj tekst — bajkę, historyjkę, zdania do nauki...
+
+Podziel go akapitami lub zdaniami. Każdy fragment stanie się osobnym, edytowalnym przystankiem poniżej."></textarea>
+      <button class="split-btn" id="split-btn" type="button">✂️ Podziel tekst na przystanki</button>
+    </div>
+
+    <div class="card">
+      <div class="card-label">03 · Przystanki (edytuj, dodaj tłumaczenie / obrazek / słówka)</div>
+      <div id="stations-editor">
+      <div class="station-edit-card" data-id="0">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 1</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="0">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="0" placeholder="np. The cat sleeps on the mat.">In the evening Janek looked at the sky and counted stars.</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="0" value="Wieczorem Janek patrzyl na niebo i liczyl gwiazdy." placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="0" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="0" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="0">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="0" data-word-idx="0" data-word-field="en" value="In the evening" placeholder="słowo">
+    <input data-word-station="0" data-word-idx="0" data-word-field="pl" value="Wieczorem" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="0" data-word-idx="0">✕</button>
+  
+    <input data-word-station="0" data-word-idx="1" data-word-field="en" value="Janek" placeholder="słowo">
+    <input data-word-station="0" data-word-idx="1" data-word-field="pl" value="Janek" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="0" data-word-idx="1">✕</button>
+  
+    <input data-word-station="0" data-word-idx="2" data-word-field="en" value="looked at the sky" placeholder="słowo">
+    <input data-word-station="0" data-word-idx="2" data-word-field="pl" value="patrzyl na niebo" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="0" data-word-idx="2">✕</button>
+  
+    <input data-word-station="0" data-word-idx="3" data-word-field="en" value="and counted" placeholder="słowo">
+    <input data-word-station="0" data-word-idx="3" data-word-field="pl" value="i liczyl" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="0" data-word-idx="3">✕</button>
+  
+    <input data-word-station="0" data-word-idx="4" data-word-field="en" value="stars" placeholder="słowo">
+    <input data-word-station="0" data-word-idx="4" data-word-field="pl" value="gwiazdy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="0" data-word-idx="4">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="1">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 2</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="1">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="1" placeholder="np. The cat sleeps on the mat.">He counted fifteen, and then the sixteenth star: 'Sixteen!'</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="1" value="Naliczyl pietnascie, a potem szesnasta gwiazde: 'Sixteen!'" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="1" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="1" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="1">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="1" data-word-idx="0" data-word-field="en" value="He counted fifteen" placeholder="słowo">
+    <input data-word-station="1" data-word-idx="0" data-word-field="pl" value="Naliczyl pietnascie" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="1" data-word-idx="0">✕</button>
+  
+    <input data-word-station="1" data-word-idx="1" data-word-field="en" value="and then" placeholder="słowo">
+    <input data-word-station="1" data-word-idx="1" data-word-field="pl" value="a potem" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="1" data-word-idx="1">✕</button>
+  
+    <input data-word-station="1" data-word-idx="2" data-word-field="en" value="the sixteenth star" placeholder="słowo">
+    <input data-word-station="1" data-word-idx="2" data-word-field="pl" value="szesnasta gwiazde" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="1" data-word-idx="2">✕</button>
+  
+    <input data-word-station="1" data-word-idx="3" data-word-field="en" value="Sixteen" placeholder="słowo">
+    <input data-word-station="1" data-word-idx="3" data-word-field="pl" value="Sixteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="1" data-word-idx="3">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="2">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 3</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="2">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="2" placeholder="np. The cat sleeps on the mat.">'Sixteen' means 'sixteen'.</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="2" value="'Sixteen' znaczy 'szesnascie'." placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="2" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="2" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="2">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="2" data-word-idx="0" data-word-field="en" value="Sixteen" placeholder="słowo">
+    <input data-word-station="2" data-word-idx="0" data-word-field="pl" value="Sixteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="2" data-word-idx="0">✕</button>
+  
+    <input data-word-station="2" data-word-idx="1" data-word-field="en" value="means" placeholder="słowo">
+    <input data-word-station="2" data-word-idx="1" data-word-field="pl" value="znaczy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="2" data-word-idx="1">✕</button>
+  
+    <input data-word-station="2" data-word-idx="2" data-word-field="en" value="sixteen" placeholder="słowo">
+    <input data-word-station="2" data-word-idx="2" data-word-field="pl" value="szesnascie" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="2" data-word-idx="2">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="3">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 4</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="3">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="3" placeholder="np. The cat sleeps on the mat.">The seventeenth star: 'Seventeen!'</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="3" value="Siedemnasta gwiazda: 'Seventeen!'" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="3" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="3" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="3">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="3" data-word-idx="0" data-word-field="en" value="The seventeenth star" placeholder="słowo">
+    <input data-word-station="3" data-word-idx="0" data-word-field="pl" value="Siedemnasta gwiazda" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="3" data-word-idx="0">✕</button>
+  
+    <input data-word-station="3" data-word-idx="1" data-word-field="en" value="Seventeen" placeholder="słowo">
+    <input data-word-station="3" data-word-idx="1" data-word-field="pl" value="Seventeen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="3" data-word-idx="1">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="4">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 5</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="4">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="4" placeholder="np. The cat sleeps on the mat.">'Seventeen' means 'seventeen'.</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="4" value="'Seventeen' znaczy 'siedemnascie'." placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="4" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="4" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="4">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="4" data-word-idx="0" data-word-field="en" value="Seventeen" placeholder="słowo">
+    <input data-word-station="4" data-word-idx="0" data-word-field="pl" value="Seventeen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="4" data-word-idx="0">✕</button>
+  
+    <input data-word-station="4" data-word-idx="1" data-word-field="en" value="means" placeholder="słowo">
+    <input data-word-station="4" data-word-idx="1" data-word-field="pl" value="znaczy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="4" data-word-idx="1">✕</button>
+  
+    <input data-word-station="4" data-word-idx="2" data-word-field="en" value="seventeen" placeholder="słowo">
+    <input data-word-station="4" data-word-idx="2" data-word-field="pl" value="siedemnascie" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="4" data-word-idx="2">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="5">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 6</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="5">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="5" placeholder="np. The cat sleeps on the mat.">The eighteenth star: 'Eighteen!'</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="5" value="Osiemnasta gwiazda: 'Eighteen!'" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="5" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="5" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="5">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="5" data-word-idx="0" data-word-field="en" value="The eighteenth star" placeholder="słowo">
+    <input data-word-station="5" data-word-idx="0" data-word-field="pl" value="Osiemnasta gwiazda" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="5" data-word-idx="0">✕</button>
+  
+    <input data-word-station="5" data-word-idx="1" data-word-field="en" value="Eighteen" placeholder="słowo">
+    <input data-word-station="5" data-word-idx="1" data-word-field="pl" value="Eighteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="5" data-word-idx="1">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="6">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 7</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="6">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="6" placeholder="np. The cat sleeps on the mat.">'Eighteen' means 'eighteen'.</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="6" value="'Eighteen' znaczy 'osiemnascie'." placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="6" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="6" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="6">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="6" data-word-idx="0" data-word-field="en" value="Eighteen" placeholder="słowo">
+    <input data-word-station="6" data-word-idx="0" data-word-field="pl" value="Eighteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="6" data-word-idx="0">✕</button>
+  
+    <input data-word-station="6" data-word-idx="1" data-word-field="en" value="means" placeholder="słowo">
+    <input data-word-station="6" data-word-idx="1" data-word-field="pl" value="znaczy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="6" data-word-idx="1">✕</button>
+  
+    <input data-word-station="6" data-word-idx="2" data-word-field="en" value="eighteen" placeholder="słowo">
+    <input data-word-station="6" data-word-idx="2" data-word-field="pl" value="osiemnascie" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="6" data-word-idx="2">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="7">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 8</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="7">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="7" placeholder="np. The cat sleeps on the mat.">The nineteenth star: 'Nineteen!'</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="7" value="Dziewietnasta gwiazda: 'Nineteen!'" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="7" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="7" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="7">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="7" data-word-idx="0" data-word-field="en" value="The nineteenth star" placeholder="słowo">
+    <input data-word-station="7" data-word-idx="0" data-word-field="pl" value="Dziewietnasta gwiazda" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="7" data-word-idx="0">✕</button>
+  
+    <input data-word-station="7" data-word-idx="1" data-word-field="en" value="Nineteen" placeholder="słowo">
+    <input data-word-station="7" data-word-idx="1" data-word-field="pl" value="Nineteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="7" data-word-idx="1">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="8">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 9</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="8">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="8" placeholder="np. The cat sleeps on the mat.">'Nineteen' means 'nineteen'.</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="8" value="'Nineteen' znaczy 'dziewietnascie'." placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="8" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="8" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="8">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="8" data-word-idx="0" data-word-field="en" value="Nineteen" placeholder="słowo">
+    <input data-word-station="8" data-word-idx="0" data-word-field="pl" value="Nineteen" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="8" data-word-idx="0">✕</button>
+  
+    <input data-word-station="8" data-word-idx="1" data-word-field="en" value="means" placeholder="słowo">
+    <input data-word-station="8" data-word-idx="1" data-word-field="pl" value="znaczy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="8" data-word-idx="1">✕</button>
+  
+    <input data-word-station="8" data-word-idx="2" data-word-field="en" value="nineteen" placeholder="słowo">
+    <input data-word-station="8" data-word-idx="2" data-word-field="pl" value="dziewietnascie" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="8" data-word-idx="2">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="9">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 10</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="9">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="9" placeholder="np. The cat sleeps on the mat.">The twentieth star: 'Twenty!'</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="9" value="Dwudziesta gwiazda: 'Twenty!'" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="9" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="9" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="9">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="9" data-word-idx="0" data-word-field="en" value="The twentieth star" placeholder="słowo">
+    <input data-word-station="9" data-word-idx="0" data-word-field="pl" value="Dwudziesta gwiazda" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="9" data-word-idx="0">✕</button>
+  
+    <input data-word-station="9" data-word-idx="1" data-word-field="en" value="Twenty" placeholder="słowo">
+    <input data-word-station="9" data-word-idx="1" data-word-field="pl" value="Twenty" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="9" data-word-idx="1">✕</button>
+  </div>
+      </div>
+    
+      <div class="station-edit-card" data-id="10">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek 11</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="10">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="10" placeholder="np. The cat sleeps on the mat.">'Twenty' means 'twenty'. Janek learned to count to twenty!</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="10" value="'Twenty' znaczy 'dwadziescia'. Janek nauczyl sie liczyc do dwudziestu!" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="10" value="" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="10" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="10">↩️ Cofnij podział na słowa</button>
+        </div>
+        <div class="word-grid">
+    <input data-word-station="10" data-word-idx="0" data-word-field="en" value="Twenty" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="0" data-word-field="pl" value="Twenty" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="0">✕</button>
+  
+    <input data-word-station="10" data-word-idx="1" data-word-field="en" value="means" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="1" data-word-field="pl" value="znaczy" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="1">✕</button>
+  
+    <input data-word-station="10" data-word-idx="2" data-word-field="en" value="twenty" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="2" data-word-field="pl" value="dwadziescia" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="2">✕</button>
+  
+    <input data-word-station="10" data-word-idx="3" data-word-field="en" value="Janek" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="3" data-word-field="pl" value="Janek" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="3">✕</button>
+  
+    <input data-word-station="10" data-word-idx="4" data-word-field="en" value="learned to count" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="4" data-word-field="pl" value="nauczyl sie liczyc" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="4">✕</button>
+  
+    <input data-word-station="10" data-word-idx="5" data-word-field="en" value="to twenty" placeholder="słowo">
+    <input data-word-station="10" data-word-idx="5" data-word-field="pl" value="do dwudziestu" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="10" data-word-idx="5">✕</button>
+  </div>
+      </div>
+    </div>
+      <button class="split-btn" id="add-station-btn" type="button">➕ Dodaj przystanek ręcznie</button>
+      <div class="stats-row" style="margin-top:14px;">
+        <span><b id="stat-words">11</b> przystanków</span>
+        <span><b id="stat-time">4</b> min spaceru</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">04 · Świat</div>
+      <div class="theme-grid" id="theme-grid"><button type="button" class="theme-card selected" data-theme="las"><span class="theme-emoji">🌲</span><span class="theme-name">Zaczarowany Las</span>
+    <span class="theme-swatch"><span style="background:#3e5a3f"></span><span style="background:#bcdcc4"></span><span style="background:#e8b23d"></span></span></button><button type="button" class="theme-card" data-theme="kosmos"><span class="theme-emoji">🪐</span><span class="theme-name">Kosmiczna Stacja</span>
+    <span class="theme-swatch"><span style="background:#0a0e2a"></span><span style="background:#7fd8ff"></span><span style="background:#c9a227"></span></span></button><button type="button" class="theme-card" data-theme="podwodny"><span class="theme-emoji">🐠</span><span class="theme-name">Podwodna Rafa</span>
+    <span class="theme-swatch"><span style="background:#0f5c73"></span><span style="background:#8fd8e8"></span><span style="background:#ff9d5c"></span></span></button><button type="button" class="theme-card" data-theme="biblioteka"><span class="theme-emoji">📚</span><span class="theme-name">Zapomniana Biblioteka</span>
+    <span class="theme-swatch"><span style="background:#2a2016"></span><span style="background:#c9a227"></span><span style="background:#8a3a2a"></span></span></button><button type="button" class="theme-card" data-theme="pustynia"><span class="theme-emoji">🏛️</span><span class="theme-name">Pustynne Ruiny</span>
+    <span class="theme-swatch"><span style="background:#c9a86a"></span><span style="background:#e8c78a"></span><span style="background:#8a3a2a"></span></span></button><button type="button" class="theme-card" data-theme="zima"><span class="theme-emoji">❄️</span><span class="theme-name">Zimowa Kraina</span>
+    <span class="theme-swatch"><span style="background:#eef4f7"></span><span style="background:#9ed2ff"></span><span style="background:#2c4a5c"></span></span></button></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">05 · Kształt trasy</div>
+      <div class="segmented" id="layout-seg">
+        <button class="seg-btn selected" data-val="spiral" type="button">🌀 Spirala<br><span style="font-size:11px;opacity:.7">oddala się od środka</span></button>
+        <button class="seg-btn" data-val="straight" type="button">➡️ Prosto do przodu<br><span style="font-size:11px;opacity:.7">przystanki na przemian po bokach</span></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">06 · Opcje spaceru</div>
+      <div class="toggle-row" style="flex-direction:column;align-items:stretch;">
+        <div><div class="t-label">Para językowa</div><div class="t-desc">Jakiego języka uczymy i na jaki tłumaczymy. Wpływa na wymowę (TTS) i listę dostępnych głosów poniżej.</div></div>
+        <select id="opt-langpair" class="station-input" style="margin-top:6px;"><option value="en_pl" selected="">Angielski ↔ Polski</option><option value="de_pl">Niemiecki ↔ Polski</option><option value="fr_pl">Francuski ↔ Polski</option><option value="es_pl">Hiszpański ↔ Polski</option><option value="it_pl">Włoski ↔ Polski</option><option value="ru_pl">Rosyjski ↔ Polski</option><option value="uk_pl">Ukraiński ↔ Polski</option><option value="zh_pl">Chiński ↔ Polski</option><option value="ja_pl">Japoński ↔ Polski</option></select>
+        <div class="t-desc" id="langpair-hint" style="margin-top:6px;"></div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Czytanie na głos (TTS)</div><div class="t-desc">Lektor przeczyta tekst w języku nauki, a potem tłumaczenie</div></div>
+        <label class="switch"><input type="checkbox" id="opt-tts" checked=""><span class="slider-tog"></span></label>
+      </div>
+      <div class="toggle-row" style="flex-direction:column;align-items:stretch;">
+        <div><div class="t-label" id="voice1-label">Głos — język nauki (angielski)</div><div class="t-desc">Lista zależy od przeglądarki/systemu — im więcej głosów masz zainstalowanych, tym większy wybór</div></div>
+        <select id="opt-voice-en" class="station-input" style="margin-top:6px;"><option value="">Automatyczny</option><option value="Microsoft William Multilingual Online (Natural) - English (Australia)">Microsoft William Multilingual Online (Natural) - English (Australia) (en-AU)</option><option value="Microsoft Natasha Online (Natural) - English (Australia)">Microsoft Natasha Online (Natural) - English (Australia) (en-AU)</option><option value="Microsoft Clara Online (Natural) - English (Canada)">Microsoft Clara Online (Natural) - English (Canada) (en-CA)</option><option value="Microsoft Liam Online (Natural) - English (Canada)">Microsoft Liam Online (Natural) - English (Canada) (en-CA)</option><option value="Microsoft Sonia Online (Natural) - English (United Kingdom)">Microsoft Sonia Online (Natural) - English (United Kingdom) (en-GB)</option><option value="Microsoft Ryan Online (Natural) - English (United Kingdom)">Microsoft Ryan Online (Natural) - English (United Kingdom) (en-GB)</option><option value="Microsoft Libby Online (Natural) - English (United Kingdom)">Microsoft Libby Online (Natural) - English (United Kingdom) (en-GB)</option><option value="Microsoft Maisie Online (Natural) - English (United Kingdom)">Microsoft Maisie Online (Natural) - English (United Kingdom) (en-GB)</option><option value="Microsoft Thomas Online (Natural) - English (United Kingdom)">Microsoft Thomas Online (Natural) - English (United Kingdom) (en-GB)</option><option value="Microsoft Yan Online (Natural) - English (Hong Kong SAR)">Microsoft Yan Online (Natural) - English (Hong Kong SAR) (en-HK)</option><option value="Microsoft Sam Online (Natural) - English (Hong Kong SAR)">Microsoft Sam Online (Natural) - English (Hong Kong SAR) (en-HK)</option><option value="Microsoft Emily Online (Natural) - English (Ireland)">Microsoft Emily Online (Natural) - English (Ireland) (en-IE)</option><option value="Microsoft Connor Online (Natural) - English (Ireland)">Microsoft Connor Online (Natural) - English (Ireland) (en-IE)</option><option value="Microsoft Neerja Online (Natural) - English (India)">Microsoft Neerja Online (Natural) - English (India) (en-IN)</option><option value="Microsoft Prabhat Online (Natural) - English (India)">Microsoft Prabhat Online (Natural) - English (India) (en-IN)</option><option value="Microsoft Asilia Online (Natural) - English (Kenya)">Microsoft Asilia Online (Natural) - English (Kenya) (en-KE)</option><option value="Microsoft Chilemba Online (Natural) - English (Kenya)">Microsoft Chilemba Online (Natural) - English (Kenya) (en-KE)</option><option value="Microsoft Ezinne Online (Natural) - English (Nigeria)">Microsoft Ezinne Online (Natural) - English (Nigeria) (en-NG)</option><option value="Microsoft Abeo Online (Natural) - English (Nigeria)">Microsoft Abeo Online (Natural) - English (Nigeria) (en-NG)</option><option value="Microsoft Molly Online (Natural) - English (New Zealand)">Microsoft Molly Online (Natural) - English (New Zealand) (en-NZ)</option><option value="Microsoft Mitchell Online (Natural) - English (New Zealand)">Microsoft Mitchell Online (Natural) - English (New Zealand) (en-NZ)</option><option value="Microsoft Rosa Online (Natural) - English (Philippines)">Microsoft Rosa Online (Natural) - English (Philippines) (en-PH)</option><option value="Microsoft James Online (Natural) - English (Philippines)">Microsoft James Online (Natural) - English (Philippines) (en-PH)</option><option value="Microsoft Luna Online (Natural) - English (Singapore)">Microsoft Luna Online (Natural) - English (Singapore) (en-SG)</option><option value="Microsoft Wayne Online (Natural) - English (Singapore)">Microsoft Wayne Online (Natural) - English (Singapore) (en-SG)</option><option value="Microsoft Imani Online (Natural) - English (Tanzania)">Microsoft Imani Online (Natural) - English (Tanzania) (en-TZ)</option><option value="Microsoft Elimu Online (Natural) - English (Tanzania)">Microsoft Elimu Online (Natural) - English (Tanzania) (en-TZ)</option><option value="Microsoft Ava Multilingual Online (Natural) - English (United States)">Microsoft Ava Multilingual Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Andrew Multilingual Online (Natural) - English (United States)">Microsoft Andrew Multilingual Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Emma Multilingual Online (Natural) - English (United States)">Microsoft Emma Multilingual Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Brian Multilingual Online (Natural) - English (United States)">Microsoft Brian Multilingual Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Ava Online (Natural) - English (United States)">Microsoft Ava Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Andrew Online (Natural) - English (United States)">Microsoft Andrew Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Emma Online (Natural) - English (United States)">Microsoft Emma Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Brian Online (Natural) - English (United States)">Microsoft Brian Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Jenny Online (Natural) - English (United States)">Microsoft Jenny Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Guy Online (Natural) - English (United States)">Microsoft Guy Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Aria Online (Natural) - English (United States)">Microsoft Aria Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Ana Online (Natural) - English (United States)">Microsoft Ana Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Christopher Online (Natural) - English (United States)">Microsoft Christopher Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Eric Online (Natural) - English (United States)">Microsoft Eric Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Michelle Online (Natural) - English (United States)">Microsoft Michelle Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Roger Online (Natural) - English (United States)">Microsoft Roger Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Steffan Online (Natural) - English (United States)">Microsoft Steffan Online (Natural) - English (United States) (en-US)</option><option value="Microsoft Leah Online (Natural) - English (South Africa)">Microsoft Leah Online (Natural) - English (South Africa) (en-ZA)</option><option value="Microsoft Luke Online (Natural) - English (South Africa)">Microsoft Luke Online (Natural) - English (South Africa) (en-ZA)</option></select>
+      </div>
+      <div class="toggle-row" style="flex-direction:column;align-items:stretch;">
+        <div><div class="t-label" id="voice2-label">Głos — tłumaczenie (polski)</div><div class="t-desc">Jak wyżej, ale dla tłumaczeń</div></div>
+        <select id="opt-voice-pl" class="station-input" style="margin-top:6px;"><option value="">Automatyczny</option><option value="Microsoft Adam - Polish (Poland)">Microsoft Adam - Polish (Poland) (pl-PL)</option><option value="Microsoft Paulina - Polish (Poland)">Microsoft Paulina - Polish (Poland) (pl-PL)</option><option value="Microsoft Marek Online (Natural) - Polish (Poland)">Microsoft Marek Online (Natural) - Polish (Poland) (pl-PL)</option><option value="Microsoft Zofia Online (Natural) - Polish (Poland)">Microsoft Zofia Online (Natural) - Polish (Poland) (pl-PL)</option></select>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Auto-przejście dalej</div><div class="t-desc">Po przeczytaniu od razu idź do kolejnego przystanku</div></div>
+        <label class="switch"><input type="checkbox" id="opt-auto"><span class="slider-tog"></span></label>
+      </div>
+      <div class="toggle-row" style="flex-direction:column;align-items:stretch;">
+        <div><div class="t-label">Szybkość poruszania kamery</div><div class="t-desc">Jak szybko kamera "dojeżdża" do kolejnego przystanku (dotyczy też auto-przejścia)</div></div>
+        <div class="slider-row">
+          <span>wolniej</span>
+          <input type="range" id="opt-speed" min="0.5" max="2.5" step="0.1" value="1">
+          <span>szybciej</span>
+        </div>
+      </div>
+      <div class="toggle-row" style="flex-direction:column;align-items:stretch;">
+        <div><div class="t-label">Odległość między przystankami</div><div class="t-desc">Jak daleko trzeba iść od jednego przystanku do drugiego</div></div>
+        <div class="slider-row">
+          <span>bliżej</span>
+          <input type="range" id="opt-spacing" min="0.5" max="2.5" step="0.1" value="1">
+          <span>dalej</span>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Swobodne chodzenie strzałkami</div><div class="t-desc">Włączone: strzałki chodzą krok po kroku jak WASD. Wyłączone: strzałki od razu przenoszą do sąsiedniego przystanku</div></div>
+        <label class="switch"><input type="checkbox" id="opt-freewalk" checked=""><span class="slider-tog"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Zablokuj patrzenie góra/dół</div><div class="t-desc">Myszką można obracać tylko w bok — łatwiej dziecku się nie zgubić i nie odwrócić "do góry nogami"</div></div>
+        <label class="switch"><input type="checkbox" id="opt-lockpitch" checked=""><span class="slider-tog"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Ukryj pasek nawigacji (WSTECZ / PAUZA / CZYTAJ / DALEJ)</div><div class="t-desc">Chowa dolny pasek przycisków w VR — zostaje tylko napis „Przystanek X / Y”. Nawigacja klawiaturą (strzałki, spacja, P) nadal działa.</div></div>
+        <label class="switch"><input type="checkbox" id="opt-hidehud"><span class="slider-tog"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-label">Panel debugowania</div><div class="t-desc">Techniczny dziennik zdarzeń na dole ekranu — przydatny tylko przy naprawianiu błędów</div></div>
+        <label class="switch"><input type="checkbox" id="opt-debug"><span class="slider-tog"></span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Podgląd trasy</div>
+      <div id="route-map-wrap">
+        <svg id="route-svg" viewBox="0 0 220 220"><path d="M 110 110 L 110.0 102.0 L 119.9 101.3 L 128.5 112.4 L 123.5 130.1 L 102.3 139.0 L 77.8 126.1 L 70.9 94.0 L 94.1 64.1 L 137.2 62.1 L 170.6 97.5 L 164.9 151.4" stroke="#c9a227" stroke-width="1.4" stroke-dasharray="3,4" fill="none" opacity="0.75"></path><circle cx="110.0" cy="102.0" r="4" fill="#6e9b85"></circle><circle cx="119.9" cy="101.3" r="3" fill="#e9e0c8"></circle><circle cx="128.5" cy="112.4" r="3" fill="#e9e0c8"></circle><circle cx="123.5" cy="130.1" r="3" fill="#e9e0c8"></circle><circle cx="102.3" cy="139.0" r="3" fill="#e9e0c8"></circle><circle cx="77.8" cy="126.1" r="3" fill="#e9e0c8"></circle><circle cx="70.9" cy="94.0" r="3" fill="#e9e0c8"></circle><circle cx="94.1" cy="64.1" r="3" fill="#e9e0c8"></circle><circle cx="137.2" cy="62.1" r="3" fill="#e9e0c8"></circle><circle cx="170.6" cy="97.5" r="3" fill="#e9e0c8"></circle><circle cx="164.9" cy="151.4" r="3" fill="#e9e0c8"></circle><g transform="translate(196,20)"><circle r="10" fill="none" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"></circle><line x1="0" y1="-8" x2="0" y2="8" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"></line><line x1="-8" y1="0" x2="8" y2="0" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"></line></g></svg>
+        <div id="route-caption">Trasa spiralnie oddala się od środka — im dalej w lekcji, tym dłuższy spacer. Każda kropka to jeden przystanek z Twojej listy. Za każdym razem świat generowany jest odrobinę inaczej.</div>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="generate-btn">Zbuduj świat 🌍</button>
+    <button class="split-btn" id="export-btn" type="button" style="width:100%;text-align:center;margin-top:10px;">💾 Eksportuj gotowy świat do pliku HTML (z edytorem)</button>
+    <button class="split-btn" id="export-clean-btn" type="button" style="width:100%;text-align:center;margin-top:10px;">🌍 Eksportuj CZYSTY plik (tylko gotowy świat, bez edytora)</button>
+    <div class="hint-error" id="error-msg"></div>
+    <footer>Global Net School — zero kont, zero chmury, zero instalacji</footer>
+  </div>
+</div>
+
+<div id="debug-panel"><div class="ok">[08:36:07] Strona wczytana. Czekam na AFRAME...</div><div class="ok">[08:36:07] AFRAME załadowany, wersja 1.7.1</div><div class="ok">[08:36:07] Komponent troika-text zarejestrowany: true</div><div class="ok">[08:36:07] sceneEl znaleziony: true, hasLoaded=false</div><div class="ok">[08:36:07] zdarzenie: camera-set-active — camera</div><div class="ok">[08:36:07] zdarzenie sceny: loaded</div><div class="ok">[08:36:07] zdarzenie sceny: renderstart (pętla renderowania ruszyła)</div><div class="ok">[08:36:32] Zaimportowano JSON: 11 zdań, dodano 11 przystanków (pole: "en"/"pl"). Ustawiono parę językową: angielski ↔ polski.</div><div class="ok">[08:37:08] Wyeksportowano CZYSTY plik HTML (bez edytora) z 11 przystankami.</div></div>
+
+<!-- ============ KONTENER VR ============ -->
+<div id="vr-container">
+  <button id="exit-btn-2d" style="display:none">← Wróć do edycji</button>
+  <button id="enter-stereo-btn">🥽 Wejdź w VR</button>
+  <div id="loading-overlay" style="display:none;">
+    <div class="spin"></div>
+    <p id="loading-text">Budowanie świata...</p>
+  </div>
+  <a-scene id="main-scene" embedded="" loading-screen="enabled: false" vr-mode-ui="enabled: true" inspector="" keyboard-shortcuts="" screenshot="" xr-mode-ui="" device-orientation-permission-ui="">
+
+    <!-- Elementy stałe — tworzone raz przy starcie strony, generator tylko je aktualizuje -->
+    <a-sky id="world-sky" color="#0a0a0a" material="" geometry="" scale=""></a-sky>
+    <a-entity id="ambient-light" light="type: ambient; color:#ffffff; intensity:0.8"></a-entity>
+    <a-entity id="directional-light" light="type: directional; color:#ffffff; intensity:0.55" position="3 8 2"></a-entity>
+    <a-plane id="ground-plane" rotation="-90 0 0" width="10" height="10" position="0 0 0" color="#222" material="roughness:1;metalness:0" shadow="" geometry=""></a-plane>
+
+    <a-entity id="path-container"></a-entity>
+    <a-entity id="decor-container"></a-entity>
+    <a-entity id="particles-container"></a-entity>
+    <a-entity id="stations-container"></a-entity>
+
+    <!-- Kursor sterowany myszą (klik = klik), niezależny od obracania kamery — dla trybu desktop/przeglądarka -->
+    <a-entity id="mouse-cursor" cursor="rayOrigin: mouse" raycaster="objects:.clickable;far:40"></a-entity>
+
+    <a-entity id="rig" position="0 0 0" rotation="0 0 0" wasd-controls="acceleration:40">
+      <a-entity id="camera" camera="" look-controls="" lock-pitch="enabled:false" position="0 1.6 0" rotation="">
+        <a-entity id="gaze-cursor" cursor="fuse:true;fuseTimeout:900" raycaster="objects:.gaze-only-vr;far:40" geometry="primitive:ring;radiusInner:0.006;radiusOuter:0.01" material="color:#c9a227;shader:flat;opacity:0.9" position="0 0 -1" animation__fuse="property:scale;startEvents:fusing;from:1 1 1;to:2.4 2.4 2.4;dur:900" animation__click="property:scale;startEvents:click;from:2.4 2.4 2.4;to:1 1 1;dur:180">
+        </a-entity>
+
+        <!-- HUD przypięty do kamery — stały, kolory neutralne niezależne od motywu -->
+        <a-entity id="hud" position="0 -0.55 -1" scale="0.62 0.62 0.62">
+          <a-entity id="hud-word-spotlight" position="0 1.2 0" visible="false">
+            <a-plane width="2.7" height="1.0" color="#0c1a1f" material="opacity:0.85;transparent:true;depthTest:false" geometry=""></a-plane>
+            <a-image id="hud-word-emoji" position="0.95 0.32 0.01" width="0.44" height="0.44" visible="false" material="" geometry=""></a-image>
+            <a-entity id="hud-word-en" troika-text="value:; color:#ede6d6; fontSize:0.32; fontWeight:bold; maxWidth:2.5; anchor:center; align:center" position="0 0.18 0.01" animation__pop="property: scale; from: 0.3 0.3 0.3; to: 1 1 1; dur: 260; easing: easeOutBack; startEvents: wordPop"><a-entity></a-entity></a-entity>
+            <a-entity id="hud-word-pl" troika-text="value:; color:#c9a227; fontSize:0.2; maxWidth:2.5; anchor:center; align:center" position="0 -0.22 0.01"><a-entity></a-entity></a-entity>
+          </a-entity>
+          <a-plane id="hud-bg-plane" width="3.7" height="0.27" color="#0c1a1f" material="opacity:0.72;transparent:true" position="0 0 -0.02" geometry=""></a-plane>
+          <a-entity id="hud-prev" class="clickable" position="-1.35 0 0" geometry="primitive:plane;width:0.82;height:0.24" material="color:#16343c;opacity:0.9">
+            <a-entity troika-text="value:◀ WSTECZ; color:#ede6d6; fontSize:0.085; anchor:center; align:center" position="0 0 0.01"><a-entity></a-entity></a-entity>
+          </a-entity>
+          <a-entity id="hud-pause" class="clickable" position="-0.45 0 0" geometry="primitive:plane;width:0.82;height:0.24" material="color:#16343c;opacity:0.9">
+            <a-entity id="hud-pause-label" troika-text="value:⏸ PAUZA; color:#ede6d6; fontSize:0.085; anchor:center; align:center" position="0 0 0.01"><a-entity></a-entity></a-entity>
+          </a-entity>
+          <a-entity id="hud-read" class="clickable" position="0.45 0 0" geometry="primitive:plane;width:0.82;height:0.24" material="color:#c9a227;opacity:0.95">
+            <a-entity troika-text="value:🔊 CZYTAJ; color:#0c1a1f; fontSize:0.085; anchor:center; align:center" position="0 0 0.01"><a-entity></a-entity></a-entity>
+          </a-entity>
+          <a-entity id="hud-next" class="clickable" position="1.35 0 0" geometry="primitive:plane;width:0.82;height:0.24" material="color:#16343c;opacity:0.9">
+            <a-entity troika-text="value:DALEJ ▶; color:#ede6d6; fontSize:0.085; anchor:center; align:center" position="0 0 0.01"><a-entity></a-entity></a-entity>
+          </a-entity>
+          <a-entity id="hud-status" troika-text="value:Wklej lekcję i zbuduj świat; color:#ede6d6; fontSize:0.1; anchor:center; align:center" position="0 -0.24 0"><a-entity></a-entity></a-entity>
+        </a-entity>
+      </a-entity>
+    </a-entity>
+
+  <canvas class="a-canvas a-grab-cursor" data-aframe-canvas="true" data-engine="three.js r173" width="1896" height="914"></canvas><div class="a-enter-vr fullscreen" aframe-injected=""><button class="a-enter-vr-button" title="Enter VR mode with a headset or fullscreen without" aframe-injected=""></button></div><div class="a-orientation-modal a-hidden" aframe-injected=""><button aframe-injected="">Exit VR</button></div></a-scene>
+</div>
+
+<script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js" crossorigin="anonymous"></script>
+<script>
+(function(){
+"use strict";
+
+/* ======================================================
+   -1. KOMPONENTY POMOCNICZE A-FRAME
+   ====================================================== */
+AFRAME.registerComponent('lock-pitch', {
+  schema: { enabled: { default: false } },
+  tick: function(){
+    if(this.data.enabled){
+      this.el.object3D.rotation.x = 0;
+    }
+  }
+});
+
+/* ======================================================
+   0. DIAGNOSTYKA
+   ====================================================== */
+function dbg(msg, cls){
+  const panel = document.getElementById('debug-panel');
+  if(!panel) return;
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  const t = new Date().toISOString().substr(11,8);
+  line.textContent = `[${t}] ${msg}`;
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+}
+window.addEventListener('error', (e)=>{
+  dbg(`BŁĄD JS: ${e.message} (${e.filename||'?'}:${e.lineno||'?'})`, 'err');
+});
+window.addEventListener('unhandledrejection', (e)=>{
+  dbg(`BŁĄD (promise): ${e.reason}`, 'err');
+});
+const debugPanelEl = document.getElementById('debug-panel');
+const optDebugEl = document.getElementById('opt-debug');
+if(optDebugEl){
+  optDebugEl.addEventListener('change', ()=>{
+    debugPanelEl.classList.toggle('visible', optDebugEl.checked);
+  });
+}
+
+dbg('Strona wczytana. Czekam na AFRAME...', 'ok');
+(function waitAframe(tries){
+  if(window.AFRAME){
+    dbg(`AFRAME załadowany, wersja ${AFRAME.version}`, 'ok');
+    dbg(`Komponent troika-text zarejestrowany: ${!!AFRAME.components['troika-text']}`, AFRAME.components['troika-text']?'ok':'warn');
+  } else if(tries<40){
+    setTimeout(()=>waitAframe(tries+1), 250);
+  } else {
+    dbg('AFRAME NIE załadował się po 10s — sprawdź połączenie z aframe.io (CDN)', 'err');
+  }
+})(0);
+
+
+/* ======================================================
+   1. MOTYWY ŚWIATÓW
+   ====================================================== */
+const THEMES = {
+  las: {
+    name:'Zaczarowany Las', emoji:'🌲',
+    sky:'#bcdcc4', fog:'#a9d0b4', fogDensity:0.045,
+    ground:'#3e5a3f', ambient:'#dff0e0', ambientIntensity:0.85,
+    light:'#fff4d6', accent:'#e8b23d', panelBg:'#2f4a35', panelBorder:'#e8b23d', textColor:'#fef8e8',
+    pathColor:'#8a7a56',
+    swatch:['#3e5a3f','#bcdcc4','#e8b23d'],
+    particle:{color:'#ffe9a8', behavior:'flicker', count:26},
+    decorate(x,z,rng){
+      let h='';
+      const n = 3+Math.floor(rng()*3);
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.6+rng()*3.2;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        const roll = rng();
+        if(roll<0.55){
+          const hue = rng()<0.5?'#2f6b3d':'#3f7a45';
+          const sc = 0.8+rng()*0.6;
+          h += `<a-entity position="${dx.toFixed(2)} 0 ${dz.toFixed(2)}" scale="${sc.toFixed(2)} ${sc.toFixed(2)} ${sc.toFixed(2)}">
+            <a-cylinder radius="0.13" height="1.1" color="#5b3a29" position="0 0.55 0" shadow></a-cylinder>
+            <a-cone radius-bottom="0.85" radius-top="0.02" height="1.7" color="${hue}" position="0 1.65 0" shadow></a-cone>
+          </a-entity>`;
+        } else if(roll<0.8){
+          h += `<a-sphere position="${dx.toFixed(2)} 0.18 ${dz.toFixed(2)}" radius="${(0.25+rng()*0.25).toFixed(2)}" scale="1 0.6 1" color="#6b6b5f"></a-sphere>`;
+        } else {
+          h += `<a-entity position="${dx.toFixed(2)} 0 ${dz.toFixed(2)}">
+            <a-cylinder radius="0.03" height="0.22" color="#e8e2d0" position="0 0.11 0"></a-cylinder>
+            <a-sphere radius="0.09" color="#c94b3f" position="0 0.24 0" scale="1 0.6 1"></a-sphere>
+          </a-entity>`;
+        }
+      }
+      return h;
+    }
+  },
+  kosmos: {
+    name:'Kosmiczna Stacja', emoji:'🪐',
+    sky:'#0a0e2a', fog:'#0a0e2a', fogDensity:0.008,
+    ground:'#171c3d', ambient:'#8899ff', ambientIntensity:0.5,
+    light:'#c9d4ff', accent:'#7fd8ff', panelBg:'#1b2150', panelBorder:'#7fd8ff', textColor:'#eaf3ff',
+    pathColor:'#3a4380',
+    swatch:['#0a0e2a','#7fd8ff','#c9a227'],
+    particle:{color:'#ffffff', behavior:'twinkle', count:70},
+    decorate(x,z,rng){
+      let h='';
+      const n = 2+Math.floor(rng()*3);
+      const cols=['#7fd8ff','#c9a5ff','#ff9fd6'];
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.6+rng()*3.2;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        const col = cols[Math.floor(rng()*cols.length)];
+        if(rng()<0.5){
+          h += `<a-octahedron position="${dx.toFixed(2)} ${(0.4+rng()*0.5).toFixed(2)} ${dz.toFixed(2)}" radius="${(0.25+rng()*0.3).toFixed(2)}" color="${col}" material="emissive:${col};emissiveIntensity:0.5;metalness:0.3;roughness:0.2" animation="property: rotation; to: 0 360 0; loop: true; dur: ${(9000+rng()*6000).toFixed(0)}; easing:linear"></a-octahedron>`;
+        } else {
+          h += `<a-torus position="${dx.toFixed(2)} ${(0.3+rng()*0.4).toFixed(2)} ${dz.toFixed(2)}" radius="0.35" radius-tubular="0.03" color="${col}" material="emissive:${col};emissiveIntensity:0.4" rotation="${(rng()*90).toFixed(0)} 0 0" animation="property: rotation; to: 360 0 0; loop: true; dur: ${(7000+rng()*5000).toFixed(0)}; easing:linear"></a-torus>`;
+        }
+      }
+      return h;
+    },
+    globalExtras(bounds){
+      return `<a-sphere position="${bounds.cx+bounds.spread*0.6} 14 ${bounds.cz-bounds.spread*0.4}" radius="5" color="#a86bd8" material="emissive:#5e3a80;emissiveIntensity:0.4;roughness:1"></a-sphere>
+      <a-torus position="${bounds.cx+bounds.spread*0.6} 14 ${bounds.cz-bounds.spread*0.4}" radius="7" radius-tubular="0.15" rotation="70 0 0" color="#c9a5ff" material="emissive:#8a6bc9;emissiveIntensity:0.4"></a-torus>`;
+    }
+  },
+  podwodny: {
+    name:'Podwodna Rafa', emoji:'🐠',
+    sky:'#0f5c73', fog:'#1a7a94', fogDensity:0.06,
+    ground:'#0d3d4d', ambient:'#8fd8e8', ambientIntensity:0.9,
+    light:'#dff8ff', accent:'#ff9d5c', panelBg:'#0f4a5c', panelBorder:'#ff9d5c', textColor:'#eafcff',
+    pathColor:'#c9c19a',
+    swatch:['#0f5c73','#8fd8e8','#ff9d5c'],
+    particle:{color:'#cdfaff', behavior:'rise', count:34},
+    decorate(x,z,rng){
+      let h='';
+      const n = 3+Math.floor(rng()*3);
+      const cols=['#ff9d5c','#ff6b81','#ffd35c','#7fe0c9'];
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.6+rng()*3.2;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        const col = cols[Math.floor(rng()*cols.length)];
+        if(rng()<0.5){
+          h += `<a-entity position="${dx.toFixed(2)} 0 ${dz.toFixed(2)}">
+            <a-cone radius-bottom="0.35" radius-top="0.02" height="0.7" color="${col}" position="0 0.35 0"></a-cone>
+            <a-cone radius-bottom="0.28" radius-top="0.02" height="0.55" color="${col}" position="0.2 0.28 0.15"></a-cone>
+          </a-entity>`;
+        } else {
+          h += `<a-cylinder radius="0.035" height="${(0.9+rng()*0.8).toFixed(2)}" color="#2f8a5c" position="${dx.toFixed(2)} ${(0.45+rng()*0.4).toFixed(2)} ${dz.toFixed(2)}" animation="property: rotation; to: 8 0 -8; dir: alternate; loop: true; dur: ${(2200+rng()*1200).toFixed(0)}; easing: easeInOutSine"></a-cylinder>`;
+        }
+      }
+      return h;
+    }
+  },
+  biblioteka: {
+    name:'Zapomniana Biblioteka', emoji:'📚',
+    sky:'#2a2016', fog:'#241b12', fogDensity:0.03,
+    ground:'#4a3a26', ambient:'#f2cf9a', ambientIntensity:0.75,
+    light:'#ffdca0', accent:'#c9a227', panelBg:'#3a2c1c', panelBorder:'#c9a227', textColor:'#f6ecd8',
+    pathColor:'#6b5638',
+    swatch:['#2a2016','#c9a227','#8a3a2a'],
+    particle:{color:'#ffdca0', behavior:'flicker', count:14},
+    decorate(x,z,rng){
+      let h='';
+      const n = 2+Math.floor(rng()*2);
+      const cols=['#8a3a2a','#2a5a4a','#3a3a7a','#7a5a2a'];
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.8+rng()*2.8;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        const ry = (a*180/Math.PI+90).toFixed(0);
+        let books='';
+        for(let b=0;b<6;b++){
+          const bc = cols[Math.floor(rng()*cols.length)];
+          books += `<a-box width="0.09" height="${(0.5+rng()*0.3).toFixed(2)}" depth="0.35" color="${bc}" position="${(-0.45+b*0.16).toFixed(2)} ${(0.25+rng()*0.15).toFixed(2)} 0"></a-box>`;
+        }
+        h += `<a-entity position="${dx.toFixed(2)} 0 ${dz.toFixed(2)}" rotation="0 ${ry} 0">
+          <a-box width="1.2" height="1.8" depth="0.4" color="#3a2a1a" position="0 0.9 0"></a-box>
+          ${books}
+        </a-entity>`;
+      }
+      return h;
+    }
+  },
+  pustynia: {
+    name:'Pustynne Ruiny', emoji:'🏛️',
+    sky:'#e8c78a', fog:'#e0b878', fogDensity:0.03,
+    ground:'#c9a86a', ambient:'#fff0d0', ambientIntensity:0.95,
+    light:'#fff4d6', accent:'#8a3a2a', panelBg:'#7a5a3a', panelBorder:'#c9a227', textColor:'#fdf6e6',
+    pathColor:'#a88a56',
+    swatch:['#c9a86a','#e8c78a','#8a3a2a'],
+    particle:{color:'#f0dca0', behavior:'flicker', count:10},
+    decorate(x,z,rng){
+      let h='';
+      const n = 2+Math.floor(rng()*3);
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.7+rng()*3.0;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        if(rng()<0.6){
+          const broken = rng()<0.4;
+          const h2 = broken? (0.5+rng()*0.5) : 1.8+rng()*0.4;
+          const tilt = broken? (rng()*20-10) : 0;
+          h += `<a-cylinder radius="0.28" height="${h2.toFixed(2)}" color="#d8c49a" position="${dx.toFixed(2)} ${(h2/2).toFixed(2)} ${dz.toFixed(2)}" rotation="0 0 ${tilt.toFixed(0)}"></a-cylinder>`;
+        } else {
+          h += `<a-sphere position="${dx.toFixed(2)} 0.15 ${dz.toFixed(2)}" radius="${(0.3+rng()*0.3).toFixed(2)}" scale="1 0.5 1" color="#a88a56"></a-sphere>`;
+        }
+      }
+      return h;
+    }
+  },
+  zima: {
+    name:'Zimowa Kraina', emoji:'❄️',
+    sky:'#d9e8f0', fog:'#cfe0ea', fogDensity:0.05,
+    ground:'#eef4f7', ambient:'#ffffff', ambientIntensity:0.95,
+    light:'#eaf6ff', accent:'#4a8ac9', panelBg:'#2c4a5c', panelBorder:'#9ed2ff', textColor:'#f0f8ff',
+    pathColor:'#d8e2e6',
+    swatch:['#eef4f7','#9ed2ff','#2c4a5c'],
+    particle:{color:'#ffffff', behavior:'fall', count:50},
+    decorate(x,z,rng){
+      let h='';
+      const n = 3+Math.floor(rng()*3);
+      for(let i=0;i<n;i++){
+        const a = rng()*Math.PI*2, r = 2.6+rng()*3.2;
+        const dx=x+Math.cos(a)*r, dz=z+Math.sin(a)*r;
+        if(rng()<0.6){
+          const sc=0.8+rng()*0.5;
+          h += `<a-entity position="${dx.toFixed(2)} 0 ${dz.toFixed(2)}" scale="${sc.toFixed(2)} ${sc.toFixed(2)} ${sc.toFixed(2)}">
+            <a-cylinder radius="0.12" height="1" color="#4a3a29" position="0 0.5 0"></a-cylinder>
+            <a-cone radius-bottom="0.75" radius-top="0.02" height="1.5" color="#3a6b4a" position="0 1.55 0"></a-cone>
+            <a-cone radius-bottom="0.75" radius-top="0.02" height="1.5" color="#ffffff" position="0 1.62 0" scale="0.85 0.28 0.85"></a-cone>
+          </a-entity>`;
+        } else {
+          h += `<a-sphere position="${dx.toFixed(2)} 0.22 ${dz.toFixed(2)}" radius="${(0.3+rng()*0.3).toFixed(2)}" scale="1 0.55 1" color="#ffffff"></a-sphere>`;
+        }
+      }
+      return h;
+    }
+  }
+};
+
+/* ======================================================
+   2. NARZĘDZIA
+   ====================================================== */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function chunkText(text, maxChars){
+  const paragraphs = text.split(/\n\s*\n/).map(p=>p.trim()).filter(Boolean);
+  let raw = [];
+  paragraphs.forEach(p=>{
+    if(p.length<=maxChars){ raw.push(p); return; }
+    const sentences = p.match(/[^.!?]+[.!?]+(["'”’)\]]*\s*)?|[^.!?]+$/g) || [p];
+    let cur='';
+    sentences.forEach(s=>{
+      if((cur+s).length>maxChars && cur.trim().length>0){ raw.push(cur.trim()); cur=s; }
+      else cur+=s;
+    });
+    if(cur.trim()) raw.push(cur.trim());
+  });
+  const merged=[];
+  raw.forEach(c=>{
+    if(merged.length && c.length<40){ merged[merged.length-1]+=' '+c; }
+    else merged.push(c);
+  });
+  return merged.length? merged : (text.trim()? [text.trim()] : []);
+}
+
+function escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ---- Stan przystanków (edytowalna lista: tekst / tłumaczenie / obrazek / słówka) ---- */
+let stations = [];
+let stationIdCounter = 0;
+
+function addStation(en, pl, image, words){
+  stations.push({ id: stationIdCounter++, en: en||'', pl: pl||'', image: image||'', words: words||null });
+}
+
+function removeStation(id){
+  stations = stations.filter(s=>String(s.id)!==String(id));
+  renderStations();
+}
+
+function toggleWordSplit(id){
+  const st = stations.find(s=>String(s.id)===String(id));
+  if(!st) return;
+  if(st.words){
+    st.words = null;
+  } else {
+    const raw = (st.en||'').match(/[\p{L}\p{N}']+/gu) || [];
+    st.words = raw.map(w=>({en:w, pl:''}));
+  }
+  renderStations();
+}
+
+function delWord(stId, wIdx){
+  const st = stations.find(s=>String(s.id)===String(stId));
+  if(!st || !st.words) return;
+  st.words.splice(wIdx,1);
+  renderStations();
+}
+
+function renderWordGrid(st){
+  if(!st.words || !st.words.length) return '<div class="empty-hint">Brak słów do podziału — wpisz najpierw tekst angielski powyżej.</div>';
+  return `<div class="word-grid">${st.words.map((w,wi)=>`
+    <input data-word-station="${st.id}" data-word-idx="${wi}" data-word-field="en" value="${escapeAttr(w.en)}" placeholder="słowo">
+    <input data-word-station="${st.id}" data-word-idx="${wi}" data-word-field="pl" value="${escapeAttr(w.pl)}" placeholder="tłumaczenie">
+    <button type="button" class="word-del" data-action="delword" data-word-station="${st.id}" data-word-idx="${wi}">✕</button>
+  `).join('')}</div>`;
+}
+
+/* ---- Biblioteka zdjęć (wgrane z dysku) ---- */
+let imageLibrary = [];
+let imgLibIdCounter = 0;
+const imgLibInputEl = document.getElementById('image-library-input');
+const imgLibStripEl = document.getElementById('image-library-strip');
+
+function renderImageLibraryStrip(){
+  if(!imgLibStripEl) return;
+  if(!imageLibrary.length){
+    imgLibStripEl.innerHTML = '<div class="empty-hint">Brak wgranych zdjęć — wybierz pliki powyżej (można zaznaczyć kilka lub kilkanaście naraz).</div>';
+    return;
+  }
+  imgLibStripEl.innerHTML = imageLibrary.map(img=>
+    `<img src="${img.dataUrl}" class="lib-thumb-img" title="${escapeAttr(img.name)}">`
+  ).join('');
+}
+if(imgLibInputEl){
+  imgLibInputEl.addEventListener('change', (e)=>{
+    const files = Array.from(e.target.files || []);
+    if(!files.length) return;
+    let pending = files.length;
+    files.forEach(file=>{
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        imageLibrary.push({ id: imgLibIdCounter++, name: file.name, dataUrl: reader.result });
+        pending--;
+        if(pending===0) renderImageLibraryStrip();
+      };
+      reader.onerror = ()=>{ pending--; if(pending===0) renderImageLibraryStrip(); };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+renderImageLibraryStrip();
+
+/* ---- Popup wyboru zdjęcia z biblioteki dla konkretnego przystanku ---- */
+let imagePickerPopup = null;
+function closeImagePicker(){
+  if(imagePickerPopup){
+    imagePickerPopup.remove();
+    imagePickerPopup = null;
+    document.removeEventListener('mousedown', outsideImagePickerHandler);
+  }
+}
+function outsideImagePickerHandler(e){
+  if(imagePickerPopup && !imagePickerPopup.contains(e.target)) closeImagePicker();
+}
+function openImagePicker(stationId, anchorEl){
+  closeImagePicker();
+  if(!imageLibrary.length){
+    errorMsg.textContent = 'Najpierw wgraj zdjęcia w bibliotece na górze strony (📷 Biblioteka zdjęć).';
+    return;
+  }
+  errorMsg.textContent = '';
+  const rect = anchorEl.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'image-picker-popup';
+  popup.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  popup.style.left = Math.max(8, rect.right + window.scrollX - 260) + 'px';
+  popup.innerHTML = imageLibrary.map(img=>
+    `<img src="${img.dataUrl}" class="lib-thumb-img" data-pick="${img.id}" title="${escapeAttr(img.name)}">`
+  ).join('');
+  document.body.appendChild(popup);
+  imagePickerPopup = popup;
+  popup.addEventListener('click', (e)=>{
+    const imgEl = e.target.closest('img[data-pick]');
+    if(!imgEl) return;
+    const libImg = imageLibrary.find(x=>String(x.id)===String(imgEl.dataset.pick));
+    if(libImg){
+      const st = stations.find(s=>String(s.id)===String(stationId));
+      if(st) st.image = libImg.dataUrl;
+      const inputEl = stationsEditor.querySelector(`input[data-field="image"][data-id="${stationId}"]`);
+      if(inputEl) inputEl.value = libImg.dataUrl;
+    }
+    closeImagePicker();
+  });
+  setTimeout(()=>document.addEventListener('mousedown', outsideImagePickerHandler), 0);
+}
+
+const stationsEditor = document.getElementById('stations-editor');
+
+function renderStations(){
+  if(!stations.length){
+    stationsEditor.innerHTML = '<div class="empty-hint">Brak przystanków. Wklej tekst i kliknij „Podziel tekst na przystanki”, wybierz gotowy zestaw powyżej, albo dodaj przystanek ręcznie.</div>';
+  } else {
+    stationsEditor.innerHTML = stations.map((st,idx)=>`
+      <div class="station-edit-card" data-id="${st.id}">
+        <div class="station-edit-head">
+          <span class="station-edit-num">Przystanek ${idx+1}</span>
+          <button type="button" class="station-edit-del" data-action="delete" data-id="${st.id}">✕ usuń</button>
+        </div>
+        <div class="station-field-label">Tekst angielski</div>
+        <textarea class="station-textarea" data-field="en" data-id="${st.id}" placeholder="np. The cat sleeps on the mat.">${escapeHtml(st.en)}</textarea>
+        <div class="station-field-label">Tłumaczenie (polski)</div>
+        <input class="station-input" data-field="pl" data-id="${st.id}" value="${escapeAttr(st.pl)}" placeholder="np. Kot śpi na macie.">
+        <div class="station-field-label">Obrazek (adres URL, opcjonalnie)</div>
+        <div style="display:flex;gap:6px;">
+          <input class="station-input" data-field="image" data-id="${st.id}" value="${escapeAttr(st.image)}" placeholder="https://... lub wybierz z biblioteki" style="flex:1;">
+          <button type="button" class="station-mini-btn" data-action="pickimage" data-id="${st.id}" style="white-space:nowrap;">🖼️ Z biblioteki</button>
+        </div>        <div class="station-actions">
+          <button type="button" class="station-mini-btn" data-action="togglewords" data-id="${st.id}">${st.words? '↩️ Cofnij podział na słowa' : '🔤 Rozbij zdanie na słowa'}</button>
+        </div>
+        ${st.words? renderWordGrid(st) : ''}
+      </div>
+    `).join('');
+  }
+  updateStats();
+}
+
+stationsEditor.addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-action]');
+  if(!btn) return;
+  const action = btn.dataset.action;
+  if(action==='delete') removeStation(btn.dataset.id);
+  else if(action==='togglewords') toggleWordSplit(btn.dataset.id);
+  else if(action==='delword') delWord(btn.dataset.wordStation, parseInt(btn.dataset.wordIdx,10));
+  else if(action==='pickimage') openImagePicker(btn.dataset.id, btn);
+});
+
+stationsEditor.addEventListener('input', (e)=>{
+  const t = e.target;
+  if(t.dataset.field && t.dataset.id!=null){
+    const st = stations.find(s=>String(s.id)===String(t.dataset.id));
+    if(st) st[t.dataset.field] = t.value;
+    updateStats();
+    return;
+  }
+  if(t.dataset.wordField && t.dataset.wordStation!=null && t.dataset.wordIdx!=null){
+    const st = stations.find(s=>String(s.id)===String(t.dataset.wordStation));
+    if(st && st.words && st.words[parseInt(t.dataset.wordIdx,10)]){
+      st.words[parseInt(t.dataset.wordIdx,10)][t.dataset.wordField] = t.value;
+    }
+  }
+});
+
+function generatePath(n, rng, spacing){
+  spacing = spacing || 1;
+  const pts=[];
+  let angle = -Math.PI/2;
+  let radius = 3.2 * spacing;
+  const angleStep = 0.85;
+  const radiusStep = 2.4 * spacing;
+  for(let i=0;i<n;i++){
+    pts.push({x: Math.cos(angle)*radius, y:0, z: Math.sin(angle)*radius});
+    angle += angleStep + (rng()*0.18-0.09);
+    radius += radiusStep + (rng()*0.4-0.2);
+  }
+  return pts;
+}
+
+function generatePathStraight(n, rng, spacing){
+  spacing = spacing || 1;
+  const pts=[];
+  const forwardStep = 3.6 * spacing;
+  const sideOffset = 2.3 * Math.max(0.7, spacing*0.7);
+  for(let i=0;i<n;i++){
+    const z = -3 - i*forwardStep;
+    const side = (i % 2 === 0) ? -1 : 1;
+    const x = side * sideOffset * (0.9 + rng()*0.25);
+    pts.push({x, y:0, z});
+  }
+  return pts;
+}
+
+function escapeAttr(s){
+  return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function wordCount(text){
+  const t = text.trim();
+  if(!t) return 0;
+  return t.split(/\s+/).length;
+}
+
+/* ======================================================
+   3. EKRAN USTAWIEŃ — UI
+   ====================================================== */
+const themeGrid = document.getElementById('theme-grid');
+let selectedTheme = 'las';
+Object.keys(THEMES).forEach(key=>{
+  const t = THEMES[key];
+  const card = document.createElement('button');
+  card.type='button';
+  card.className = 'theme-card' + (key===selectedTheme?' selected':'');
+  card.dataset.theme = key;
+  card.innerHTML = `<span class="theme-emoji">${t.emoji}</span><span class="theme-name">${t.name}</span>
+    <span class="theme-swatch">${t.swatch.map(c=>`<span style="background:${c}"></span>`).join('')}</span>`;
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedTheme = key;
+  });
+  themeGrid.appendChild(card);
+});
+
+let selectedLayout = 'spiral';
+document.querySelectorAll('#layout-seg .seg-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#layout-seg .seg-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedLayout = btn.dataset.val;
+    updateStats();
+  });
+});
+
+const WORDSETS = {
+  'Kolory 🎨': ['red - czerwony','blue - niebieski','green - zielony','yellow - żółty','pink - różowy','orange - pomarańczowy','purple - fioletowy','black - czarny','white - biały','brown - brązowy'],
+  'Zwierzęta 🐾': ['cat - kot','dog - pies','fish - ryba','bird - ptak','horse - koń','rabbit - królik','duck - kaczka','frog - żaba','mouse - mysz','cow - krowa'],
+  'Liczby 🔢': ['one - jeden','two - dwa','three - trzy','four - cztery','five - pięć','six - sześć','seven - siedem','eight - osiem','nine - dziewięć','ten - dziesięć'],
+  'Rodzina 👪': ['mother - mama','father - tata','sister - siostra','brother - brat','grandmother - babcia','grandfather - dziadek','baby - dziecko','family - rodzina'],
+  'Powitania 👋': ['hello - cześć','goodbye - do widzenia','please - proszę','thank you - dziękuję','yes - tak','no - nie','sorry - przepraszam','good morning - dzień dobry']
+};
+const wordsetRow = document.getElementById('wordset-row');
+Object.keys(WORDSETS).forEach(name=>{
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'wordset-btn';
+  btn.textContent = name;
+  btn.addEventListener('click', ()=>{
+    WORDSETS[name].forEach(line=>{
+      const parts = line.split(/\s*-\s*/);
+      addStation((parts[0]||'').trim(), (parts[1]||'').trim(), '', null);
+    });
+    renderStations();
+  });
+  wordsetRow.appendChild(btn);
+});
+
+document.getElementById('split-btn').addEventListener('click', ()=>{
+  const text = lessonTextEl.value.trim();
+  if(!text) return;
+  const chunks = chunkText(text, 280);
+  chunks.forEach(c=>addStation(c, '', '', null));
+  renderStations();
+});
+
+/* ---- Import gotowej struktury JSON (zdania + słówka) ---- */
+function importSentencesJson(jsonText){
+  const jsonErr = document.getElementById('error-msg');
+  let data;
+  try{
+    data = JSON.parse(jsonText);
+  } catch(e){
+    jsonErr.textContent = 'Nie udało się odczytać JSON — sprawdź, czy struktura jest poprawna (błąd: ' + e.message + ').';
+    return;
+  }
+  const sentences = Array.isArray(data) ? data : (Array.isArray(data.sentences) ? data.sentences : null);
+  if(!sentences || !sentences.length){
+    jsonErr.textContent = 'Nie znaleziono listy zdań. Oczekiwana struktura: { "sentences": [ { "pl":"...", "en":"...", "words":[...] } ] }.';
+    return;
+  }
+
+  let foreignField = 'en';
+  let nativeField = 'pl';
+  if(data.language && typeof data.language === 'object' && data.language.target){
+    foreignField = data.language.target;
+    nativeField = data.language.source || 'pl';
+  } else {
+    const sample = sentences.find(s=>s && typeof s==='object');
+    if(sample){
+      const keys = Object.keys(sample).filter(k=>!['id','image','words'].includes(k));
+      if(keys.length>=2){
+        nativeField = keys.includes('pl') ? 'pl' : keys[0];
+        foreignField = keys.find(k=>k!==nativeField) || 'en';
+      }
+    }
+  }
+
+  let added = 0;
+  sentences.forEach(s=>{
+    if(!s || !s[foreignField]) return;
+    const words = (Array.isArray(s.words) && s.words.length)
+      ? s.words.map(w=>({ en: (w[foreignField]||'').trim(), pl: (w[nativeField]||'').trim() })).filter(w=>w.en)
+      : null;
+    addStation(s[foreignField], s[nativeField] || '', s.image || '', (words && words.length)? words : null);
+    added++;
+  });
+
+  const TARGET_LANG_MAP = { en:'en_pl', de:'de_pl', fr:'fr_pl', es:'es_pl', it:'it_pl', ru:'ru_pl', uk:'uk_pl', zh:'zh_pl', ja:'ja_pl' };
+  const matchedPair = TARGET_LANG_MAP[String(foreignField).toLowerCase()];
+  if(matchedPair && LANG_PAIRS[matchedPair] && matchedPair !== selectedLangPair){
+    selectedLangPair = matchedPair;
+    const langSelEl = document.getElementById('opt-langpair');
+    if(langSelEl) langSelEl.value = matchedPair;
+    manualVoiceURIs = { en:'', pl:'' };
+    updateLangPairUI();
+    refreshVoices();
+  }
+
+  renderStations();
+  const langNote = matchedPair ? ` Ustawiono parę językową: ${LANG_PAIRS[matchedPair].label1} ↔ ${LANG_PAIRS[matchedPair].label2}.` : '';
+  if(added===0){
+    jsonErr.textContent = `Nie znaleziono zdań z tekstem w polu "${foreignField}". Sprawdź, czy nazwy pól w JSON się zgadzają (albo dodaj sekcję "language":{"source":"...","target":"..."}).`;
+  } else {
+    jsonErr.textContent = '';
+  }
+  dbg(`Zaimportowano JSON: ${sentences.length} zdań, dodano ${added} przystanków (pole: "${foreignField}"/"${nativeField}").${langNote}`, 'ok');
+}
+
+document.getElementById('json-import-btn').addEventListener('click', ()=>{
+  const text = document.getElementById('json-paste').value.trim();
+  if(!text){
+    document.getElementById('error-msg').textContent = 'Wklej najpierw JSON w polu powyżej, albo wczytaj plik .json.';
+    return;
+  }
+  importSentencesJson(text);
+});
+
+document.getElementById('json-file-input').addEventListener('change', (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    document.getElementById('json-paste').value = reader.result;
+    importSentencesJson(reader.result);
+  };
+  reader.onerror = ()=>{
+    document.getElementById('error-msg').textContent = 'Nie udało się wczytać pliku.';
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+document.getElementById('add-station-btn').addEventListener('click', ()=>{
+  addStation('', '', '', null);
+  renderStations();
+  const cards = stationsEditor.querySelectorAll('.station-edit-card');
+  if(cards.length) cards[cards.length-1].scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+const statWords = document.getElementById('stat-words');
+const statTime = document.getElementById('stat-time');
+const routeSvg = document.getElementById('route-svg');
+
+function drawRouteSvg(n){
+  routeSvg.innerHTML='';
+  const cx=110, cy=110;
+  const cap = Math.min(n, 22);
+  const svgns='http://www.w3.org/2000/svg';
+  const pts=[];
+  let path;
+
+  if(selectedLayout === 'straight'){
+    const startY = 24;
+    const stepY = Math.min(16, (196-startY)/Math.max(cap-1,1));
+    const sideX = 34;
+    path = `M ${cx} ${startY}`;
+    for(let i=0;i<cap;i++){
+      const y = startY + i*stepY;
+      const x = cx + (i%2===0 ? -sideX : sideX);
+      pts.push({x,y});
+      path += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }
+  } else {
+    let angle = -Math.PI/2, radius = 8;
+    const angleStep = 0.85, radiusStep = 9.5;
+    path = `M ${cx} ${cy}`;
+    for(let i=0;i<cap;i++){
+      const x = cx + Math.cos(angle)*radius;
+      const y = cy + Math.sin(angle)*radius;
+      pts.push({x,y});
+      path += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+      angle += angleStep;
+      radius += radiusStep * (0.55 + i*0.02);
+    }
+  }
+
+  const pathEl = document.createElementNS(svgns,'path');
+  pathEl.setAttribute('d', path);
+  pathEl.setAttribute('stroke', '#c9a227');
+  pathEl.setAttribute('stroke-width','1.4');
+  pathEl.setAttribute('stroke-dasharray','3,4');
+  pathEl.setAttribute('fill','none');
+  pathEl.setAttribute('opacity','0.75');
+  routeSvg.appendChild(pathEl);
+
+  pts.forEach((p,i)=>{
+    const circ = document.createElementNS(svgns,'circle');
+    circ.setAttribute('cx',p.x.toFixed(1));
+    circ.setAttribute('cy',p.y.toFixed(1));
+    circ.setAttribute('r', i===0?4:3);
+    circ.setAttribute('fill', i===0?'#6e9b85':'#e9e0c8');
+    routeSvg.appendChild(circ);
+  });
+  if(n>22){
+    const last = pts[pts.length-1];
+    const t = document.createElementNS(svgns,'text');
+    t.setAttribute('x', last.x.toFixed(1));
+    t.setAttribute('y', (last.y-8).toFixed(1));
+    t.setAttribute('fill','#9fb3ae');
+    t.setAttribute('font-size','9');
+    t.setAttribute('font-family','JetBrains Mono, monospace');
+    t.textContent = `+${n-22}`;
+    routeSvg.appendChild(t);
+  }
+  const compass = document.createElementNS(svgns,'g');
+  compass.setAttribute('transform','translate(196,20)');
+  compass.innerHTML = `<circle r="10" fill="none" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"/><line x1="0" y1="-8" x2="0" y2="8" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"/><line x1="-8" y1="0" x2="8" y2="0" stroke="#9fb3ae" stroke-width="0.8" opacity="0.5"/>`;
+  routeSvg.appendChild(compass);
+}
+
+const lessonTextEl = document.getElementById('lesson-text');
+
+function updateStats(){
+  const n = stations.length;
+  const minutes = Math.max(1, Math.round(n*0.4));
+  statWords.textContent = n;
+  statTime.textContent = n? minutes : 0;
+  drawRouteSvg(n || 1);
+}
+renderStations();
+
+/* ======================================================
+   4. GENEROWANIE ŚWIATA
+   ====================================================== */
+const generateBtn = document.getElementById('generate-btn');
+const errorMsg = document.getElementById('error-msg');
+const setupScreen = document.getElementById('setup-screen');
+const vrContainer = document.getElementById('vr-container');
+const loadingOverlay = document.getElementById('loading-overlay');
+const sceneEl = document.getElementById('main-scene');
+dbg(`sceneEl znaleziony: ${!!sceneEl}, hasLoaded=${sceneEl && sceneEl.hasLoaded}`, 'ok');
+if(sceneEl){
+  sceneEl.addEventListener('loaded', ()=>dbg('zdarzenie sceny: loaded', 'ok'));
+  sceneEl.addEventListener('renderstart', ()=>dbg('zdarzenie sceny: renderstart (pętla renderowania ruszyła)', 'ok'));
+  sceneEl.addEventListener('camera-set-active', (e)=>dbg(`zdarzenie: camera-set-active — ${e.detail && e.detail.cameraEl && e.detail.cameraEl.id}`, 'ok'));
+}
+const exitBtn2d = document.getElementById('exit-btn-2d');
+
+let worldState = null;
+
+generateBtn.addEventListener('click', ()=>{
+  if(!window.AFRAME){
+    errorMsg.textContent = 'A-Frame nie wczytał się z CDN (aframe.io / unpkg.com). Jeśli testujesz to w podglądzie artefaktu w czacie — otwórz plik bezpośrednio w przeglądarce, ponieważ sandbox podglądu może blokować zewnętrzne skrypty.';
+    dbg('Przerwano budowanie świata: window.AFRAME nie istnieje.', 'err');
+    return;
+  }
+  const usable = stations.filter(s=>s.en && s.en.trim().length>0);
+  if(usable.length < 1){
+    errorMsg.textContent = 'Dodaj przynajmniej jeden przystanek z wpisanym tekstem angielskim (wklej i podziel tekst, wybierz gotowy zestaw, albo dodaj przystanek ręcznie).';
+    return;
+  }
+  errorMsg.textContent = '';
+  buildWorld(usable, THEMES[selectedTheme], {
+    tts: document.getElementById('opt-tts').checked,
+    autoAdvance: document.getElementById('opt-auto').checked,
+    freeWalk: document.getElementById('opt-freewalk').checked,
+    lockPitch: document.getElementById('opt-lockpitch').checked,
+    layout: selectedLayout,
+    moveSpeed: parseFloat(document.getElementById('opt-speed').value) || 1,
+    spacing: parseFloat(document.getElementById('opt-spacing').value) || 1,
+    hideHud: document.getElementById('opt-hidehud') ? document.getElementById('opt-hidehud').checked : false
+  });
+});
+
+function forceSceneResize(){
+  window.dispatchEvent(new Event('resize'));
+  if(sceneEl.resize) { try{ sceneEl.resize(); }catch(e){ dbg('błąd resize(): '+e.message, 'err'); } }
+  const canvas = sceneEl.canvas;
+  if(canvas){
+    canvas.style.width='100%';
+    canvas.style.height='100%';
+    dbg(`canvas: ${canvas.width}x${canvas.height} (CSS: ${canvas.clientWidth}x${canvas.clientHeight})`, (canvas.width>0&&canvas.height>0)?'ok':'err');
+  } else {
+    dbg('sceneEl.canvas jeszcze nie istnieje', 'warn');
+  }
+}
+
+function applyHudVisibility(hide){
+  ['hud-bg-plane','hud-prev','hud-pause','hud-read','hud-next'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.setAttribute('visible', !hide);
+  });
+}
+
+function buildWorld(chunks, theme, opts){
+  dbg(`buildWorld start: ${chunks.length} przystanków, motyw ${theme.name}`, 'ok');
+  dbg(`sceneEl.hasLoaded=${sceneEl.hasLoaded}, sceneEl.canvas=${!!sceneEl.canvas}`, 'ok');
+  setupScreen.style.display='none';
+  vrContainer.classList.add('visible');
+  loadingOverlay.style.display='flex';
+  requestAnimationFrame(()=>{ forceSceneResize(); setTimeout(forceSceneResize, 200); setTimeout(forceSceneResize, 800); });
+
+  const seed = Date.now() % 2147483647;
+  const rng = mulberry32(seed);
+  const pts = (opts.layout === 'straight')
+    ? generatePathStraight(chunks.length, rng, opts.spacing)
+    : generatePath(chunks.length, rng, opts.spacing);
+
+  let minX=0,maxX=0,minZ=0,maxZ=0;
+  pts.forEach(p=>{ minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minZ=Math.min(minZ,p.z); maxZ=Math.max(maxZ,p.z); });
+  const spread = Math.max(maxX-minX, maxZ-minZ) + 14;
+  const cx = (minX+maxX)/2, cz = (minZ+maxZ)/2;
+
+  document.getElementById('world-sky').setAttribute('color', theme.sky);
+  document.getElementById('ambient-light').setAttribute('light', `type: ambient; color:${theme.ambient}; intensity:${theme.ambientIntensity}`);
+  document.getElementById('directional-light').setAttribute('light', `type: directional; color:${theme.light}; intensity:0.55`);
+  const groundEl = document.getElementById('ground-plane');
+  groundEl.setAttribute('width', spread.toFixed(1));
+  groundEl.setAttribute('height', spread.toFixed(1));
+  groundEl.setAttribute('position', `${cx.toFixed(1)} 0 ${cz.toFixed(1)}`);
+  groundEl.setAttribute('color', theme.ground);
+  sceneEl.setAttribute('fog', `type: exponential; color:${theme.fog}; density:${theme.fogDensity}`);
+
+  let pathHtml = '';
+  for(let i=0;i<pts.length-1;i++){
+    const a=pts[i], b=pts[i+1];
+    const dist = Math.hypot(b.x-a.x, b.z-a.z);
+    const steps = Math.max(1, Math.ceil(dist/0.85));
+    for(let s=1;s<steps;s++){
+      const t=s/steps;
+      const x=a.x+(b.x-a.x)*t, z=a.z+(b.z-a.z)*t;
+      pathHtml += `<a-cylinder position="${x.toFixed(2)} 0.02 ${z.toFixed(2)}" radius="0.32" height="0.05" color="${theme.pathColor}"></a-cylinder>`;
+    }
+  }
+  document.getElementById('path-container').innerHTML = pathHtml;
+
+  let decorHtml = '';
+  pts.forEach(p=>{ decorHtml += theme.decorate(p.x, p.z, rng); });
+  if(theme.globalExtras){ decorHtml += theme.globalExtras({cx, cz, spread}); }
+  document.getElementById('decor-container').innerHTML = decorHtml;
+
+  document.getElementById('particles-container').innerHTML = buildAmbientParticles(theme, cx, cz, spread, rng);
+
+  let stationsHtml = '';
+  pts.forEach((p,i)=>{
+    const facingAngle = Math.atan2(cx-p.x, cz-p.z) * 180/Math.PI;
+    const st = chunks[i];
+    const wordEn = escapeAttr(st.en);
+    const wordPl = escapeAttr(st.pl || '');
+    const hasImage = !!(st.image && /^(https?:\/\/|data:image\/)/i.test(st.image.trim()));
+    const isFirst = i===0;
+
+    const panelHeight = 2.05;
+    const panelTopY = 1.35 + panelHeight/2;
+    const panelCenterY = 1.35 + panelHeight/2;
+    let textY = panelTopY - 0.55;
+    const mainTextBlock = `<a-entity troika-text="value: ${wordEn}; color:${theme.textColor}; fontSize:0.135; maxWidth:2.5; lineHeight:1.35; anchor:center; align:center" position="0 ${textY.toFixed(2)} -1.27"></a-entity>`;
+    textY -= 0.5;
+    const plBlock = wordPl? `<a-entity troika-text="value: ${wordPl}; color:${theme.accent}; fontSize:0.115; maxWidth:2.5; anchor:center; align:center" position="0 ${textY.toFixed(2)} -1.27"></a-entity>` : '';
+
+    let imagePanelBlock = '';
+    if(hasImage){
+      const imgSize = 1.25;
+      const imgX = 1.4 + 0.16 + imgSize/2;
+      imagePanelBlock = `
+        <a-plane width="${(imgSize+0.08).toFixed(2)}" height="${(imgSize+0.08).toFixed(2)}" position="${imgX.toFixed(2)} ${panelCenterY.toFixed(2)} -1.3" color="${theme.panelBg}" material="opacity:0.92;roughness:1" side="double"></a-plane>
+        <a-plane width="${(imgSize+0.14).toFixed(2)}" height="${(imgSize+0.14).toFixed(2)}" position="${imgX.toFixed(2)} ${panelCenterY.toFixed(2)} -1.31" color="${theme.panelBorder}" material="opacity:0.5" side="double"></a-plane>
+        <a-image src="${escapeAttr(st.image)}" width="${imgSize}" height="${imgSize}" position="${imgX.toFixed(2)} ${panelCenterY.toFixed(2)} -1.29"></a-image>
+      `;
+    }
+
+    stationsHtml += `
+    <a-entity id="station-${i}" data-index="${i}" position="${p.x.toFixed(2)} 0 ${p.z.toFixed(2)}">
+      <a-cylinder radius="1.15" height="0.06" position="0 0.03 0" color="${theme.pathColor}" opacity="0.9"></a-cylinder>
+      <a-entity class="clickable station-marker" data-index="${i}" position="0 1 0" geometry="primitive: cylinder; radius:0.6; height:1.6" material="opacity:0;transparent:true"></a-entity>
+      <a-entity rotation="0 ${facingAngle.toFixed(1)} 0" position="0 0 0">
+        <a-plane width="2.8" height="${panelHeight.toFixed(2)}" position="0 ${panelCenterY.toFixed(2)} -1.3" color="${theme.panelBg}" material="opacity:0.92;roughness:1" side="double"></a-plane>
+        <a-plane width="2.86" height="${(panelHeight+0.06).toFixed(2)}" position="0 ${panelCenterY.toFixed(2)} -1.31" color="${theme.panelBorder}" material="opacity:0.5" side="double"></a-plane>
+        <a-entity troika-text="value: PRZYSTANEK ${i+1} / ${pts.length}; color:${theme.panelBorder}; fontSize:0.11; maxWidth:2.5; anchor:center; align:center; letterSpacing:0.05" position="0 ${panelTopY.toFixed(2)} -1.29"></a-entity>
+        ${mainTextBlock}
+        ${plBlock}
+        ${imagePanelBlock}
+      </a-entity>
+    </a-entity>`;
+  });
+  document.getElementById('stations-container').innerHTML = stationsHtml;
+  wireStationMarkers();
+
+  const start = pts[0];
+  const startFacingAngle = Math.atan2(cx-start.x, cz-start.z) * 180/Math.PI;
+  const startBoardAng = startFacingAngle;
+  const rig = document.getElementById('rig');
+  rig.removeAttribute('animation__move');
+  rig.removeAttribute('animation__rotate');
+  rig.setAttribute('position', `${start.x.toFixed(2)} 0 ${start.z.toFixed(2)}`);
+  rig.setAttribute('rotation', `0 ${startBoardAng.toFixed(1)} 0`);
+
+  document.getElementById('hud-prev').setAttribute('material', `color:${theme.panelBg};opacity:0.9`);
+  document.getElementById('hud-next').setAttribute('material', `color:${theme.panelBg};opacity:0.9`);
+  document.getElementById('hud-read').setAttribute('material', `color:${theme.accent};opacity:0.95`);
+
+  const camEl0 = document.getElementById('camera');
+  if(camEl0){
+    camEl0.setAttribute('lock-pitch', 'enabled', !!opts.lockPitch);
+    if(opts.lockPitch) camEl0.object3D.rotation.x = 0;
+  }
+
+  applyHudVisibility(!!opts.hideHud);
+
+  worldState = {
+    theme, chunks, pts, opts,
+    currentIndex: 0,
+    visited: new Set([0]),
+    rig,
+    playToken: 0,
+    isNavigating: false,
+    navLockTimer: null,
+    cx, cz,
+    isPaused: false,
+    resumeAction: null
+  };
+
+  document.getElementById('hud-status').setAttribute('troika-text', `value:Przystanek 1 / ${pts.length}; color:${theme.textColor}; fontSize:0.13; anchor:center; align:center`);
+
+  forceSceneResize();
+  loadingOverlay.style.display='none';
+  const camEl = document.getElementById('camera');
+  const camComp = camEl && camEl.components && camEl.components.camera;
+  dbg(`rig pozycja: ${rig.getAttribute('position').x.toFixed(1)} ${rig.getAttribute('position').y.toFixed(1)} ${rig.getAttribute('position').z.toFixed(1)}`, 'ok');
+  dbg(`kamera aktywna: ${!!(camComp && camComp.data && camComp.data.active !== false)}, sceneEl.camera === camera.getObject3D: ${sceneEl.camera === (camComp&&camComp.camera)}`, 'ok');
+  dbg(`stacje w DOM: ${document.querySelectorAll('#stations-container > *').length}`, 'ok');
+  if(opts.tts) speakChunk(0);
+}
+
+function buildAmbientParticles(theme, cx, cz, spread, rng){
+  const p = theme.particle;
+  let html='';
+  const half = spread/2;
+  for(let i=0;i<p.count;i++){
+    const x = cx + (rng()*2-1)*half;
+    const z = cz + (rng()*2-1)*half;
+    const yBase = 0.5 + rng()*3.5;
+    if(p.behavior==='flicker'){
+      html += `<a-sphere position="${x.toFixed(2)} ${yBase.toFixed(2)} ${z.toFixed(2)}" radius="0.03" color="${p.color}" material="emissive:${p.color};emissiveIntensity:0.9;shader:flat" animation="property:material.emissiveIntensity;from:0.2;to:1;dir:alternate;loop:true;dur:${(800+rng()*1200).toFixed(0)}"></a-sphere>`;
+    } else if(p.behavior==='twinkle'){
+      const yHigh = 4+rng()*10;
+      html += `<a-sphere position="${x.toFixed(2)} ${yHigh.toFixed(2)} ${z.toFixed(2)}" radius="${(0.025+rng()*0.02).toFixed(3)}" color="${p.color}" material="emissive:${p.color};emissiveIntensity:1;shader:flat" animation="property:material.emissiveIntensity;from:0.3;to:1;dir:alternate;loop:true;dur:${(1200+rng()*2000).toFixed(0)}"></a-sphere>`;
+    } else if(p.behavior==='rise'){
+      html += `<a-sphere position="${x.toFixed(2)} 0.2 ${z.toFixed(2)}" radius="${(0.03+rng()*0.04).toFixed(3)}" color="${p.color}" material="opacity:0.65;transparent:true;shader:flat" animation="property:position;to:${x.toFixed(2)} ${(4+rng()*3).toFixed(2)} ${z.toFixed(2)};loop:true;dur:${(4000+rng()*3000).toFixed(0)};easing:linear"></a-sphere>`;
+    } else if(p.behavior==='fall'){
+      html += `<a-sphere position="${x.toFixed(2)} ${(4+rng()*4).toFixed(2)} ${z.toFixed(2)}" radius="0.025" color="${p.color}" material="shader:flat" animation="property:position;to:${(x+ (rng()*2-1)).toFixed(2)} 0 ${(z+(rng()*2-1)).toFixed(2)};loop:true;dur:${(3500+rng()*3000).toFixed(0)};easing:linear"></a-sphere>`;
+    }
+  }
+  return html;
+}
+
+/* ======================================================
+   5. NAWIGACJA + TTS
+   ====================================================== */
+function wireHudStatic(){
+  document.getElementById('hud-next').addEventListener('click', goNext);
+  document.getElementById('hud-prev').addEventListener('click', goPrev);
+  document.getElementById('hud-read').addEventListener('click', ()=>{ if(worldState) speakChunk(worldState.currentIndex); });
+  document.getElementById('hud-pause').addEventListener('click', togglePause);
+  document.addEventListener('keydown', (e)=>{
+    if(!worldState) return;
+    if(e.key==='p' || e.key==='P'){ togglePause(); return; }
+    if(worldState.opts.freeWalk){
+      if(e.key===' '){ e.preventDefault(); speakChunk(worldState.currentIndex); }
+      return;
+    }
+    if(e.key==='ArrowRight') goNext();
+    if(e.key==='ArrowLeft') goPrev();
+    if(e.key===' '){ e.preventDefault(); speakChunk(worldState.currentIndex); }
+  });
+}
+wireHudStatic();
+
+const gazeCursorEl = document.getElementById('gaze-cursor');
+if(gazeCursorEl && sceneEl){
+  sceneEl.addEventListener('enter-vr', ()=>{ gazeCursorEl.setAttribute('raycaster', 'objects', '.clickable'); });
+  sceneEl.addEventListener('exit-vr', ()=>{ gazeCursorEl.setAttribute('raycaster', 'objects', '.gaze-only-vr'); });
+}
+
+function wireStationMarkers(){
+  document.querySelectorAll('.station-marker').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = parseInt(el.dataset.index,10);
+      travelTo(idx);
+    });
+  });
+}
+
+function goNext(){
+  if(!worldState || worldState.isNavigating) return;
+  if(worldState.currentIndex < worldState.pts.length-1){
+    travelTo(worldState.currentIndex+1);
+  }
+}
+function goPrev(){
+  if(!worldState || worldState.isNavigating) return;
+  if(worldState.currentIndex > 0){
+    travelTo(worldState.currentIndex-1);
+  }
+}
+
+function travelTo(idx){
+  const ws = worldState;
+  ws.playToken++;
+  ws.isNavigating = true;
+  const speed = (ws.opts.moveSpeed && ws.opts.moveSpeed > 0) ? ws.opts.moveSpeed : 1;
+  const moveDur = Math.max(250, Math.round(1100 / speed));
+  clearTimeout(ws.navLockTimer);
+  ws.navLockTimer = setTimeout(()=>{ if(worldState) worldState.isNavigating = false; }, moveDur + 50);
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  hideWordSpotlight();
+  ws.isPaused = false;
+  ws.resumeAction = null;
+  const pauseLabelEl = document.getElementById('hud-pause-label');
+  if(pauseLabelEl) pauseLabelEl.setAttribute('troika-text', 'value', '⏸ PAUZA');
+  ws.currentIndex = idx;
+  ws.visited.add(idx);
+  const p = ws.pts[idx];
+  const rig = ws.rig;
+  rig.setAttribute('animation__move', `property: position; to: ${p.x} 0 ${p.z}; dur: ${moveDur}; easing: easeInOutQuad`);
+
+  const facingAngle = Math.atan2(ws.cx-p.x, ws.cz-p.z) * 180/Math.PI;
+  const boardAng = facingAngle;
+  rig.setAttribute('animation__rotate', `property: rotation; to: 0 ${boardAng} 0; dur: ${moveDur}; easing: easeInOutQuad`);
+
+  document.getElementById('hud-status').setAttribute('troika-text', `value:Przystanek ${idx+1} / ${ws.pts.length}; color:${ws.theme.textColor}; fontSize:0.13; anchor:center; align:center`);
+
+  if(ws.opts.tts) speakChunk(idx);
+
+  if(idx===ws.pts.length-1){
+    setTimeout(showCompletion, moveDur + 200);
+  }
+}
+
+let currentUtterance = null;
+let polishVoice = null;
+let englishVoice = null;
+let manualVoiceURIs = { en: '', pl: '' };
+
+const LANG_PAIRS = {
+  en_pl: { code1:'en-US', code2:'pl-PL', prefix1:'en', prefix2:'pl', label1:'angielski', label2:'polski', hint:'' },
+  de_pl: { code1:'de-DE', code2:'pl-PL', prefix1:'de', prefix2:'pl', label1:'niemiecki', label2:'polski', hint:'' },
+  fr_pl: { code1:'fr-FR', code2:'pl-PL', prefix1:'fr', prefix2:'pl', label1:'francuski', label2:'polski', hint:'' },
+  es_pl: { code1:'es-ES', code2:'pl-PL', prefix1:'es', prefix2:'pl', label1:'hiszpański', label2:'polski', hint:'' },
+  it_pl: { code1:'it-IT', code2:'pl-PL', prefix1:'it', prefix2:'pl', label1:'włoski', label2:'polski', hint:'' },
+  ru_pl: { code1:'ru-RU', code2:'pl-PL', prefix1:'ru', prefix2:'pl', label1:'rosyjski', label2:'polski', hint:'' },
+  uk_pl: { code1:'uk-UA', code2:'pl-PL', prefix1:'uk', prefix2:'pl', label1:'ukraiński', label2:'polski', hint:'' },
+  zh_pl: { code1:'zh-CN', code2:'pl-PL', prefix1:'zh', prefix2:'pl', label1:'chiński', label2:'polski',
+           hint:'⚠️ Znaki chińskie mogą się nie wyświetlić poprawnie (czcionka użyta do tekstu 3D nie ma jeszcze wsparcia CJK) — samo czytanie na głos powinno jednak działać. Automatyczny podział zdania na "słowa" nie ma sensu bez spacji — lepiej wklejać gotowe pary słówek przez JSON.' },
+  ja_pl: { code1:'ja-JP', code2:'pl-PL', prefix1:'ja', prefix2:'pl', label1:'japoński', label2:'polski',
+           hint:'⚠️ Jak wyżej: znaki japońskie mogą się nie wyświetlić bez odpowiedniej czcionki, a dzielenie na "słowa" po spacji nie zadziała sensownie.' }
+};
+let selectedLangPair = 'en_pl';
+
+const langPairSelectEl = document.getElementById('opt-langpair');
+if(langPairSelectEl){
+  langPairSelectEl.innerHTML = Object.keys(LANG_PAIRS).map(key=>{
+    const lp = LANG_PAIRS[key];
+    const label = lp.label1.charAt(0).toUpperCase()+lp.label1.slice(1) + ' ↔ ' + lp.label2.charAt(0).toUpperCase()+lp.label2.slice(1);
+    return `<option value="${key}"${key===selectedLangPair?' selected':''}>${label}</option>`;
+  }).join('');
+  langPairSelectEl.addEventListener('change', ()=>{
+    selectedLangPair = langPairSelectEl.value;
+    manualVoiceURIs = { en: '', pl: '' };
+    updateLangPairUI();
+    refreshVoices();
+  });
+}
+
+function updateLangPairUI(){
+  const lp = LANG_PAIRS[selectedLangPair] || LANG_PAIRS.en_pl;
+  const v1 = document.getElementById('voice1-label');
+  const v2 = document.getElementById('voice2-label');
+  if(v1) v1.textContent = 'Głos — język nauki (' + lp.label1 + ')';
+  if(v2) v2.textContent = 'Głos — tłumaczenie (' + lp.label2 + ')';
+  const hintEl = document.getElementById('langpair-hint');
+  if(hintEl) hintEl.textContent = lp.hint || '';
+}
+updateLangPairUI();
+
+function pickVoice(langPrefix){
+  if(!('speechSynthesis' in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  return voices.find(v=>v.lang && v.lang.toLowerCase().startsWith(langPrefix)) || null;
+}
+
+function refreshVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const lp = LANG_PAIRS[selectedLangPair] || LANG_PAIRS.en_pl;
+  const voices = window.speechSynthesis.getVoices();
+  const voices1 = voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith(lp.prefix1));
+  const voices2 = voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith(lp.prefix2));
+
+  populateVoiceSelect('opt-voice-en', voices1);
+  populateVoiceSelect('opt-voice-pl', voices2);
+
+  const manual1 = manualVoiceURIs.en ? voices.find(v=>v.voiceURI===manualVoiceURIs.en && v.lang && v.lang.toLowerCase().startsWith(lp.prefix1)) : null;
+  const manual2 = manualVoiceURIs.pl ? voices.find(v=>v.voiceURI===manualVoiceURIs.pl && v.lang && v.lang.toLowerCase().startsWith(lp.prefix2)) : null;
+  englishVoice = manual1 || pickVoice(lp.prefix1);
+  polishVoice = manual2 || pickVoice(lp.prefix2);
+}
+
+function populateVoiceSelect(selectId, voices){
+  const sel = document.getElementById(selectId);
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Automatyczny</option>' +
+    voices.map(v=>`<option value="${escapeAttr(v.voiceURI)}">${escapeAttr(v.name)} (${escapeAttr(v.lang)})</option>`).join('');
+}
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+  refreshVoices();
+}
+
+const optVoiceEnEl = document.getElementById('opt-voice-en');
+const optVoicePlEl = document.getElementById('opt-voice-pl');
+if(optVoiceEnEl) optVoiceEnEl.addEventListener('change', ()=>{ manualVoiceURIs.en = optVoiceEnEl.value; refreshVoices(); });
+if(optVoicePlEl) optVoicePlEl.addEventListener('change', ()=>{ manualVoiceURIs.pl = optVoicePlEl.value; refreshVoices(); });
+
+function forceOnTop(el){
+  if(!el || !el.object3D) return;
+  el.object3D.traverse(node=>{
+    if(node.material){
+      node.material.depthTest = false;
+      node.renderOrder = 999;
+    }
+  });
+}
+
+const WORD_EMOJI = {
+  cat:'🐱', dog:'🐶', fish:'🐟', bird:'🐦', horse:'🐴', rabbit:'🐰', duck:'🦆', frog:'🐸',
+  mouse:'🐭', cow:'🐮', hedgehog:'🦔', sparrow:'🐦', bee:'🐝', butterfly:'🦋', bear:'🐻',
+  fox:'🦊', owl:'🦉', chicken:'🐔', sheep:'🐑', pig:'🐷', snail:'🐌',
+  red:'🔴', blue:'🔵', green:'🟢', yellow:'🟡', pink:'🩷', orange:'🟠', purple:'🟣',
+  black:'⚫', white:'⚪', brown:'🟤',
+  one:'1️⃣', two:'2️⃣', three:'3️⃣', four:'4️⃣', five:'5️⃣', six:'6️⃣', seven:'7️⃣',
+  eight:'8️⃣', nine:'9️⃣', ten:'🔟',
+  mother:'👩', father:'👨', sister:'👧', brother:'👦', grandmother:'👵', grandfather:'👴',
+  baby:'👶', family:'👪', friend:'🧑‍🤝‍🧑',
+  forest:'🌲', tree:'🌳', flower:'🌸', sun:'☀️', moon:'🌙', star:'⭐', sky:'🌤️', rain:'🌧️',
+  snow:'❄️', water:'💧', river:'🏞️', mountain:'⛰️', path:'🥾', branch:'🌿', nest:'🪺',
+  wind:'💨', cloud:'☁️',
+  house:'🏠', book:'📚', ball:'⚽', car:'🚗', bike:'🚲', chair:'🪑', table:'🍽️', door:'🚪',
+  window:'🪟', bed:'🛏️', cup:'☕', apple:'🍎', bread:'🍞', milk:'🥛',
+  happy:'😊', sad:'😢', scared:'😨', tired:'😴', angry:'😠', surprised:'😲', love:'❤️',
+  run:'🏃', walk:'🚶', jump:'🤸', sleep:'😴', eat:'🍽️', drink:'🥤', see:'👀', look:'👀',
+  hear:'👂', listen:'👂', sing:'🎵', fly:'🕊️', swim:'🏊', play:'🎮', help:'🤝', find:'🔍',
+  lived:'🏡', live:'🏡',
+  hello:'👋', goodbye:'👋', yes:'✅', no:'❌', please:'🙏', morning:'🌅', night:'🌃'
+};
+
+function lookupEmoji(word){
+  if(!word) return '';
+  const clean = String(word).toLowerCase().trim().replace(/[.,!?;:"'()]/g, '');
+  return WORD_EMOJI[clean] || '';
+}
+
+function emojiToImageUrl(emoji){
+  const codepoints = Array.from(emoji).map(ch => ch.codePointAt(0).toString(16)).filter(cp => cp !== 'fe0f');
+  return `https://cdn.jsdelivr.net/gh/twitter/[email protected]/assets/72x72/${codepoints.join('-')}.png`;
+}
+
+function showWordSpotlight(w){
+  const group = document.getElementById('hud-word-spotlight');
+  const enEl = document.getElementById('hud-word-en');
+  const plEl = document.getElementById('hud-word-pl');
+  const emojiEl = document.getElementById('hud-word-emoji');
+  if(!group || !enEl || !plEl) return;
+  enEl.setAttribute('troika-text', 'value', w.en);
+  plEl.setAttribute('troika-text', 'value', w.pl || '');
+  group.setAttribute('visible', true);
+  enEl.emit('wordPop');
+
+  if(emojiEl){
+    const emoji = lookupEmoji(w.en);
+    if(emoji){
+      emojiEl.setAttribute('src', emojiToImageUrl(emoji));
+      emojiEl.setAttribute('visible', true);
+    } else {
+      emojiEl.setAttribute('visible', false);
+    }
+  }
+
+  forceOnTop(enEl); forceOnTop(plEl); if(emojiEl) forceOnTop(emojiEl);
+  setTimeout(()=>{ forceOnTop(enEl); forceOnTop(plEl); if(emojiEl) forceOnTop(emojiEl); }, 60);
+  setTimeout(()=>{ forceOnTop(enEl); forceOnTop(plEl); if(emojiEl) forceOnTop(emojiEl); }, 220);
+}
+
+function hideWordSpotlight(){
+  const group = document.getElementById('hud-word-spotlight');
+  const emojiEl = document.getElementById('hud-word-emoji');
+  if(group) group.setAttribute('visible', false);
+  if(emojiEl) emojiEl.setAttribute('visible', false);
+}
+
+function pauseSafeTimeout(fn, delay, token){
+  return setTimeout(()=>{
+    if(!worldState || (token!==undefined && worldState.playToken!==token)) return;
+    if(worldState.isPaused){
+      worldState.resumeAction = fn;
+    } else {
+      fn();
+    }
+  }, delay);
+}
+
+function togglePause(){
+  if(!worldState) return;
+  worldState.isPaused = !worldState.isPaused;
+  if(worldState.isPaused){
+    if('speechSynthesis' in window) window.speechSynthesis.pause();
+  } else {
+    if('speechSynthesis' in window) window.speechSynthesis.resume();
+    if(worldState.resumeAction){
+      const fn = worldState.resumeAction;
+      worldState.resumeAction = null;
+      fn();
+    }
+  }
+  const label = document.getElementById('hud-pause-label');
+  if(label){
+    label.setAttribute('troika-text', 'value', worldState.isPaused ? '▶ WZNÓW' : '⏸ PAUZA');
+  }
+}
+
+function speakWordList(words, i, token){
+  if(!worldState || worldState.playToken!==token) return;
+  if(i>=words.length){
+    hideWordSpotlight();
+    if(worldState.opts.autoAdvance && worldState.currentIndex < worldState.pts.length-1){
+      pauseSafeTimeout(()=>{ if(worldState && worldState.playToken===token) goNext(); }, 500, token);
+    }
+    return;
+  }
+  const w = words[i];
+  showWordSpotlight(w);
+  const lp = LANG_PAIRS[selectedLangPair] || LANG_PAIRS.en_pl;
+  const uEn = new SpeechSynthesisUtterance(w.en);
+  uEn.lang = lp.code1;
+  if(englishVoice) uEn.voice = englishVoice;
+  uEn.rate = 0.8;
+  currentUtterance = uEn;
+  uEn.onend = ()=>{
+    if(!worldState || worldState.playToken!==token) return;
+    if(w.pl){
+      const uPl = new SpeechSynthesisUtterance(w.pl);
+      uPl.lang = lp.code2;
+      if(polishVoice) uPl.voice = polishVoice;
+      uPl.rate = 0.9;
+      uPl.onend = ()=> pauseSafeTimeout(()=>speakWordList(words, i+1, token), 350, token);
+      pauseSafeTimeout(()=>{ if(worldState && worldState.playToken===token) window.speechSynthesis.speak(uPl); }, 300, token);
+    } else {
+      pauseSafeTimeout(()=>speakWordList(words, i+1, token), 400, token);
+    }
+  };
+  window.speechSynthesis.speak(uEn);
+}
+
+function speakChunk(idx){
+  if(!('speechSynthesis' in window) || !worldState) return;
+  window.speechSynthesis.cancel();
+  hideWordSpotlight();
+  worldState.playToken++;
+  const token = worldState.playToken;
+  const st = worldState.chunks[idx];
+  const hasWords = !!(st.words && st.words.length);
+
+  function afterSentence(){
+    if(!worldState || worldState.playToken!==token) return;
+    if(hasWords){
+      speakWordList(st.words, 0, token);
+    } else if(worldState.opts.autoAdvance){
+      if(worldState.currentIndex < worldState.pts.length-1){
+        pauseSafeTimeout(()=>{ if(worldState && worldState.playToken===token) goNext(); }, 600, token);
+      }
+    }
+  }
+
+  const lp2 = LANG_PAIRS[selectedLangPair] || LANG_PAIRS.en_pl;
+  const utterEn = new SpeechSynthesisUtterance(st.en);
+  utterEn.lang = lp2.code1;
+  if(englishVoice) utterEn.voice = englishVoice;
+  utterEn.rate = 0.85;
+
+  const utterPl = st.pl ? new SpeechSynthesisUtterance(st.pl) : null;
+  if(utterPl){
+    utterPl.lang = lp2.code2;
+    if(polishVoice) utterPl.voice = polishVoice;
+    utterPl.rate = 0.95;
+    utterPl.onend = ()=> pauseSafeTimeout(afterSentence, 400, token);
+  }
+
+  utterEn.onend = ()=>{
+    if(!worldState || worldState.playToken!==token) return;
+    if(utterPl){
+      pauseSafeTimeout(()=>{ if(worldState && worldState.playToken===token) window.speechSynthesis.speak(utterPl); }, 350, token);
+    } else {
+      afterSentence();
+    }
+  };
+
+  currentUtterance = utterEn;
+  window.speechSynthesis.speak(utterEn);
+}
+
+function showCompletion(){
+  const hud = document.getElementById('hud-status');
+  if(hud){
+    hud.setAttribute('troika-text', `value:🎉 Ukończono lekcję!; color:${worldState.theme.accent}; fontSize:0.16; anchor:center; align:center`);
+  }
+}
+
+exitBtn2d.addEventListener('click', exitWorld);
+
+function resetWasdKeys(){
+  const rig = document.getElementById('rig');
+  const comp = rig && rig.components && rig.components['wasd-controls'];
+  if(comp && comp.keys){
+    Object.keys(comp.keys).forEach(k=>{ comp.keys[k] = false; });
+  }
+}
+window.addEventListener('blur', resetWasdKeys);
+document.addEventListener('mouseup', resetWasdKeys);
+document.addEventListener('pointerup', resetWasdKeys);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) resetWasdKeys(); });
+
+const enterStereoBtn = document.getElementById('enter-stereo-btn');
+enterStereoBtn.addEventListener('click', ()=>{
+  if(sceneEl.enterVR){
+    sceneEl.enterVR().catch(err=>{
+      console.error('Nie udało się wejść w VR:', err);
+    });
+  }
+});
+
+function exitWorld(){
+  if(window.__CLEAN_EXPORT__) return;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  hideWordSpotlight();
+  if(sceneEl.is && sceneEl.is('vr-mode')){
+    sceneEl.exitVR();
+  }
+  document.getElementById('path-container').innerHTML = '';
+  document.getElementById('decor-container').innerHTML = '';
+  document.getElementById('particles-container').innerHTML = '';
+  document.getElementById('stations-container').innerHTML = '';
+  vrContainer.classList.remove('visible');
+  loadingOverlay.style.display='none';
+  setupScreen.style.display='flex';
+  worldState = null;
+}
+
+/* ======================================================
+   6. EKSPORT DO SAMODZIELNEGO PLIKU HTML
+   ====================================================== */
+function buildExportConfig(){
+  const usableStations = stations.filter(s=>s.en && s.en.trim());
+  if(!usableStations.length){
+    errorMsg.textContent = 'Dodaj przynajmniej jeden przystanek z tekstem angielskim przed eksportem.';
+    return null;
+  }
+  return {
+    theme: selectedTheme,
+    stations: usableStations.map(s=>({ en: s.en, pl: s.pl||'', image: s.image||'', words: (s.words&&s.words.length)? s.words:null })),
+    opts: {
+      tts: document.getElementById('opt-tts').checked,
+      autoAdvance: document.getElementById('opt-auto').checked,
+      freeWalk: document.getElementById('opt-freewalk').checked,
+      lockPitch: document.getElementById('opt-lockpitch').checked,
+      layout: selectedLayout,
+      moveSpeed: parseFloat(document.getElementById('opt-speed').value) || 1,
+      spacing: parseFloat(document.getElementById('opt-spacing').value) || 1,
+      langPair: selectedLangPair,
+      hideHud: document.getElementById('opt-hidehud') ? document.getElementById('opt-hidehud').checked : false
+    }
+  };
+}
+
+function downloadHtmlBlob(html, filename){
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+
+function exportWorldHtml(){
+  const cfg = buildExportConfig();
+  if(!cfg) return;
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const safeJson = JSON.stringify(cfg).replace(/</g, '\\u003c');
+  const injection = '<script>window.__AUTOSTART_WORLD__ = ' + safeJson + ';</' + 'script>\n';
+  html = html.replace('</head>', injection + '</head>');
+  downloadHtmlBlob(html, 'moj-swiat-vr-klasa1.html');
+  dbg('Wyeksportowano samodzielny plik HTML (z edytorem) z ' + cfg.stations.length + ' przystankami.', 'ok');
+}
+
+// Eksport "czysty" — wynikowy plik od razu pokazuje gotowy świat VR, bez ekranu edycji,
+// bez przycisku "Wróć do edycji" i bez przycisków budowania/eksportu.
+function exportCleanWorldHtml(){
+  const cfg = buildExportConfig();
+  if(!cfg) return;
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const safeJson = JSON.stringify(cfg).replace(/</g, '\\u003c');
+  const injection = '<script>window.__AUTOSTART_WORLD__ = ' + safeJson + '; window.__CLEAN_EXPORT__ = true;</' + 'script>\n';
+  html = html.replace('</head>', injection + '</head>');
+  html = html.replace(
+    '#setup-screen{',
+    '#setup-screen{display:none!important;'
+  );
+  html = html.replace(
+    'id="exit-btn-2d"',
+    'id="exit-btn-2d" style="display:none"'
+  );
+  downloadHtmlBlob(html, 'moj-swiat-vr-klasa1-gotowy.html');
+  dbg('Wyeksportowano CZYSTY plik HTML (bez edytora) z ' + cfg.stations.length + ' przystankami.', 'ok');
+}
+
+document.getElementById('export-btn').addEventListener('click', exportWorldHtml);
+const exportCleanBtnEl = document.getElementById('export-clean-btn');
+if(exportCleanBtnEl) exportCleanBtnEl.addEventListener('click', exportCleanWorldHtml);
+
+/* ---- Autostart: uruchamia się tylko w pliku wyeksportowanym ---- */
+if(window.__AUTOSTART_WORLD__){
+  const cfg = window.__AUTOSTART_WORLD__;
+  stations = (cfg.stations||[]).map(s=>({
+    id: stationIdCounter++, en: s.en||'', pl: s.pl||'', image: s.image||'', words: s.words||null
+  }));
+  if(cfg.theme && THEMES[cfg.theme]) selectedTheme = cfg.theme;
+  if(cfg.opts && cfg.opts.layout) selectedLayout = cfg.opts.layout;
+  if(cfg.opts && cfg.opts.langPair && LANG_PAIRS[cfg.opts.langPair]){
+    selectedLangPair = cfg.opts.langPair;
+    if(langPairSelectEl) langPairSelectEl.value = selectedLangPair;
+    updateLangPairUI();
+    refreshVoices();
+  }
+  renderStations();
+  setTimeout(()=>{
+    const usable = stations.filter(s=>s.en && s.en.trim());
+    if(usable.length){
+      buildWorld(usable, THEMES[selectedTheme], {
+        tts: cfg.opts && cfg.opts.tts!==undefined ? cfg.opts.tts : true,
+        autoAdvance: cfg.opts && cfg.opts.autoAdvance!==undefined ? cfg.opts.autoAdvance : false,
+        freeWalk: cfg.opts && cfg.opts.freeWalk!==undefined ? cfg.opts.freeWalk : true,
+        lockPitch: cfg.opts && cfg.opts.lockPitch!==undefined ? cfg.opts.lockPitch : true,
+        layout: cfg.opts && cfg.opts.layout ? cfg.opts.layout : 'spiral',
+        moveSpeed: cfg.opts && cfg.opts.moveSpeed ? cfg.opts.moveSpeed : 1,
+        spacing: cfg.opts && cfg.opts.spacing ? cfg.opts.spacing : 1,
+        hideHud: cfg.opts && cfg.opts.hideHud!==undefined ? cfg.opts.hideHud : false
+      });
+      if(window.__CLEAN_EXPORT__){
+        const exitB = document.getElementById('exit-btn-2d');
+        if(exitB) exitB.style.display='none';
+      }
+    }
+  }, 60);
+}
+
+})();
+</script>
+
+</body></html>
