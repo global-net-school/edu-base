@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pamięciogród — Klasa 1</title>
+<style>
+  :root{
+    --bg: #F3EFE2;
+    --paper: #FBF8EF;
+    --ink: #22331F;
+    --ink-soft: #4B5A44;
+    --bed: #3C5A44;
+    --bed-dark: #2A4232;
+    --moss: #8CA383;
+    --moss-pale: #E4E9DC;
+    --plum: #7A3B54;
+    --plum-pale: #F1E1E6;
+    --gold: #C7962F;
+    --gold-pale: #F6E9C9;
+    --line: #DAD0B2;
+    --radius: 20px;
+    --shadow: 0 2px 0 rgba(34,51,31,0.06), 0 8px 20px rgba(34,51,31,0.08);
+    font-size: 19px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(circle at 8% 4%, rgba(124,148,115,0.14), transparent 40%),
+      radial-gradient(circle at 96% 92%, rgba(122,59,84,0.10), transparent 45%),
+      var(--bg);
+    color:var(--ink);
+    font-family: 'Avenir Next', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .display{
+    font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  #app{ max-width:640px; margin:0 auto; padding:20px 16px 64px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:6px 2px 18px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:38px; height:38px; border-radius:10px;
+    background: linear-gradient(160deg, var(--bed), var(--bed-dark));
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px; box-shadow: var(--shadow);
+    flex-shrink:0;
+  }
+  .brand .name{ font-family:Georgia,serif; font-size:19px; font-weight:700; letter-spacing:-0.01em; }
+  .brand .sub{ font-size:11px; color:var(--ink-soft); margin-top:-2px; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:var(--paper);
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; cursor:pointer; color:var(--ink);
+  }
+  .icon-btn:active{ transform:scale(0.94); }
+
+  /* ---------- Streak ribbon ---------- */
+  .streak-ribbon{
+    display:flex; align-items:center; gap:10px;
+    background:var(--gold-pale); border:1px solid #E9D28F;
+    border-radius:14px; padding:10px 14px; margin-bottom:18px;
+  }
+  .streak-ribbon .flame{ font-size:20px; }
+  .streak-ribbon b{ color:#8A6512; }
+  .streak-ribbon .due{
+    margin-left:auto; font-size:13px; color:var(--ink-soft);
+  }
+
+  /* ---------- Garden map (home) ---------- */
+  .garden-title{ margin:6px 0 4px; }
+  .garden-title h1{ font-size:24px; margin:0 0 4px; font-weight:700; }
+  .garden-title p{ margin:0; color:var(--ink-soft); font-size:14.5px; line-height:1.5; }
+
+  .beds-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px;
+  }
+  .bed-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 14px 14px; cursor:pointer; position:relative; overflow:hidden;
+    box-shadow:var(--shadow); transition:transform .12s ease;
+  }
+  .bed-card:active{ transform:scale(0.97); }
+  .bed-card .badge{
+    position:absolute; top:10px; right:10px;
+    background:var(--plum); color:#fff; font-size:11px; font-weight:700;
+    border-radius:20px; padding:2px 8px;
+  }
+  .bed-card .glyph{ font-size:34px; line-height:1; }
+  .bed-card .bed-name{ font-family:Georgia,serif; font-weight:700; font-size:16.5px; margin-top:8px; }
+  .bed-card .bed-count{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .bloom-track{
+    height:6px; background:var(--moss-pale); border-radius:6px; margin-top:10px; overflow:hidden;
+  }
+  .bloom-fill{ height:100%; background:linear-gradient(90deg, var(--moss), var(--bed)); border-radius:6px; }
+
+  .cta-row{ display:flex; gap:10px; margin-top:20px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    border:none; border-radius:14px; padding:14px 18px; font-size:15px; font-weight:700;
+    cursor:pointer; font-family:inherit; text-align:center;
+  }
+  .btn:active{ transform:scale(0.97); }
+  .btn-primary{ background:var(--bed); color:#fff; box-shadow:var(--shadow); flex:1; }
+  .btn-primary:disabled{ background:#B9C3B2; cursor:default; }
+  .btn-secondary{ background:var(--paper); color:var(--ink); border:1px solid var(--line); flex:1; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1px dashed var(--line); }
+  .btn-full{ width:100%; }
+  .btn-plum{ background:var(--plum); color:#fff; box-shadow:var(--shadow); }
+  .btn-gold{ background:var(--gold); color:#fff; }
+
+  .section-label{ font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; margin:26px 0 10px; }
+
+  /* ---------- Cards (learn / review) ---------- */
+  .card{
+    background:var(--paper); border:1px solid var(--line); border-radius:22px;
+    padding:26px 22px; box-shadow:var(--shadow); text-align:center;
+  }
+  .card .big-icon{ font-size:78px; line-height:1; margin-bottom:6px; }
+  .card .word-en{ font-family:Georgia,serif; font-size:34px; font-weight:700; margin:6px 0 2px; }
+  .card .word-pl{ font-size:15px; color:var(--ink-soft); margin-bottom:14px; }
+  .speak-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--moss-pale); color:var(--bed-dark); border:none; border-radius:20px;
+    padding:8px 14px; font-size:13.5px; font-weight:700; cursor:pointer; margin-bottom:16px;
+  }
+  .mnemonic-box{
+    background:var(--plum-pale); border:1px solid #E4C4D0; border-radius:14px;
+    padding:12px 14px; text-align:left; font-size:14px; line-height:1.55; color:#5A2740; margin-bottom:12px;
+  }
+  .mnemonic-box b{ color:var(--plum); }
+  .sentence-box{
+    text-align:left; font-size:14px; color:var(--ink-soft); font-style:italic;
+    border-left:3px solid var(--moss); padding-left:10px; margin-bottom:4px;
+  }
+
+  .progress-dots{ display:flex; gap:6px; justify-content:center; margin:16px 0 4px; }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--line); }
+  .dot.done{ background:var(--bed); }
+  .dot.current{ background:var(--gold); }
+
+  /* ---------- Review input ---------- */
+  .answer-row{ margin-top:6px; }
+  .answer-input{
+    width:100%; padding:14px 16px; font-size:18px; border-radius:14px;
+    border:2px solid var(--line); background:#fff; font-family:inherit; text-align:center;
+    outline:none;
+  }
+  .answer-input:focus{ border-color:var(--bed); }
+  .feedback{
+    margin-top:14px; padding:12px 14px; border-radius:12px; font-size:14.5px; text-align:left; line-height:1.5;
+  }
+  .feedback.ok{ background:var(--moss-pale); color:var(--bed-dark); }
+  .feedback.bad{ background:var(--plum-pale); color:#5A2740; }
+
+  /* ---------- Story ---------- */
+  .story-box{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    padding:20px; box-shadow:var(--shadow); line-height:1.85; font-size:16px;
+  }
+  .story-box .sentence{ transition:background .25s ease; padding:2px 3px; border-radius:6px; }
+  .story-box .sentence.active{ background:var(--gold-pale); }
+  .story-word{ font-weight:700; color:var(--bed); border-bottom:2px dotted var(--moss); }
+
+  /* ---------- Stats ---------- */
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .stat-card{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:16px; box-shadow:var(--shadow); }
+  .stat-card .num{ font-family:Georgia,serif; font-size:28px; font-weight:700; color:var(--bed-dark); }
+  .stat-card .lbl{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  .word-row{
+    display:flex; align-items:center; gap:12px; padding:10px 4px; border-bottom:1px solid var(--line);
+  }
+  .word-row:last-child{ border-bottom:none; }
+  .word-row .ic{ font-size:22px; width:30px; text-align:center; }
+  .word-row .en{ font-weight:700; font-size:14.5px; }
+  .word-row .pl{ font-size:12.5px; color:var(--ink-soft); }
+  .word-row .stage{ margin-left:auto; font-size:20px; }
+
+  .empty{
+    text-align:center; padding:36px 18px; color:var(--ink-soft); font-size:14.5px; line-height:1.6;
+  }
+  .empty .em-icon{ font-size:40px; margin-bottom:10px; }
+
+  .footer-nav{
+    position:fixed; bottom:0; left:0; right:0;
+    background:var(--paper); border-top:1px solid var(--line);
+    display:flex; justify-content:center; padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    z-index:20;
+  }
+  .footer-nav .row{ display:flex; gap:22px; max-width:640px; width:100%; justify-content:space-around; }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer;
+    color:var(--ink-soft); font-size:10.5px; font-weight:700; background:none; border:none; font-family:inherit;
+  }
+  .nav-item .ic{ font-size:19px; }
+  .nav-item.active{ color:var(--bed-dark); }
+
+  .back-link{
+    display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft);
+    font-size:13.5px; font-weight:700; cursor:pointer; margin-bottom:10px; background:none; border:none; font-family:inherit; padding:0;
+  }
+  select, .settings-row input{
+    font-family:inherit; font-size:14.5px; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#fff;
+  }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; padding:14px 4px; border-bottom:1px solid var(--line); gap:14px; }
+  .settings-row:last-child{ border-bottom:none; }
+  .settings-row .lbl{ font-size:14.5px; font-weight:600; }
+  .settings-row .desc{ font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+  a.link{ color:var(--bed-dark); }
+
+  /* ---------- Tryb wyboru (klasa 1) ---------- */
+  .choice-grid{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+  .choice-btn{
+    display:flex; align-items:center; gap:14px;
+    background:#fff; border:2px solid var(--line); border-radius:16px;
+    padding:14px 16px; font-size:19px; font-weight:700; cursor:pointer;
+    font-family:inherit; color:var(--ink); text-align:left; width:100%;
+  }
+  .choice-btn:active{ transform:scale(0.98); }
+  .choice-btn .cic{ font-size:28px; }
+  .choice-btn.correct{ background:var(--moss-pale); border-color:var(--bed); }
+  .choice-btn.wrong{ background:var(--plum-pale); border-color:var(--plum); }
+  .choice-btn:disabled{ opacity:0.55; }
+
+  /* ---------- Formularz dodawania słówek ---------- */
+  .field{ margin-bottom:14px; text-align:left; }
+  .field label{ display:block; font-size:13.5px; font-weight:700; color:var(--ink-soft); margin-bottom:6px; }
+  .field input[type=text], .field textarea{
+    width:100%; padding:12px 14px; font-size:16px; border-radius:12px;
+    border:2px solid var(--line); font-family:inherit; background:#fff; outline:none;
+  }
+  .field input[type=text]:focus, .field textarea:focus{ border-color:var(--bed); }
+  .field textarea{ resize:vertical; min-height:60px; }
+  .emoji-picker{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-top:8px;
+    max-height:150px; overflow-y:auto; padding:8px; background:#fff; border:2px solid var(--line); border-radius:12px;
+  }
+  .emoji-picker button{
+    font-size:22px; background:none; border:none; border-radius:8px; padding:6px 0; cursor:pointer;
+  }
+  .emoji-picker button.sel{ background:var(--moss-pale); }
+  .icon-preview{
+    width:56px; height:56px; border-radius:14px; background:var(--moss-pale);
+    display:flex; align-items:center; justify-content:center; font-size:30px; flex-shrink:0;
+  }
+  .icon-row{ display:flex; align-items:center; gap:12px; }
+  .custom-row{
+    display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid var(--line);
+  }
+  .custom-row:last-child{ border-bottom:none; }
+  .del-btn{
+    margin-left:auto; background:none; border:none; font-size:19px; cursor:pointer; color:var(--plum); padding:6px;
+  }
+  .toggle-row{ display:flex; gap:8px; }
+  .toggle-opt{
+    flex:1; padding:10px; text-align:center; border-radius:12px; border:2px solid var(--line);
+    background:#fff; font-size:13.5px; font-weight:700; cursor:pointer; color:var(--ink-soft);
+  }
+  .toggle-opt.active{ background:var(--bed); border-color:var(--bed); color:#fff; }
+  .file-label{
+    display:inline-block; background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:14px 18px; font-size:14.5px; font-weight:700; cursor:pointer; text-align:center;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="footer-nav">
+  <div class="row">
+    <button class="nav-item" data-nav="home"><span class="ic">🗺️</span>Ogród</button>
+    <button class="nav-item" data-nav="review"><span class="ic">🔁</span>Powtórka</button>
+    <button class="nav-item" data-nav="story"><span class="ic">📖</span>Historia</button>
+    <button class="nav-item" data-nav="addword"><span class="ic">➕</span>Dodaj</button>
+    <button class="nav-item" data-nav="settings"><span class="ic">⚙️</span>Ustawienia</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   PAMIĘCIOGRÓD — dane słownictwa
+   Metoda słów-kluczy (dual coding): ikona + skojarzenie fonetyczne + zdanie
+   ============================================================ */
+const PACKS = {
+  dom: {
+    name: "Dom", icon: "🏡",
+    words: [
+      {id:"dom-table", en:"table", pl:"stół", icon:"🍽️", mnemonic:"TABLE brzmi jak „tejbl” — wyobraź sobie <b>TE BULWY</b> (ziemniaki) leżące na stole.", sentence:"The food is on the table.", sentencePl:"Jedzenie jest na stole."},
+      {id:"dom-chair", en:"chair", pl:"krzesło", icon:"🪑", mnemonic:"CHAIR brzmi jak „czer” — na krześle siedzi wielka <b>CZEREŚNIA</b>.", sentence:"Sit on the chair, please.", sentencePl:"Usiądź na krześle, proszę."},
+      {id:"dom-window", en:"window", pl:"okno", icon:"🪟", mnemonic:"WINDOW zawiera słowo WIND (wiatr) — <b>WIATR</b> wieje przez okno.", sentence:"Open the window, please.", sentencePl:"Otwórz okno, proszę."},
+      {id:"dom-door", en:"door", pl:"drzwi", icon:"🚪", mnemonic:"DOOR brzmi jak „dor” — <b>DOROTA</b> puka do drzwi.", sentence:"Close the door.", sentencePl:"Zamknij drzwi."},
+      {id:"dom-bed", en:"bed", pl:"łóżko", icon:"🛏️", mnemonic:"BED brzmi jak „bed” — dziecko <b>BECZY</b> (płacze) w łóżku przed snem.", sentence:"I sleep in my bed.", sentencePl:"Śpię w moim łóżku."},
+      {id:"dom-lamp", en:"lamp", pl:"lampa", icon:"💡", mnemonic:"LAMP brzmi niemal jak polska <b>LAMPA</b> — to słowo-bliźniak!", sentence:"Turn on the lamp.", sentencePl:"Włącz lampę."},
+      {id:"dom-book", en:"book", pl:"książka", icon:"📖", mnemonic:"BOOK brzmi jak „buk” — książka leży pod drzewem <b>BUK</b>.", sentence:"Read a book with me.", sentencePl:"Poczytaj ze mną książkę."},
+      {id:"dom-clock", en:"clock", pl:"zegar", icon:"🕐", mnemonic:"CLOCK brzmi jak „klok” — zegar zbudowany z <b>KLOCKÓW</b> tyka głośno.", sentence:"The clock says three o'clock.", sentencePl:"Zegar pokazuje trzecią."},
+      {id:"dom-mirror", en:"mirror", pl:"lustro", icon:"🪞", mnemonic:"MIRROR brzmi jak „mirer” — w lustrze widzisz <b>MIRAŻ</b> swojej twarzy.", sentence:"Look in the mirror.", sentencePl:"Spójrz w lustro."},
+      {id:"dom-key", en:"key", pl:"klucz", icon:"🔑", mnemonic:"KEY brzmi jak „ki” — kluczem jest mały <b>KIJEK</b>, który otwiera drzwi.", sentence:"Where is my key?", sentencePl:"Gdzie jest mój klucz?"}
+    ]
+  },
+  natura: {
+    name: "Las", icon: "🌲",
+    words: [
+      {id:"nat-tree", en:"tree", pl:"drzewo", icon:"🌳", mnemonic:"TREE brzmi jak „tri” — drzewo ma <b>TRZY</b> grube gałęzie.", sentence:"The tree is very tall.", sentencePl:"Drzewo jest bardzo wysokie."},
+      {id:"nat-flower", en:"flower", pl:"kwiat", icon:"🌸", mnemonic:"FLOWER brzmi jak „flała” — kwiat gra na <b>FLECIE</b> dla pszczół.", sentence:"She picked a flower.", sentencePl:"Zerwała kwiat."},
+      {id:"nat-river", en:"river", pl:"rzeka", icon:"🏞️", mnemonic:"RIVER brzmi jak „riwer” — rzeka jest <b>RYWALEM</b> mostu, płynie szybciej.", sentence:"The river is long.", sentencePl:"Rzeka jest długa."},
+      {id:"nat-mountain", en:"mountain", pl:"góra", icon:"⛰️", mnemonic:"MOUNTAIN brzmi jak „małnten” — na szczycie leży złota <b>MONETA</b>.", sentence:"We climbed the mountain.", sentencePl:"Wspięliśmy się na górę."},
+      {id:"nat-sun", en:"sun", pl:"słońce", icon:"☀️", mnemonic:"SUN brzmi jak „san” — słońce świeci na złote <b>SANIE</b>.", sentence:"The sun is bright today.", sentencePl:"Słońce jest dziś jasne."},
+      {id:"nat-cloud", en:"cloud", pl:"chmura", icon:"☁️", mnemonic:"CLOUD brzmi jak „klałd” — chmura to miękka <b>KŁADKA</b> nad niebem.", sentence:"I see a white cloud.", sentencePl:"Widzę białą chmurę."},
+      {id:"nat-rain", en:"rain", pl:"deszcz", icon:"🌧️", mnemonic:"RAIN brzmi jak „rejn” — deszcz pada na grzbiet <b>RENIFERA</b>.", sentence:"The rain is falling.", sentencePl:"Pada deszcz."},
+      {id:"nat-star", en:"star", pl:"gwiazda", icon:"⭐", mnemonic:"STAR brzmi jak „star” — gwiazda jest <b>STARA</b> jak wszechświat.", sentence:"I can see a star.", sentencePl:"Widzę gwiazdę."},
+      {id:"nat-moon", en:"moon", pl:"księżyc", icon:"🌙", mnemonic:"MOON brzmi jak „mun” — księżyc nosi srebrny <b>MUNDUR</b>.", sentence:"The moon is full tonight.", sentencePl:"Dziś księżyc jest w pełni."},
+      {id:"nat-forest", en:"forest", pl:"las", icon:"🌲", mnemonic:"FOREST brzmi jak „forest” — w lesie stoi stara <b>FURA</b> drwala.", sentence:"We walked in the forest.", sentencePl:"Spacerowaliśmy po lesie."}
+    ]
+  },
+  miasto: {
+    name: "Miasto", icon: "🏙️",
+    words: [
+      {id:"mia-car", en:"car", pl:"samochód", icon:"🚗", mnemonic:"CAR brzmi jak „kar” — samochód dostał <b>KARĘ</b> za szybką jazdę.", sentence:"The car is red.", sentencePl:"Samochód jest czerwony."},
+      {id:"mia-street", en:"street", pl:"ulica", icon:"🛣️", mnemonic:"STREET brzmi jak „stryt” — na ulicy każdy nosi odświętny <b>STRÓJ</b>.", sentence:"Cross the street carefully.", sentencePl:"Ostrożnie przejdź przez ulicę."},
+      {id:"mia-shop", en:"shop", pl:"sklep", icon:"🏪", mnemonic:"SHOP brzmi jak „szop” — sklep mieści się w starej <b>SZOPIE</b>.", sentence:"We go to the shop.", sentencePl:"Idziemy do sklepu."},
+      {id:"mia-bridge", en:"bridge", pl:"most", icon:"🌉", mnemonic:"BRIDGE brzmi jak „brydż” — most wygląda jak wielka <b>BRYTFANNA</b> nad rzeką.", sentence:"The bridge is very long.", sentencePl:"Most jest bardzo długi."},
+      {id:"mia-train", en:"train", pl:"pociąg", icon:"🚂", mnemonic:"TRAIN brzmi jak „trejn” — pociąg jedzie na poranny <b>TRENING</b>.", sentence:"The train is fast.", sentencePl:"Pociąg jest szybki."},
+      {id:"mia-park", en:"park", pl:"park", icon:"🛝", mnemonic:"PARK brzmi niemal jak polski <b>PARK</b> — to słowo-bliźniak!", sentence:"Let's play in the park.", sentencePl:"Pobawmy się w parku."},
+      {id:"mia-school", en:"school", pl:"szkoła", icon:"🏫", mnemonic:"SCHOOL brzmi jak „skul” — uczniowie siedzą <b>SKULENI</b> nad książkami.", sentence:"I go to school every day.", sentencePl:"Chodzę do szkoły codziennie."},
+      {id:"mia-house", en:"house", pl:"dom", icon:"🏠", mnemonic:"HOUSE brzmi jak „hałs” — dom krzyczy <b>„AŁŁ”</b>, gdy ktoś trzaska drzwiami.", sentence:"This is my house.", sentencePl:"To jest mój dom."},
+      {id:"mia-bicycle", en:"bicycle", pl:"rower", icon:"🚲", mnemonic:"BICYCLE brzmi jak „bajsikl” — rower jedzie prosto z <b>BAJKI</b>.", sentence:"I ride my bicycle.", sentencePl:"Jeżdżę na rowerze."},
+      {id:"mia-bus", en:"bus", pl:"autobus", icon:"🚌", mnemonic:"BUS brzmi jak „bas” — autobus gra niski dźwięk <b>BAS</b>.", sentence:"The bus is late.", sentencePl:"Autobus się spóźnia."}
+    ]
+  },
+  kosmos: {
+    name: "Kosmos", icon: "🚀",
+    words: [
+      {id:"kos-rocket", en:"rocket", pl:"rakieta", icon:"🚀", mnemonic:"ROCKET brzmi jak „rokit” — rakieta leci cały <b>ROK</b> do gwiazd.", sentence:"The rocket flies to space.", sentencePl:"Rakieta leci w kosmos."},
+      {id:"kos-planet", en:"planet", pl:"planeta", icon:"🪐", mnemonic:"PLANET brzmi jak „planit” — każda planeta ma swój <b>PLAN</b> lotu.", sentence:"Earth is our planet.", sentencePl:"Ziemia to nasza planeta."},
+      {id:"kos-astronaut", en:"astronaut", pl:"astronauta", icon:"👨‍🚀", mnemonic:"ASTRONAUT brzmi jak „astronot” — astronauta zbiera kwiaty <b>ASTRY</b> na Marsie.", sentence:"The astronaut wears a suit.", sentencePl:"Astronauta nosi skafander."},
+      {id:"kos-spaceship", en:"spaceship", pl:"statek kosmiczny", icon:"🛸", mnemonic:"SPACESHIP brzmi jak „spejs-szip” — statek zabiera cię na <b>SPACER</b> między gwiazdami.", sentence:"The spaceship is huge.", sentencePl:"Statek kosmiczny jest ogromny."},
+      {id:"kos-alien", en:"alien", pl:"kosmita", icon:"👽", mnemonic:"ALIEN brzmi jak „ejlien” — kosmita jest <b>ALE LENIWY</b>, śpi cały dzień.", sentence:"The alien is green.", sentencePl:"Kosmita jest zielony."},
+      {id:"kos-comet", en:"comet", pl:"kometa", icon:"☄️", mnemonic:"COMET brzmi jak „komit” — kometa ma ogon jak dym z <b>KOMINA</b>.", sentence:"The comet has a long tail.", sentencePl:"Kometa ma długi ogon."},
+      {id:"kos-satellite", en:"satellite", pl:"satelita", icon:"🛰️", mnemonic:"SATELLITE brzmi jak „satelajt” — satelita błyszczy jak <b>SATYNA</b> na niebie.", sentence:"The satellite orbits Earth.", sentencePl:"Satelita krąży wokół Ziemi."},
+      {id:"kos-galaxy", en:"galaxy", pl:"galaktyka", icon:"🌌", mnemonic:"GALAXY brzmi jak „galaksi” — kręci się jak miska <b>GALARETKI</b> z gwiazdami.", sentence:"Our galaxy is called the Milky Way.", sentencePl:"Nasza galaktyka nazywa się Droga Mleczna."},
+      {id:"kos-telescope", en:"telescope", pl:"teleskop", icon:"🔭", mnemonic:"TELESCOPE brzmi jak „teliskołp” — to jak <b>TELEFON</b> do odległych gwiazd.", sentence:"Look through the telescope.", sentencePl:"Spójrz przez teleskop."},
+      {id:"kos-orbit", en:"orbit", pl:"orbita", icon:"🌀", mnemonic:"ORBIT brzmi niemal jak polska <b>ORBITA</b> — to słowo-bliźniak!", sentence:"The moon has an orbit around Earth.", sentencePl:"Księżyc ma orbitę wokół Ziemi."}
+    ]
+  }
+};
+
+const STORIES = {
+  dom: {
+    title: "Poranek Toma",
+    sentences: [
+      "Tom wakes up in his <b>bed</b>.",
+      "He looks at the <b>clock</b> — it says seven o'clock.",
+      "He opens the <b>window</b> and looks outside.",
+      "Then he takes a <b>book</b> from the <b>table</b> and sits on a <b>chair</b> near the <b>lamp</b>.",
+      "Before he leaves, he looks in the <b>mirror</b>, picks up his <b>key</b>, and closes the <b>door</b> behind him."
+    ]
+  },
+  natura: {
+    title: "Spacer Mii",
+    sentences: [
+      "Mia walks into the <b>forest</b>.",
+      "She sees a tall <b>tree</b> and a small <b>flower</b> next to a <b>river</b>.",
+      "The <b>sun</b> is warm, but one <b>cloud</b> brings light <b>rain</b>.",
+      "Later, when the sky is dark, she sees the <b>moon</b> and one bright <b>star</b> above the <b>mountain</b>."
+    ]
+  },
+  miasto: {
+    title: "Droga Jacka do szkoły",
+    sentences: [
+      "Every morning, Jack walks past his <b>house</b> to <b>school</b>.",
+      "He crosses the <b>street</b> and rides his <b>bicycle</b> over the <b>bridge</b>.",
+      "He waits for the <b>bus</b> near the <b>shop</b>, but today his <b>car</b> is faster than the <b>train</b>.",
+      "After school, he plays in the <b>park</b>."
+    ]
+  },
+  kosmos: {
+    title: "Lot w nieznane",
+    sentences: [
+      "An <b>astronaut</b> sits inside a big <b>spaceship</b>.",
+      "The <b>rocket</b> flies past a <b>satellite</b> and enters the <b>orbit</b> of a strange <b>planet</b>.",
+      "Through the <b>telescope</b>, she sees a green <b>alien</b> and a <b>comet</b> flying through the <b>galaxy</b>."
+    ]
+  }
+};
+
+/* ============================================================
+   SILNIK PAMIĘCI — Repeated Spaced Retrieval (RSR)
+   Rozszerzające się odstępy powtórek, oparte na badaniach nad
+   nauką słownictwa u dzieci (m.in. Fritz i in. 2007; Leonard i in. 2021).
+   ============================================================ */
+const INTERVALS_DAYS = [0, 1, 2, 4, 7, 14, 30, 60]; // indeks = poziom
+const MAX_LEVEL = INTERVALS_DAYS.length - 1;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem("pamieciogrod_klasa1_v1");
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { words:{}, streak:{count:0,last:null}, settings:{voice:null, sessionSize:6, inputMode:"choice"}, custom:[] };
+}
+function saveState(){ localStorage.setItem("pamieciogrod_klasa1_v1", JSON.stringify(STATE)); }
+let STATE = loadState();
+if(!STATE.custom) STATE.custom = [];
+if(!STATE.settings) STATE.settings = { voice:null, sessionSize:6, inputMode:"choice" };
+if(!STATE.settings.inputMode) STATE.settings.inputMode = "choice";
+
+function syncCustomPack(){
+  PACKS.custom = { name:"Moje słówka", icon:"✏️", words: STATE.custom };
+}
+
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function addDays(days){ const d = new Date(); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+
+function getProgress(id){
+  return STATE.words[id] || null;
+}
+function isDue(id){
+  const p = getProgress(id);
+  if(!p) return false;
+  return p.next <= todayKey();
+}
+function isNew(id){ return !getProgress(id); }
+
+function growthStage(level){
+  if(level===undefined || level===null) return "🌰"; // nasiono jeszcze nie zasadzone
+  if(level<=1) return "🌱";
+  if(level<=3) return "🌿";
+  if(level<=5) return "🌷";
+  return "🌸";
+}
+
+function allWordsFlat(){
+  let out = [];
+  for(const packId in PACKS){
+    PACKS[packId].words.forEach(w => out.push({...w, packId}));
+  }
+  return out;
+}
+
+function bedBloomPct(packId){
+  const words = PACKS[packId].words;
+  let sum = 0, started = 0;
+  words.forEach(w=>{
+    const p = getProgress(w.id);
+    if(p){ sum += p.level/MAX_LEVEL; started++; }
+  });
+  if(started===0) return 0;
+  return Math.round((sum/words.length)*100);
+}
+
+function dueCount(packId){
+  const words = packId ? PACKS[packId].words : allWordsFlat();
+  return words.filter(w=>isDue(w.id)).length;
+}
+function newAvailableCount(packId){
+  const words = PACKS[packId].words;
+  return words.filter(w=>isNew(w.id)).length;
+}
+
+function recordLearn(id){
+  STATE.words[id] = { level:1, next: addDays(1), total:1, correct:1, lastSeen: todayKey() };
+  saveState();
+}
+function recordReview(id, correct){
+  const p = STATE.words[id];
+  if(!p) return;
+  p.total++;
+  if(correct){
+    p.correct++;
+    p.level = Math.min(MAX_LEVEL, p.level+1);
+  }else{
+    p.level = Math.max(1, p.level-2);
+  }
+  p.next = addDays(INTERVALS_DAYS[p.level]);
+  p.lastSeen = todayKey();
+  saveState();
+}
+function bumpStreak(){
+  const t = todayKey();
+  if(STATE.streak.last === t) return;
+  const y = addDaysFrom(t,-1);
+  if(STATE.streak.last === y){ STATE.streak.count++; }
+  else { STATE.streak.count = 1; }
+  STATE.streak.last = t;
+  saveState();
+}
+function addDaysFrom(dateStr, days){
+  const d = new Date(dateStr); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10);
+}
+
+/* ============================================================
+   TTS — Web Speech API (działa offline w większości przeglądarek
+   dzięki wbudowanym głosom systemowym)
+   ============================================================ */
+let VOICES_READY = false;
+function getVoicesSafe(){ return window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+function ensureVoicesLoaded(cb){
+  // Chrome/Edge/Safari ładują listę głosów asynchronicznie — bez tego czasem
+  // trafia się pusta lista przy pierwszym odtworzeniu, co powoduje losowy głos.
+  if(VOICES_READY || getVoicesSafe().length){ VOICES_READY = true; cb(); return; }
+  if(!window.speechSynthesis){ cb(); return; }
+  let done = false;
+  const finish = () => { if(done) return; done = true; VOICES_READY = true; cb(); };
+  speechSynthesis.addEventListener("voiceschanged", finish, { once:true });
+  setTimeout(finish, 350); // zabezpieczenie, gdyby zdarzenie nie odpaliło
+}
+function pickVoiceForLang(langPrefix){
+  const voices = getVoicesSafe();
+  if(langPrefix==="en" && STATE.settings.voice){
+    const v = voices.find(v=>v.voiceURI===STATE.settings.voice);
+    if(v) return v;
+  }
+  return voices.find(v=>v.lang && v.lang.toLowerCase().startsWith(langPrefix)) || null;
+}
+function speakInLang(text, bcp47, onend){
+  if(!window.speechSynthesis){ if(onend) onend(); return; }
+  ensureVoicesLoaded(()=>{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    // Kluczowe: zawsze ustawiamy `lang` na wypowiedzi, niezależnie od tego,
+    // czy udało się dopasować konkretny obiekt głosu. Dzięki temu przeglądarka
+    // nie "miesza" języków, nawet jeśli listy głosów jeszcze nie ma lub
+    // brakuje idealnego dopasowania.
+    u.lang = bcp47;
+    const voice = pickVoiceForLang(bcp47.slice(0,2).toLowerCase());
+    if(voice) u.voice = voice;
+    u.rate = bcp47.startsWith("pl") ? 0.95 : 0.92;
+    if(onend) u.onend = onend;
+    speechSynthesis.speak(u);
+  });
+}
+function speak(text, onend){ speakInLang(text, "en-US", onend); }
+function speakPolish(text, onend){ speakInLang(text, "pl-PL", onend); }
+function stripHtml(text){
+  const div = document.createElement("div");
+  div.innerHTML = text;
+  return div.textContent || div.innerText || "";
+}
+function speakMnemonic(rawText){
+  speakPolish(stripHtml(rawText));
+}
+function speakSentenceThenTranslation(en, pl){
+  speak(en, ()=>{
+    if(pl) speakPolish(pl);
+  });
+}
+
+/* ============================================================
+   NAWIGACJA / STAN WIDOKU
+   ============================================================ */
+let VIEW = "home";
+let SESSION = null; // { type:'learn'|'review', packId, queue:[], index:0, results:[] }
+
+let VIEW_ARG = null;
+function go(view, extra){
+  VIEW = view;
+  SESSION = null;
+  VIEW_ARG = extra !== undefined ? extra : null;
+  render();
+  window.scrollTo(0,0);
+}
+
+document.querySelectorAll(".nav-item").forEach(btn=>{
+  btn.addEventListener("click", ()=> go(btn.dataset.nav));
+});
+
+/* ============================================================
+   RENDEROWANIE WIDOKÓW
+   ============================================================ */
+function render(){
+  syncCustomPack();
+  document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active", b.dataset.nav===VIEW));
+  const app = document.getElementById("app");
+  if(VIEW==="home") return renderHome(app);
+  if(VIEW==="bed") return renderBed(app, VIEW_ARG);
+  if(VIEW==="learn") return renderLearn(app);
+  if(VIEW==="review") return renderReview(app);
+  if(VIEW==="story") return renderStoryHub(app);
+  if(VIEW==="storyplay") return renderStoryPlay(app, VIEW_ARG);
+  if(VIEW==="stats") return renderStats(app);
+  if(VIEW==="settings") return renderSettings(app);
+  if(VIEW==="addword") return renderAddWord(app);
+}
+
+function topbarHTML(){
+  return `
+  <div class="topbar">
+    <div class="brand">
+      <div class="mark">🌿</div>
+      <div><div class="name display">Pamięciogród</div><div class="sub">nauka angielskiego przez zapamiętywanie</div></div>
+    </div>
+  </div>`;
+}
+
+function renderHome(app){
+  const due = dueCount();
+  const streakN = STATE.streak.count || 0;
+  let beds = "";
+  for(const id in PACKS){
+    const pack = PACKS[id];
+    if(id==="custom" && (!pack.words || pack.words.length===0)) continue;
+    const bloom = bedBloomPct(id);
+    const dueN = dueCount(id);
+    beds += `
+    <div class="bed-card" onclick="go('bed', '${id}')" data-goto="${id}">
+      ${dueN>0 ? `<div class="badge">${dueN} do powtórki</div>` : ""}
+      <div class="glyph">${pack.icon}</div>
+      <div class="bed-name display">${pack.name}</div>
+      <div class="bed-count">${bloom}% rozkwitu</div>
+      <div class="bloom-track"><div class="bloom-fill" style="width:${bloom}%"></div></div>
+    </div>`;
+  }
+  app.innerHTML = `
+    ${topbarHTML()}
+    ${streakN>0 ? `
+    <div class="streak-ribbon">
+      <span class="flame">🔥</span>
+      <span><b>${streakN}</b> dzień${streakN===1?"":"y"} z rzędu w ogrodzie</span>
+      <span class="due">${due} słów czeka</span>
+    </div>` : ""}
+    <div class="garden-title">
+      <h1 class="display">Mapa Ogrodu</h1>
+      <p>Każde słowo to sadzonka. Im częściej ją przypominasz sobie samodzielnie, tym mocniej zakwita — to nie metafora, tak naprawdę działa Twoja pamięć.</p>
+    </div>
+    <div class="beds-grid">${beds}</div>
+    <div class="cta-row">
+      <button class="btn btn-primary" ${due===0 ? "disabled":""} onclick="startReview()">🔁 Powtórz teraz (${due})</button>
+    </div>
+  `;
+}
+
+function renderBed(app, packIdArg){
+  const packId = packIdArg || app.dataset.pack;
+  app.dataset.pack = packId;
+  const pack = PACKS[packId];
+  const bloom = bedBloomPct(packId);
+  const dueN = dueCount(packId);
+  const newN = newAvailableCount(packId);
+
+  let rows = pack.words.map(w=>{
+    const p = getProgress(w.id);
+    const stage = growthStage(p ? p.level : null);
+    const status = !p ? "jeszcze nie zasadzone" : (isDue(w.id) ? "gotowe do powtórki" : `następna powtórka: ${p.next}`);
+    return `<div class="word-row">
+      <div class="ic">${w.icon}</div>
+      <div><div class="en">${w.en}</div><div class="pl">${w.pl} · ${status}</div></div>
+      <div class="stage">${stage}</div>
+    </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    ${topbarHTML()}
+    <button class="back-link" onclick="go('home')">← Mapa ogrodu</button>
+    <div class="garden-title">
+      <h1 class="display">${pack.icon} ${pack.name}</h1>
+      <p>${bloom}% rozkwitu w tej grządce · ${dueN} słów do powtórki · ${newN} nowych do zasadzenia</p>
+    </div>
+    <div class="cta-row">
+      <button class="btn btn-primary" ${newN===0?"disabled":""} onclick="startLearn('${packId}')">🌱 Zasadź nowe (${newN})</button>
+      <button class="btn btn-secondary" ${dueN===0?"disabled":""} onclick="startReview('${packId}')">🔁 Powtórz (${dueN})</button>
+    </div>
+    <div class="section-label">Słowa w tej grządce</div>
+    <div class="card" style="text-align:left; padding:6px 14px;">${rows}</div>
+  `;
+}
+
+/* ---------- LEARN FLOW ---------- */
+function startLearn(packId){
+  const words = PACKS[packId].words.filter(w=>isNew(w.id)).slice(0, STATE.settings.sessionSize || 6);
+  if(words.length===0){ go('bed', packId); return; }
+  SESSION = { type:"learn", packId, queue:words, index:0 };
+  VIEW = "learn";
+  renderLearn(document.getElementById("app"));
+}
+function renderLearn(app){
+  if(!SESSION){ return go("home"); }
+  const { queue, index, packId } = SESSION;
+  if(index >= queue.length){
+    // sesja zakończona — oznacz wszystkie jako nauczone
+    queue.forEach(w=>recordLearn(w.id));
+    bumpStreak();
+    app.innerHTML = `
+      ${topbarHTML()}
+      <div class="card">
+        <div class="big-icon">🌱</div>
+        <div class="word-en display">Zasadzono ${queue.length} słów!</div>
+        <div class="word-pl">Wrócą do Ciebie jutro na pierwszą powtórkę.</div>
+        <div class="cta-row" style="margin-top:20px;">
+          <button class="btn btn-primary" onclick="go('bed','${packId}')">Wróć do grządki</button>
+        </div>
+      </div>`;
+    return;
+  }
+  const w = queue[index];
+  const dots = queue.map((_,i)=>`<div class="dot ${i<index?'done':(i===index?'current':'')}"></div>`).join("");
+  app.innerHTML = `
+    ${topbarHTML()}
+    <button class="back-link" onclick="go('bed','${packId}')">← Przerwij</button>
+    <div class="card">
+      <div class="big-icon">${w.icon}</div>
+      <div class="word-en display">${w.en}</div>
+      <div class="word-pl">${w.pl}</div>
+      <button class="speak-btn" onclick="speak('${w.en.replace(/'/g,"\\'")}')">🔊 Posłuchaj wymowy</button>
+      <div class="mnemonic-box">💡 <b>Skojarzenie:</b> ${w.mnemonic}</div>
+      <button class="speak-btn" onclick='speakMnemonic(${JSON.stringify(w.mnemonic)})'>🔊 Odsłuchaj skojarzenie</button>
+      ${w.sentence ? `
+      <div class="sentence-box">“${w.sentence}”${w.sentencePl ? ` <span style="opacity:.7;">— ${w.sentencePl}</span>` : ""}</div>
+      <button class="speak-btn" onclick='speakSentenceThenTranslation(${JSON.stringify(w.sentence)}, ${JSON.stringify(w.sentencePl||"")})'>🔊 Odsłuchaj zdanie i tłumaczenie</button>
+      ` : ""}
+    </div>
+    <div class="progress-dots">${dots}</div>
+    <div class="cta-row">
+      <button class="btn btn-primary btn-full" onclick="learnNext()">Zapamiętane, dalej →</button>
+    </div>
+  `;
+}
+function learnNext(){
+  SESSION.index++;
+  renderLearn(document.getElementById("app"));
+}
+
+/* ---------- REVIEW FLOW (aktywne przypominanie) ---------- */
+function startReview(packId){
+  const words = (packId ? PACKS[packId].words : allWordsFlat()).filter(w=>isDue(w.id));
+  if(words.length===0){ return; }
+  // przetasuj — losowa kolejność wzmacnia trudność pożądaną
+  for(let i=words.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [words[i],words[j]]=[words[j],words[i]]; }
+  SESSION = { type:"review", packId, queue:words, index:0, results:[], awaitingNext:false };
+  VIEW = "review";
+  renderReview(document.getElementById("app"));
+}
+function normalize(s){ return (s||"").trim().toLowerCase().replace(/[^a-z]/g,""); }
+
+function renderReview(app){
+  if(!SESSION || SESSION.queue.length===0){
+    const due = dueCount();
+    if(due===0){
+      app.innerHTML = `
+        ${topbarHTML()}
+        <div class="empty">
+          <div class="em-icon">🌸</div>
+          <b>Wszystko rozkwitło na dziś!</b><br>
+          Żadne słowo nie czeka teraz na powtórkę. Wróć jutro — ogród rośnie w swoim tempie.
+        </div>
+        <div class="cta-row"><button class="btn btn-secondary btn-full" onclick="go('home')">Zobacz mapę ogrodu</button></div>
+      `;
+    } else {
+      app.innerHTML = `
+        ${topbarHTML()}
+        <div class="garden-title"><h1 class="display">Powtórka</h1><p>${due} słów czeka na aktywne przypomnienie sobie. To najskuteczniejszy sposób na trwałą pamięć.</p></div>
+        <div class="cta-row"><button class="btn btn-primary btn-full" onclick="startReview()">Zacznij powtórkę (${due})</button></div>
+      `;
+    }
+    return;
+  }
+  const { queue, index } = SESSION;
+  if(index >= queue.length){
+    bumpStreak();
+    const correctN = SESSION.results.filter(r=>r).length;
+    app.innerHTML = `
+      ${topbarHTML()}
+      <div class="card">
+        <div class="big-icon">${correctN===queue.length ? "🌸" : "🌿"}</div>
+        <div class="word-en display">${correctN}/${queue.length} poprawnie</div>
+        <div class="word-pl">Świetna robota — Twoje sadzonki rosną dalej.</div>
+        <div class="cta-row" style="margin-top:20px;"><button class="btn btn-primary" onclick="go('home')">Wróć do ogrodu</button></div>
+      </div>`;
+    return;
+  }
+  const w = queue[index];
+  const dots = queue.map((_,i)=>`<div class="dot ${i<index?'done':(i===index?'current':'')}"></div>`).join("");
+  const mode = STATE.settings.inputMode || "choice";
+
+  if(mode === "choice"){
+    const options = buildChoiceOptions(w);
+    const optionsHTML = options.map(o=>`
+      <button class="choice-btn" data-en="${o.en.replace(/"/g,'&quot;')}" onclick="checkChoice(this)">
+        <span class="cic">${o.icon}</span><span>${o.en}</span>
+      </button>`).join("");
+    app.innerHTML = `
+      ${topbarHTML()}
+      <button class="back-link" onclick="go('home')">← Przerwij</button>
+      <div class="card">
+        <div class="big-icon">${w.icon}</div>
+        <div class="word-pl" style="font-size:20px; font-weight:700; color:var(--ink);">${w.pl}</div>
+        <div style="font-size:13px; color:var(--ink-soft); margin-bottom:14px;">Które słowo to po angielsku?</div>
+        <div class="choice-grid" id="choiceGrid">${optionsHTML}</div>
+        <div id="feedbackSlot"></div>
+        <div id="reviewActions" class="cta-row" style="margin-top:16px;"></div>
+      </div>
+      <div class="progress-dots">${dots}</div>
+    `;
+    return;
+  }
+
+  app.innerHTML = `
+    ${topbarHTML()}
+    <button class="back-link" onclick="go('home')">← Przerwij</button>
+    <div class="card">
+      <div class="big-icon">${w.icon}</div>
+      <div class="word-pl" style="font-size:18px; font-weight:700; color:var(--ink);">${w.pl}</div>
+      <div style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;">Jak to jest po angielsku?</div>
+      <div class="answer-row">
+        <input id="answerInput" class="answer-input" autocomplete="off" autocapitalize="off" placeholder="wpisz słowo…" />
+      </div>
+      <div id="feedbackSlot"></div>
+      <div id="reviewActions" class="cta-row" style="margin-top:16px;">
+        <button class="btn btn-primary btn-full" onclick="checkAnswer()">Sprawdź</button>
+      </div>
+    </div>
+    <div class="progress-dots">${dots}</div>
+  `;
+  const input = document.getElementById("answerInput");
+  input.focus();
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter") checkAnswer(); });
+}
+function buildChoiceOptions(correctWord){
+  const pool = allWordsFlat().filter(w=>w.id!==correctWord.id && w.en.toLowerCase()!==correctWord.en.toLowerCase());
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const distractors = pool.slice(0,2);
+  const options = [{en:correctWord.en, icon:correctWord.icon}, ...distractors.map(d=>({en:d.en, icon:d.icon}))];
+  for(let i=options.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [options[i],options[j]]=[options[j],options[i]]; }
+  return options;
+}
+function checkChoice(btn){
+  if(SESSION.awaitingNext) return;
+  const w = SESSION.queue[SESSION.index];
+  const chosen = btn.dataset.en;
+  const correct = normalize(chosen) === normalize(w.en);
+  document.querySelectorAll("#choiceGrid .choice-btn").forEach(b=>{
+    b.disabled = true;
+    if(normalize(b.dataset.en)===normalize(w.en)) b.classList.add("correct");
+    else if(b===btn) b.classList.add("wrong");
+  });
+  SESSION.results.push(correct);
+  recordReview(w.id, correct);
+  const slot = document.getElementById("feedbackSlot");
+  if(correct){
+    slot.innerHTML = `<div class="feedback ok">✅ Brawo! To jest <b>${w.en}</b>.</div>`;
+  }else{
+    slot.innerHTML = `<div class="feedback bad">To było <b>${w.en}</b>. ${w.mnemonic}</div>`;
+  }
+  speak(w.en);
+  SESSION.awaitingNext = true;
+  document.getElementById("reviewActions").innerHTML = `<button class="btn btn-primary btn-full" onclick="reviewNext()">Dalej →</button>`;
+}
+function checkAnswer(){
+  if(SESSION.awaitingNext){ reviewNext(); return; }
+  const w = SESSION.queue[SESSION.index];
+  const input = document.getElementById("answerInput");
+  const correct = normalize(input.value) === normalize(w.en);
+  input.disabled = true;
+  SESSION.results.push(correct);
+  recordReview(w.id, correct);
+  const slot = document.getElementById("feedbackSlot");
+  if(correct){
+    slot.innerHTML = `<div class="feedback ok">✅ Świetnie! <b>${w.en}</b> to poprawna odpowiedź.</div>`;
+  }else{
+    slot.innerHTML = `<div class="feedback bad">✏️ Poprawna odpowiedź to <b>${w.en}</b>. ${w.mnemonic}</div>`;
+  }
+  speak(w.en);
+  SESSION.awaitingNext = true;
+  document.getElementById("reviewActions").innerHTML = `<button class="btn btn-primary btn-full" onclick="reviewNext()">Dalej →</button>`;
+}
+function reviewNext(){
+  SESSION.index++;
+  SESSION.awaitingNext = false;
+  renderReview(document.getElementById("app"));
+}
+
+/* ---------- STORY MODE ---------- */
+function renderStoryHub(app){
+  let cards = "";
+  for(const id in STORIES){
+    const s = STORIES[id];
+    const pack = PACKS[id];
+    cards += `
+    <div class="bed-card" onclick="go('storyplay','${id}')">
+      <div class="glyph">${pack.icon}</div>
+      <div class="bed-name display">${s.title}</div>
+      <div class="bed-count">Historia z grządki „${pack.name}”</div>
+    </div>`;
+  }
+  app.innerHTML = `
+    ${topbarHTML()}
+    <div class="garden-title">
+      <h1 class="display">Historie</h1>
+      <p>Krótkie opowieści łączą poznane słowa w naturalny kontekst — to wzmacnia zapamiętywanie mocniej niż sama lista słówek.</p>
+    </div>
+    <div class="beds-grid">${cards}</div>
+  `;
+}
+let STORY_STATE = { id:null, i:0 };
+function renderStoryPlay(app, idArg){
+  const id = idArg || STORY_STATE.id || Object.keys(STORIES)[0];
+  STORY_STATE.id = id;
+  const s = STORIES[id];
+  const pack = PACKS[id];
+  const sentencesHTML = s.sentences.map((txt,i)=>`<span class="sentence" id="sent-${i}">${txt}</span> `).join("");
+  app.innerHTML = `
+    ${topbarHTML()}
+    <button class="back-link" onclick="go('story')">← Wszystkie historie</button>
+    <div class="garden-title"><h1 class="display">${pack.icon} ${s.title}</h1></div>
+    <div class="story-box" id="storyBox">${sentencesHTML}</div>
+    <div class="cta-row" style="margin-top:16px;">
+      <button class="btn btn-primary btn-full" id="storyPlayBtn" onclick="playStory('${id}')">🔊 Przeczytaj na głos</button>
+    </div>
+  `;
+}
+function playStory(id){
+  const s = STORIES[id];
+  const clean = t => t.replace(/<[^>]+>/g,"");
+  let i = 0;
+  const btn = document.getElementById("storyPlayBtn");
+  btn.disabled = true; btn.textContent = "🔊 Czytam…";
+  function step(){
+    document.querySelectorAll(".sentence").forEach(el=>el.classList.remove("active"));
+    if(i>=s.sentences.length){ btn.disabled=false; btn.textContent="🔊 Przeczytaj na głos"; return; }
+    const el = document.getElementById("sent-"+i);
+    if(el) el.classList.add("active");
+    speak(clean(s.sentences[i]), ()=>{ i++; step(); });
+  }
+  step();
+}
+
+/* ---------- STATS ---------- */
+function renderStats(app){
+  const words = allWordsFlat();
+  const started = words.filter(w=>getProgress(w.id));
+  const mastered = words.filter(w=>{ const p=getProgress(w.id); return p && p.level>=6; });
+  const totalReviews = words.reduce((sum,w)=>{ const p=getProgress(w.id); return sum + (p? p.total : 0); },0);
+  const totalCorrect = words.reduce((sum,w)=>{ const p=getProgress(w.id); return sum + (p? p.correct : 0); },0);
+  const acc = totalReviews ? Math.round((totalCorrect/totalReviews)*100) : 0;
+
+  let rows = started
+    .sort((a,b)=> getProgress(b.id).level - getProgress(a.id).level)
+    .map(w=>{
+      const p = getProgress(w.id);
+      return `<div class="word-row">
+        <div class="ic">${w.icon}</div>
+        <div><div class="en">${w.en}</div><div class="pl">${w.pl}</div></div>
+        <div class="stage">${growthStage(p.level)}</div>
+      </div>`;
+    }).join("");
+
+  app.innerHTML = `
+    ${topbarHTML()}
+    <button class="back-link" onclick="go('settings')">← Ustawienia</button>
+    <div class="garden-title"><h1 class="display">Postępy</h1><p>Panel rodzica — pełny obraz tego, co dziecko naprawdę zapamiętało.</p></div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num">${started.length}/${words.length}</div><div class="lbl">zasadzonych słów</div></div>
+      <div class="stat-card"><div class="num">${mastered.length}</div><div class="lbl">w pełnym rozkwicie 🌸</div></div>
+      <div class="stat-card"><div class="num">${acc}%</div><div class="lbl">celność powtórek</div></div>
+      <div class="stat-card"><div class="num">${STATE.streak.count||0}</div><div class="lbl">dni z rzędu 🔥</div></div>
+    </div>
+    <div class="section-label">Wszystkie zasadzone słowa</div>
+    ${started.length ? `<div class="card" style="text-align:left; padding:6px 14px;">${rows}</div>` :
+      `<div class="empty"><div class="em-icon">🌰</div>Jeszcze żadne słowo nie zostało zasadzone.<br>Wejdź do grządki i zacznij naukę.</div>`}
+    <div class="section-label">Dane</div>
+    <div class="cta-row">
+      <button class="btn btn-secondary" onclick="exportData()">⬇️ Eksportuj postępy</button>
+      <button class="btn btn-ghost" onclick="resetData()">Wyzeruj</button>
+    </div>
+  `;
+}
+function exportData(){
+  const blob = new Blob([JSON.stringify(STATE, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "pamieciogrod-postepy.json"; a.click();
+  URL.revokeObjectURL(url);
+}
+function resetData(){
+  if(!confirm("Na pewno wyzerować wszystkie postępy? Tej operacji nie można cofnąć.")) return;
+  STATE = { words:{}, streak:{count:0,last:null}, settings:STATE.settings };
+  saveState();
+  render();
+}
+
+/* ---------- SETTINGS ---------- */
+function renderSettings(app){
+  const voices = window.speechSynthesis ? speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith("en")) : [];
+  const options = voices.map(v=>`<option value="${v.voiceURI}" ${STATE.settings.voice===v.voiceURI?"selected":""}>${v.name} (${v.lang})</option>`).join("");
+  app.innerHTML = `
+    ${topbarHTML()}
+    <div class="garden-title"><h1 class="display">Ustawienia</h1></div>
+    <div class="card" style="text-align:left;">
+      <div class="settings-row">
+        <div><div class="lbl">Głos lektora</div><div class="desc">Wybierz głos angielski dostępny w Twoim systemie.</div></div>
+        <select onchange="STATE.settings.voice=this.value; saveState();">
+          <option value="">Automatyczny</option>
+          ${options}
+        </select>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Ile nowych słów na raz</div><div class="desc">Rozmiar sesji nauki nowych słów.</div></div>
+        <select onchange="STATE.settings.sessionSize=parseInt(this.value); saveState();">
+          ${[4,6,8,10].map(n=>`<option value="${n}" ${STATE.settings.sessionSize===n?"selected":""}>${n} słów</option>`).join("")}
+        </select>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Test głosu</div><div class="desc">Sprawdź, jak brzmi wybrany lektor.</div></div>
+        <button class="btn btn-secondary" onclick="speak('This is how I sound.')">🔊 Odtwórz</button>
+      </div>
+      <div class="settings-row" style="flex-direction:column; align-items:stretch;">
+        <div style="margin-bottom:8px;"><div class="lbl">Sposób powtórki</div><div class="desc">Dla klasy 1 polecamy „wybieranie” — dziecko wskazuje właściwe słowo, nie musi go pisać.</div></div>
+        <div class="toggle-row">
+          <button class="toggle-opt ${STATE.settings.inputMode==='choice'?'active':''}" onclick="setInputMode('choice')">👆 Wybieram</button>
+          <button class="toggle-opt ${STATE.settings.inputMode==='type'?'active':''}" onclick="setInputMode('type')">⌨️ Piszę</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Postępy</div>
+    <div class="cta-row"><button class="btn btn-secondary btn-full" onclick="go('stats')">📊 Zobacz pełne postępy dziecka</button></div>
+
+    <div class="section-label">Zapis i przenoszenie danych</div>
+    <div class="card" style="text-align:left;">
+      <div class="settings-row">
+        <div><div class="lbl">Zapisz kopię</div><div class="desc">Pobiera plik z postępami i własnymi słówkami — możesz go przenieść na inne urządzenie.</div></div>
+        <button class="btn btn-secondary" onclick="exportData()">⬇️ Eksportuj</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Wczytaj kopię</div><div class="desc">Przywraca postępy i słówka z wcześniej zapisanego pliku.</div></div>
+        <label class="file-label">📂 Wybierz plik
+          <input type="file" accept="application/json" style="display:none" onchange="importDataFile(this)" />
+        </label>
+      </div>
+      <div class="settings-row">
+        <div><div class="lbl">Wyzeruj wszystko</div><div class="desc">Usuwa postępy i własne słówka bez możliwości cofnięcia.</div></div>
+        <button class="btn btn-ghost" onclick="resetData()">Wyzeruj</button>
+      </div>
+    </div>
+
+    <div class="section-label">O metodzie</div>
+    <div class="card" style="text-align:left; font-size:13.5px; line-height:1.6; color:var(--ink-soft);">
+      Pamięciogród opiera się na czterech mechanizmach potwierdzonych w badaniach nad zapamiętywaniem u dzieci:
+      aktywnym przypominaniu sobie zamiast biernego czytania, rozszerzających się odstępach powtórek,
+      metodzie skojarzeń słów-kluczy oraz osadzeniu słownictwa w naturalnym kontekście historii.
+      Wszystkie dane zostają wyłącznie na tym urządzeniu — bez konta, bez chmury.
+    </div>
+  `;
+}
+function setInputMode(mode){
+  STATE.settings.inputMode = mode;
+  saveState();
+  render();
+}
+
+/* ---------- DODAWANIE WŁASNYCH SŁÓWEK ---------- */
+const EMOJI_CHOICES = ["🐶","🐱","🐰","🐻","🦁","🐸","🐦","🐟","🍎","🍌","🍕","🍦","⚽","🎈","🚗","🚲","✈️","🏠","🌞","🌧️","🌈","⭐","🎨","🎵","📚","✏️","👕","👟","🧸","💧","🔥","❄️","🌳","🍓","🥕","🐔","🐄","🐷","🦋","🐝"];
+let PICKED_ICON = "🐶";
+
+function renderAddWord(app){
+  syncCustomPack();
+  const custom = STATE.custom;
+  const emojiGrid = EMOJI_CHOICES.map(e=>`<button type="button" class="${e===PICKED_ICON?'sel':''}" onclick="pickIcon('${e}')">${e}</button>`).join("");
+  const rows = custom.map(w=>`
+    <div class="custom-row">
+      <div class="icon-preview" style="width:40px;height:40px;font-size:22px;">${w.icon}</div>
+      <div><div class="en" style="font-weight:700;">${w.en}</div><div class="pl" style="font-size:13px;color:var(--ink-soft);">${w.pl}</div></div>
+      <button class="del-btn" onclick="deleteCustomWord('${w.id}')">🗑️</button>
+    </div>`).join("");
+
+  app.innerHTML = `
+    ${topbarHTML()}
+    <div class="garden-title">
+      <h1 class="display">Dodaj własne słówko</h1>
+      <p>Rodzic lub nauczyciel może dodać dowolne słowo — trafi do specjalnej grządki „Moje słówka” i będzie powtarzane tym samym systemem.</p>
+    </div>
+    <div class="card" style="text-align:left;">
+      <div class="field">
+        <label>Słowo po angielsku *</label>
+        <input type="text" id="newEn" placeholder="np. apple" />
+      </div>
+      <div class="field">
+        <label>Tłumaczenie po polsku *</label>
+        <input type="text" id="newPl" placeholder="np. jabłko" />
+      </div>
+      <div class="field">
+        <label>Opis lub skojarzenie (opcjonalnie)</label>
+        <textarea id="newDesc" placeholder="np. APPLE brzmi jak „epl” — wyobraź sobie czerwone jabłko na stole."></textarea>
+      </div>
+      <div class="field">
+        <label>Przykładowe zdanie po angielsku (opcjonalnie)</label>
+        <input type="text" id="newSentence" placeholder="np. I eat an apple." />
+      </div>
+      <div class="field">
+        <label>Tłumaczenie zdania (opcjonalnie)</label>
+        <input type="text" id="newSentencePl" placeholder="np. Jem jabłko." />
+      </div>
+      <div class="field">
+        <label>Ikonka</label>
+        <div class="icon-row">
+          <div class="icon-preview" id="iconPreview">${PICKED_ICON}</div>
+          <input type="text" id="newIconText" value="${PICKED_ICON}" style="width:70px; text-align:center; font-size:22px; padding:10px; border-radius:12px; border:2px solid var(--line);" oninput="PICKED_ICON=this.value; document.getElementById('iconPreview').textContent=this.value;" />
+        </div>
+        <div class="emoji-picker">${emojiGrid}</div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addCustomWord()">🌱 Dodaj do ogródka</button>
+    </div>
+
+    <div class="section-label">Moje słówka (${custom.length})</div>
+    ${custom.length ? `<div class="card" style="text-align:left; padding:6px 14px;">${rows}</div>` :
+      `<div class="empty"><div class="em-icon">✏️</div>Nie dodano jeszcze żadnego własnego słówka.</div>`}
+  `;
+}
+function pickIcon(e){
+  PICKED_ICON = e;
+  document.getElementById("iconPreview").textContent = e;
+  document.getElementById("newIconText").value = e;
+  document.querySelectorAll(".emoji-picker button").forEach(b=>b.classList.toggle("sel", b.textContent===e));
+}
+function addCustomWord(){
+  const en = document.getElementById("newEn").value.trim();
+  const pl = document.getElementById("newPl").value.trim();
+  const desc = document.getElementById("newDesc").value.trim();
+  const sentence = document.getElementById("newSentence").value.trim();
+  const sentencePl = document.getElementById("newSentencePl").value.trim();
+  const icon = document.getElementById("newIconText").value.trim() || "✏️";
+  if(!en || !pl){ alert("Uzupełnij słowo po angielsku i tłumaczenie po polsku."); return; }
+  const id = "custom-" + Date.now();
+  STATE.custom.push({ id, en, pl, icon, mnemonic: desc || `Zapamiętaj: ${en} = ${pl}.`, sentence, sentencePl });
+  saveState();
+  syncCustomPack();
+  PICKED_ICON = "🐶";
+  renderAddWord(document.getElementById("app"));
+}
+function deleteCustomWord(id){
+  if(!confirm("Usunąć to słówko?")) return;
+  STATE.custom = STATE.custom.filter(w=>w.id!==id);
+  delete STATE.words[id];
+  saveState();
+  syncCustomPack();
+  renderAddWord(document.getElementById("app"));
+}
+
+/* ---------- IMPORT / EKSPORT ---------- */
+function importDataFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data.words || !data.custom){ alert("To nie wygląda na plik zapisu Pamięciogrodu."); return; }
+      STATE = data;
+      if(!STATE.settings.inputMode) STATE.settings.inputMode = "choice";
+      saveState();
+      syncCustomPack();
+      alert("Zapis wczytany! Postępy i słówka zostały przywrócone.");
+      go("home");
+    }catch(err){
+      alert("Nie udało się wczytać pliku. Sprawdź, czy to poprawny plik zapisu.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ============================================================
+   INICJALIZACJA
+   ============================================================ */
+if(window.speechSynthesis){
+  speechSynthesis.addEventListener("voiceschanged", () => { if(VIEW==="settings") render(); });
+}
+if(!STATE.settings) STATE.settings = { voice:null, sessionSize:6, inputMode:"choice" };
+syncCustomPack();
+render();
+</script>
+</body>
+</html>
