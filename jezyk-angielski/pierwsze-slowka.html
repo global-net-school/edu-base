@@ -3,194 +3,403 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Język angielski — Global Net School</title>
-<meta name="description" content="światy 3D do zwiedzania jak w grze,  quizy, VR , AR , gry angażujące w ćwiczenie wymowy">
+<title>Mapa Przygody — Angielski Klasa 1 — Global Net School</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FBF7EC; --paper-2:#F5EFE0; --grid:#CBD9E6; --grid-soft:#DCE6EF;
-    --ink:#22304A; --ink-soft:#4B5875;
-    --accent:#7B4B8A; --accent-soft:#E7DCEC; --accent-dark:#4E2E5C;
-    --forest:#2F5D50; --forest-dark:#1E3C34;
-    --vr:#B3541E; --vr-soft:#F3DFC9;
-    --font-display:'Fraunces', serif; --font-body:'Atkinson Hyperlegible', sans-serif; --font-mono:'Space Mono', monospace;
+    --sky1:#8fd7f7; --sky2:#c9ecfb;
+    --grass:#8bc34a; --grass-dark:#6ea23a;
+    --path:#f7e2a8; --path-edge:#e0c079;
+    --sun:#ffd54f;
+    --node-done:#7bc86c; --node-done-edge:#4f9a45;
+    --node-next:#ff9f43; --node-next-edge:#e07a1f;
+    --node-group:#5c9ac0; --node-group-edge:#3a6f9c;
+    --ink:#2b3a3f;
+    --card:#ffffff;
+    --font-title:'Baloo 2', cursive; --font-body:'Quicksand', sans-serif;
   }
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{margin:0; font-family:var(--font-body); color:var(--ink); background:linear-gradient(var(--grid-soft) 1px, transparent 1px) 0 0/100% 34px, var(--paper); background-attachment:fixed;}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--ink);
+    background:linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 38%, var(--grass) 40%, var(--grass-dark) 100%);
+    min-height:100vh; overflow-x:hidden;
+  }
   a{color:inherit;}
-  .wrap{max-width:1120px; margin:0 auto; padding:0 28px;}
-  header.site{position:sticky; top:0; z-index:40; background:rgba(251,247,236,0.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--grid);}
-  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 28px; max-width:1120px; margin:0 auto;}
-  .brand{display:flex; align-items:center; gap:12px; font-family:var(--font-display); font-weight:600; font-size:1.28rem; text-decoration:none; color:var(--ink);}
-  .brand-mark{width:38px; height:38px; border-radius:9px; background:var(--forest); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:0.95rem; transform:rotate(-4deg); box-shadow:3px 3px 0 var(--forest-dark);}
-  .brand small{display:block; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.06em; color:var(--ink-soft); font-weight:400; text-transform:uppercase;}
-  .btn-ghost{font-family:var(--font-mono); font-size:0.8rem; text-transform:uppercase; padding:10px 16px; border-radius:9px; border:2px solid var(--ink); text-decoration:none; color:var(--ink);}
-  .breadcrumb{padding:20px 0 0; font-family:var(--font-mono); font-size:0.78rem; color:var(--ink-soft);}
-  .breadcrumb a{text-decoration:none; color:var(--ink-soft); border-bottom:1px dashed var(--grid);}
-  .breadcrumb .sep{margin:0 8px; opacity:0.5;}
-  .breadcrumb .current{color:var(--ink);}
-  .subject-hero{padding:26px 0 40px;}
-  .subject-hero-inner{display:flex; align-items:flex-start; gap:22px; flex-wrap:wrap;}
-  .subject-icon-lg{width:64px; height:64px; border-radius:14px; flex-shrink:0; background:var(--accent-soft); color:var(--accent-dark); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:1.7rem; transform:rotate(-3deg);}
-  .kicker{display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-dark); background:var(--accent-soft); border:1px solid var(--accent); padding:6px 12px; border-radius:999px; margin-bottom:16px;}
-  h1{font-family:var(--font-display); font-weight:600; font-size:clamp(2rem, 4vw, 2.8rem); line-height:1.08; margin:0 0 14px; color:var(--ink);}
-  .subject-hero p.lede{font-size:1.05rem; line-height:1.65; color:var(--ink-soft); max-width:64ch; margin:0;}
-  section{padding:0 0 56px;}
-  .grade-block{margin-bottom:48px;}
-  .grade-label-row{display:flex; align-items:baseline; gap:14px; margin-bottom:22px; border-bottom:2px solid var(--ink); padding-bottom:10px; flex-wrap:wrap;}
-  .grade-label-row .grade-num{font-family:var(--font-mono); font-size:0.8rem; background:var(--ink); color:var(--paper); padding:5px 11px; border-radius:6px;}
-  .grade-label-row h2{margin:0; font-family:var(--font-display); font-weight:600; font-size:clamp(1.3rem,2.2vw,1.7rem); color:var(--ink);}
-  .grade-label-row .grade-sub{font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-soft); margin-left:auto;}
 
-  /* --- karty tematów --- */
-  .topic-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(270px, 1fr)); gap:20px;}
-  .topic-card{position:relative; background:var(--paper-2); border:1px solid var(--grid); border-radius:4px 4px 12px 12px; padding:24px 22px 20px; box-shadow:5px 5px 0 rgba(34,48,74,0.06); display:flex; flex-direction:column; gap:14px;}
-  .topic-tab{position:absolute; top:-12px; left:20px; font-family:var(--font-mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; padding:4px 10px; border-radius:6px 6px 0 0; background:var(--accent); color:#fff;}
-  .topic-head{display:flex; align-items:center; gap:12px;}
-  .topic-emoji{width:42px; height:42px; border-radius:10px; background:var(--accent-soft); color:var(--accent-dark); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0;}
-  .topic-card h3{font-family:var(--font-display); font-weight:600; font-size:1.15rem; margin:0;}
-  .topic-card .topic-desc{margin:0; color:var(--ink-soft); font-size:0.86rem; line-height:1.5;}
-  .mode-list{display:flex; flex-direction:column; gap:8px; margin-top:auto;}
-  .mode-link{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:var(--font-mono); font-size:0.78rem; padding:9px 12px; border-radius:8px; border:1.5px solid var(--grid); background:var(--paper); transition:transform .12s ease, border-color .12s ease;}
-  .mode-link:hover{transform:translateX(3px); border-color:var(--accent);}
-  .mode-link .mode-ico{width:20px; text-align:center; flex-shrink:0;}
-  .mode-link .mode-name{flex-grow:1;}
-  .mode-link .mode-tag{font-size:0.62rem; text-transform:uppercase; color:var(--ink-soft); opacity:0.75;}
-  .mode-link.vr-link{border-color:var(--vr); background:var(--vr-soft); color:var(--vr);}
-  .mode-link.vr-link:hover{border-color:var(--vr);}
+  header{
+    padding:18px 20px; display:flex; align-items:center; justify-content:space-between;
+    position:relative; z-index:5;
+  }
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-family:var(--font-title); font-weight:700; font-size:1.1rem;}
+  .brand-mark{width:36px; height:36px; border-radius:10px; background:#2F5D50; color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--font-title); font-weight:700; font-size:0.85rem; transform:rotate(-5deg); box-shadow:2px 2px 0 rgba(0,0,0,0.15);}
+  .back-link{
+    font-family:var(--font-body); font-weight:600; font-size:0.85rem; text-decoration:none;
+    color:var(--ink); background:rgba(255,255,255,0.75); padding:8px 14px; border-radius:999px;
+    border:2px solid rgba(255,255,255,0.9); cursor:pointer;
+  }
+  .back-link.hidden{ display:none; }
 
-  footer{border-top:1px solid var(--grid); padding:34px 0 30px; margin-top:10px;}
-  .footer-bottom{display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-family:var(--font-mono); font-size:0.76rem; color:var(--ink-soft);}
-  .footer-bottom a{color:var(--ink-soft); text-decoration:none;}
+  .title-wrap{ text-align:center; padding:6px 20px 8px; position:relative; z-index:5;}
+  .title-wrap h1{
+    font-family:var(--font-title); font-weight:800; font-size:clamp(1.6rem,5vw,2.4rem);
+    margin:0 0 4px; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,0.15);
+  }
+  .title-wrap p{ margin:0; font-weight:600; color:#eafff0; font-size:0.95rem; text-shadow:0 1px 0 rgba(0,0,0,0.1);}
+  .title-wrap .breadcrumb-pill{
+    display:inline-block; margin-top:8px; background:rgba(255,255,255,0.85); color:var(--ink);
+    padding:6px 14px; border-radius:999px; font-weight:700; font-size:0.8rem; font-family:var(--font-title);
+  }
+
+  .sun{
+    position:absolute; top:60px; right:8%; width:70px; height:70px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff5d0, var(--sun)); z-index:1;
+    box-shadow:0 0 30px rgba(255,213,79,0.6);
+  }
+  .cloud{ position:absolute; background:#fff; border-radius:50px; opacity:0.9; z-index:1; }
+
+  #map-area{ position:relative; max-width:640px; margin:0 auto; padding:10px 20px 60px; z-index:2;}
+  #map-svg{ width:100%; height:auto; display:block; overflow:visible; }
+
+  .node-group-el{ cursor:pointer; }
+  .node-label{
+    font-family:var(--font-title); font-weight:700; fill:#fff; font-size:15px;
+    text-anchor:middle; paint-order:stroke; stroke:rgba(0,0,0,0.25); stroke-width:3px;
+  }
+  .node-sublabel{
+    font-family:var(--font-body); font-weight:600; fill:#fff; font-size:10px;
+    text-anchor:middle; paint-order:stroke; stroke:rgba(0,0,0,0.3); stroke-width:2.5px;
+  }
+  .node-emoji{ font-size:34px; text-anchor:middle; dominant-baseline:central; }
+  .node-star{ font-size:18px; text-anchor:middle; }
+  .node-badge-count{
+    font-family:var(--font-title); font-weight:700; font-size:12px; fill:#fff; text-anchor:middle; dominant-baseline:central;
+  }
+
+  .node-circle{ transition: transform .15s ease; transform-origin:center; }
+  .node-group-el:hover .node-circle{ transform:scale(1.08); }
+
+  #mode-popup{
+    position:fixed; inset:0; background:rgba(20,30,25,0.55);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  #mode-popup.visible{ display:flex; }
+  .popup-card{
+    background:var(--card); border-radius:22px; padding:26px 24px; max-width:360px; width:100%;
+    text-align:center; box-shadow:0 12px 0 rgba(0,0,0,0.15);
+    animation:pop-in .18s ease;
+  }
+  @keyframes pop-in{ from{ transform:scale(0.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .popup-emoji{ font-size:52px; margin-bottom:4px; }
+  .popup-card h2{ font-family:var(--font-title); font-size:1.4rem; margin:0 0 4px; color:var(--ink); }
+  .popup-card .popup-sub{ font-size:0.85rem; color:#6b7a80; margin-bottom:18px; }
+  .popup-actions{ display:flex; flex-direction:column; gap:10px; }
+  .popup-btn{
+    display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink);
+    background:#f3f7f4; border:2px solid #e2ece3; border-radius:14px; padding:12px 16px;
+    font-family:var(--font-body); font-weight:700; font-size:0.95rem; text-align:left;
+    transition:transform .12s ease, border-color .12s ease;
+  }
+  .popup-btn:hover{ transform:translateY(-2px); border-color:var(--node-next-edge); }
+  .popup-btn .pb-emoji{ font-size:22px; flex-shrink:0; }
+  .popup-btn .pb-text small{ display:block; font-weight:500; color:#7c8a8f; font-size:0.72rem; }
+  .popup-btn.vr-btn{ background:#fff3e6; border-color:#ffd9ad; }
+  .popup-close{
+    margin-top:16px; background:none; border:none; color:#8a9aa0; font-family:var(--font-body);
+    font-weight:600; font-size:0.85rem; cursor:pointer; text-decoration:underline;
+  }
+
+  footer{ text-align:center; padding:20px; color:#eafff0; font-size:0.78rem; font-weight:600; position:relative; z-index:5;}
+
+  @media(max-width:420px){
+    .popup-card{padding:22px 18px;}
+  }
 </style>
 </head>
 <body>
-<header class="site">
-  <div class="nav">
-    <a href="../index.html" class="brand">
-      <span class="brand-mark">GNS</span>
-      <span>Global Net School<small>materiały do nauki</small></span>
-    </a>
-    <a class="btn-ghost" href="../index.html">← Strona główna</a>
-  </div>
+
+<div class="cloud" style="width:90px;height:34px;top:40px;left:6%;"></div>
+<div class="cloud" style="width:60px;height:24px;top:100px;left:20%;"></div>
+<div class="sun"></div>
+
+<header>
+  <a href="../index.html" class="brand">
+    <span class="brand-mark">GNS</span>
+    Global Net School
+  </a>
+  <button class="back-link" id="back-btn">← Wróć do mapy głównej</button>
 </header>
-<main id="main">
-  <div class="wrap breadcrumb">
-    <a href="../index.html">Global Net School</a><span class="sep">/</span>
-    <a href="../index.html#przedmioty">Przedmioty</a><span class="sep">/</span>
-    <span class="current">Język angielski</span>
-  </div>
-  <section class="subject-hero">
-    <div class="wrap subject-hero-inner">
-      <div class="subject-icon-lg">A</div>
-      <div>
-        <span class="kicker">Klasy 1–3</span>
-        <h1>Materiały z języka angielskiego</h1>
-        <p class="lede">Światy 3D do zwiedzania jak w grze, quizy, VR — każdy temat możesz przejść na trzy sposoby: samodzielny spacer po planszy, automatyczny lot kamery z lektorem, albo quiz sprawdzający słówka.</p>
-      </div>
+
+<div class="title-wrap">
+  <h1 id="page-title">🗺️ Kraina Angielskiego</h1>
+  <p id="page-sub">Klasa 1 · kliknij wyspę, żeby zacząć przygodę</p>
+</div>
+
+<div id="map-area">
+  <svg id="map-svg" viewBox="0 0 400 900" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<footer>Global Net School — zero kont, zero chmury, zero instalacji</footer>
+
+<!-- ===== Popup wyboru trybu ===== -->
+<div id="mode-popup">
+  <div class="popup-card">
+    <div class="popup-emoji" id="popup-emoji">🔢</div>
+    <h2 id="popup-title">Liczenie</h2>
+    <p class="popup-sub">Wybierz, jak chcesz się dzisiaj uczyć</p>
+    <div class="popup-actions">
+      <a class="popup-btn" id="popup-explore" href="#">
+        <span class="pb-emoji">🚶</span>
+        <span class="pb-text">Zwiedzaj świat 3D<small>chodzę sam(a) po planszy</small></span>
+      </a>
+      <a class="popup-btn" id="popup-fly" href="#">
+        <span class="pb-emoji">🎥</span>
+        <span class="pb-text">Lot z lektorem<small>kamera sama mnie oprowadza</small></span>
+      </a>
+      <a class="popup-btn" id="popup-quiz" href="#">
+        <span class="pb-emoji">📝</span>
+        <span class="pb-text">Quiz<small>sprawdzam, co pamiętam</small></span>
+      </a>
+      <a class="popup-btn vr-btn" id="popup-vr" href="#">
+        <span class="pb-emoji">🥽</span>
+        <span class="pb-text">Gogle VR<small>wkładam telefon do gogli</small></span>
+      </a>
     </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-
-      <div class="grade-block">
-        <div class="grade-label-row">
-          <span class="grade-num">Klasa 1</span>
-          <h2>Tematy — klasa 1</h2>
-          <span class="grade-sub">edukacja wczesnoszkolna</span>
-        </div>
-
-        <div class="topic-grid">
-
-          <!-- TEMAT: LICZENIE -->
-          <div class="topic-card">
-            <span class="topic-tab">Temat</span>
-            <div class="topic-head">
-              <div class="topic-emoji">🔢</div>
-              <h3>Liczenie 1–10</h3>
-            </div>
-            <p class="topic-desc">Liczby po angielsku w świecie 3D — licz przedmioty, powtarzaj wymowę.</p>
-            <div class="mode-list">
-              <a class="mode-link" href="jezyk-angielski/vr-explore.html?temat=liczenie">
-                <span class="mode-ico">🚶</span><span class="mode-name">Zwiedzaj planszę 3D</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/vr-flythrough.html?temat=liczenie">
-                <span class="mode-ico">🎥</span><span class="mode-name">Lot kamery + lektor</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/quiz.html?temat=liczenie">
-                <span class="mode-ico">📝</span><span class="mode-name">Quiz</span>
-              </a>
-              <a class="mode-link vr-link" href="jezyk-angielski/vr-explore.html?temat=liczenie&vr=1">
-                <span class="mode-ico">🥽</span><span class="mode-name">Otwórz w goglach VR</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- TEMAT: KOLORY -->
-          <div class="topic-card">
-            <span class="topic-tab">Temat</span>
-            <div class="topic-head">
-              <div class="topic-emoji">🎨</div>
-              <h3>Kolory</h3>
-            </div>
-            <p class="topic-desc">Podstawowe kolory — nazwy po angielsku wśród kolorowych obiektów 3D.</p>
-            <div class="mode-list">
-              <a class="mode-link" href="jezyk-angielski/vr-explore.html?temat=kolory">
-                <span class="mode-ico">🚶</span><span class="mode-name">Zwiedzaj planszę 3D</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/vr-flythrough.html?temat=kolory">
-                <span class="mode-ico">🎥</span><span class="mode-name">Lot kamery + lektor</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/quiz.html?temat=kolory">
-                <span class="mode-ico">📝</span><span class="mode-name">Quiz</span>
-              </a>
-              <a class="mode-link vr-link" href="jezyk-angielski/vr-explore.html?temat=kolory&vr=1">
-                <span class="mode-ico">🥽</span><span class="mode-name">Otwórz w goglach VR</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- TEMAT: ZWIERZĘTA (przykład kolejnego) -->
-          <div class="topic-card">
-            <span class="topic-tab">Temat</span>
-            <div class="topic-head">
-              <div class="topic-emoji">🐾</div>
-              <h3>Zwierzęta</h3>
-            </div>
-            <p class="topic-desc">Zwierzęta domowe i leśne — poznaj nazwy, posłuchaj wymowy.</p>
-            <div class="mode-list">
-              <a class="mode-link" href="jezyk-angielski/vr-explore.html?temat=zwierzeta">
-                <span class="mode-ico">🚶</span><span class="mode-name">Zwiedzaj planszę 3D</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/vr-flythrough.html?temat=zwierzeta">
-                <span class="mode-ico">🎥</span><span class="mode-name">Lot kamery + lektor</span>
-              </a>
-              <a class="mode-link" href="jezyk-angielski/quiz.html?temat=zwierzeta">
-                <span class="mode-ico">📝</span><span class="mode-name">Quiz</span>
-              </a>
-              <a class="mode-link vr-link" href="jezyk-angielski/vr-explore.html?temat=zwierzeta&vr=1">
-                <span class="mode-ico">🥽</span><span class="mode-name">Otwórz w goglach VR</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- dodaj kolejne tematy kopiując blok .topic-card i zmieniając ?temat=... -->
-
-        </div>
-      </div>
-
-    </div>
-  </section>
-</main>
-<footer>
-  <div class="wrap footer-bottom">
-    <span>© 2026 Global Net School — materiały dostępne bezpłatnie</span>
-    <a href="../index.html">← Wróć do strony głównej</a>
+    <button class="popup-close" id="popup-close">Zamknij</button>
   </div>
-</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ======================================================
+   LISTA TEMATÓW — dodaj kolejny obiekt, żeby rozszerzyć mapę.
+   "key" musi pasować do nazwy pliku dane/temat-<key>.json
+   Węzeł z "children" NIE prowadzi do lekcji — otwiera mini-mapę podtematów.
+   Klucz pliku danych dla podtematu to "<parentKey>-<childKey>"
+   (np. dom + kuchnia -> dane/temat-dom-kuchnia.json).
+   ====================================================== */
+const TOPICS = [
+  { key:'liczenie',  label:'Liczenie',    emoji:'🔢' },
+  { key:'kolory',    label:'Kolory',      emoji:'🎨' },
+  { key:'zwierzeta', label:'Zwierzęta',   emoji:'🐾' },
+  { key:'rodzina',   label:'Rodzina',     emoji:'👪' },
+  { key:'dom', label:'W domu', emoji:'🏠', children:[
+      { key:'kuchnia',  label:'Kuchnia',  emoji:'🍳' },
+      { key:'pokoj',    label:'Pokój',    emoji:'🛋️' },
+      { key:'lazienka', label:'Łazienka', emoji:'🛁' }
+  ]},
+  { key:'jedzenie',  label:'Jedzenie',    emoji:'🍎' }
+];
+
+const STORAGE_KEY = 'gns_klasa1_angielski_progress';
+
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e){ return {}; }
+}
+function markVisited(fullKey){
+  const p = loadProgress();
+  p[fullKey] = true;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){}
+}
+const progress = loadProgress();
+
+const svg = document.getElementById('map-svg');
+const svgNS = 'http://www.w3.org/2000/svg';
+const W = 400;
+const topMargin = 70;
+const bottomMargin = 60;
+const stepY = 130;
+const xPattern = [200, 120, 280, 90, 310, 200];
+const decorEmojis = ['🌳','🌸','🌼','🪨','🌿','🌲'];
+
+function svgEl(tag, attrs){
+  const el = document.createElementNS(svgNS, tag);
+  Object.keys(attrs).forEach(k=>el.setAttribute(k, attrs[k]));
+  return el;
+}
+function seededRand(seed){ let s = seed; return ()=>{ s = (s*9301+49297)%233280; return s/233280; }; }
+
+/* ======================================================
+   Stan nawigacji: gdzie jesteśmy na mapie
+   currentParent = null -> mapa główna
+   currentParent = obiekt tematu z children -> mini-mapa podtematów
+   ====================================================== */
+let currentParent = null;
+
+const backBtn = document.getElementById('back-btn');
+const pageTitle = document.getElementById('page-title');
+const pageSub = document.getElementById('page-sub');
+
+backBtn.addEventListener('click', ()=>{
+  currentParent = null;
+  renderMap(TOPICS, null);
+});
+
+function fullKeyFor(node, parent){
+  return parent ? (parent.key + '-' + node.key) : node.key;
+}
+
+function renderMap(nodes, parent){
+  svg.innerHTML = '';
+  currentParent = parent;
+
+  // nagłówek strony
+  if(parent){
+    pageTitle.textContent = parent.emoji + ' ' + parent.label;
+    pageSub.textContent = 'Wybierz, gdzie chcesz zajrzeć';
+    backBtn.classList.remove('hidden');
+  } else {
+    pageTitle.textContent = '🗺️ Kraina Angielskiego';
+    pageSub.textContent = 'Klasa 1 · kliknij wyspę, żeby zacząć przygodę';
+    backBtn.classList.add('hidden');
+  }
+
+  const H = topMargin + stepY*Math.max(nodes.length-1,0) + bottomMargin;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const points = nodes.map((n,i)=>({
+    x: xPattern[i % xPattern.length],
+    y: topMargin + i*stepY
+  }));
+
+  // ścieżka
+  let pathD = `M ${points[0].x} ${points[0].y}`;
+  for(let i=0;i<points.length-1;i++){
+    const a = points[i], b = points[i+1];
+    const midY = (a.y+b.y)/2;
+    pathD += ` C ${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
+  }
+  if(points.length>1){
+    svg.appendChild(svgEl('path', { d:pathD, fill:'none', stroke:'var(--path-edge)', 'stroke-width':22, 'stroke-linecap':'round' }));
+    svg.appendChild(svgEl('path', { d:pathD, fill:'none', stroke:'var(--path)', 'stroke-width':16, 'stroke-linecap':'round', 'stroke-dasharray':'2,16' }));
+  }
+
+  // dekoracje (seed zależny od tego, czy jesteśmy w podmapie, żeby się różniły)
+  const rng = seededRand(parent ? 99 : 42);
+  for(let i=0;i<points.length-1;i++){
+    const a = points[i], b = points[i+1];
+    const midX = (a.x+b.x)/2, midY=(a.y+b.y)/2;
+    for(let d=0; d<2; d++){
+      const side = d===0 ? -1 : 1;
+      const offX = side * (55 + rng()*35);
+      const offY = -20 + rng()*40;
+      const emoji = decorEmojis[Math.floor(rng()*decorEmojis.length)];
+      const t = svgEl('text', { x: midX+offX, y: midY+offY, 'font-size':22, 'text-anchor':'middle', opacity:0.85 });
+      t.textContent = emoji;
+      svg.appendChild(t);
+    }
+  }
+
+  // węzły
+  nodes.forEach((node, i)=>{
+    const p = points[i];
+    const isGroup = !!(node.children && node.children.length);
+    const fKey = fullKeyFor(node, parent);
+    const visited = !isGroup && !!progress[fKey];
+
+    const g = svgEl('g', { class:'node-group-el', 'data-key': fKey });
+
+    let fill, edge;
+    if(isGroup){ fill='var(--node-group)'; edge='var(--node-group-edge)'; }
+    else if(visited){ fill='var(--node-done)'; edge='var(--node-done-edge)'; }
+    else{ fill='var(--node-next)'; edge='var(--node-next-edge)'; }
+
+    g.appendChild(svgEl('ellipse', { cx:p.x, cy:p.y+34, rx:34, ry:8, fill:'rgba(0,0,0,0.15)' }));
+    const circle = svgEl('circle', { cx:p.x, cy:p.y, r:36, fill, stroke:edge, 'stroke-width':5, class:'node-circle' });
+    g.appendChild(circle);
+
+    const emoji = svgEl('text', { x:p.x, y:p.y - (isGroup?4:0), class:'node-emoji' });
+    emoji.textContent = node.emoji;
+    g.appendChild(emoji);
+
+    if(isGroup){
+      // mała plakietka z liczbą podtematów, żeby dziecko/rodzic widzieli że to "drzwi dalej"
+      const badgeBg = svgEl('circle', { cx:p.x+24, cy:p.y+22, r:12, fill:'#fff', stroke:edge, 'stroke-width':2 });
+      const badgeText = svgEl('text', { x:p.x+24, y:p.y+22, class:'node-badge-count', fill:edge });
+      badgeText.setAttribute('fill', edge);
+      badgeText.textContent = node.children.length;
+      g.appendChild(badgeBg);
+      g.appendChild(badgeText);
+    }
+
+    if(visited){
+      const star = svgEl('text', { x:p.x+28, y:p.y-26, class:'node-star' });
+      star.textContent = '⭐';
+      g.appendChild(star);
+    }
+
+    const label = svgEl('text', { x:p.x, y:p.y+58, class:'node-label' });
+    label.textContent = node.label;
+    g.appendChild(label);
+
+    if(isGroup){
+      const sub = svgEl('text', { x:p.x, y:p.y+72, class:'node-sublabel' });
+      sub.textContent = '👉 zobacz pokoje';
+      g.appendChild(sub);
+    }
+
+    g.addEventListener('click', ()=>{
+      if(isGroup){
+        renderMap(node.children, node);
+      } else {
+        openPopup(node, parent);
+      }
+    });
+
+    svg.appendChild(g);
+  });
+}
+
+/* ======================================================
+   POPUP WYBORU TRYBU
+   ====================================================== */
+const popup = document.getElementById('mode-popup');
+const popupEmoji = document.getElementById('popup-emoji');
+const popupTitle = document.getElementById('popup-title');
+const btnExplore = document.getElementById('popup-explore');
+const btnFly = document.getElementById('popup-fly');
+const btnQuiz = document.getElementById('popup-quiz');
+const btnVr = document.getElementById('popup-vr');
+
+// Dostosuj te ścieżki do faktycznej struktury Twoich plików w jezyk-angielski/
+const ENGINE_PATHS = {
+  explore: 'jezyk-angielski/vr-explore.html?temat=',
+  fly:     'jezyk-angielski/vr-flythrough.html?temat=',
+  quiz:    'jezyk-angielski/quiz.html?temat='
+};
+
+function openPopup(node, parent){
+  const fKey = fullKeyFor(node, parent);
+  const displayLabel = parent ? (parent.label + ' — ' + node.label) : node.label;
+
+  popupEmoji.textContent = node.emoji;
+  popupTitle.textContent = displayLabel;
+  btnExplore.href = ENGINE_PATHS.explore + fKey;
+  btnFly.href = ENGINE_PATHS.fly + fKey;
+  btnQuiz.href = ENGINE_PATHS.quiz + fKey;
+  btnVr.href = ENGINE_PATHS.explore + fKey + '&vr=1';
+
+  [btnExplore, btnFly, btnQuiz, btnVr].forEach(btn=>{
+    btn.onclick = ()=> markVisited(fKey);
+  });
+
+  popup.classList.add('visible');
+}
+document.getElementById('popup-close').addEventListener('click', ()=>{
+  popup.classList.remove('visible');
+});
+popup.addEventListener('click', (e)=>{
+  if(e.target === popup) popup.classList.remove('visible');
+});
+
+/* ======================================================
+   START
+   ====================================================== */
+renderMap(TOPICS, null);
+
+})();
+</script>
 </body>
 </html>
