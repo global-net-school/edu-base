@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Przedmiot — Akademia 3D</title>
+<meta name="theme-color" content="#6C5CE7">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./index.html"><span class="logo-orb" aria-hidden="true">🚀</span> Akademia 3D</a>
+  <nav class="top-actions" aria-label="Nawigacja główna">
+    <button class="icon-btn" type="button"><span class="emoji">⭐</span><span data-stat="punkty">0</span></button>
+    <button class="icon-btn" id="btn-ustawienia" type="button"><span class="emoji">⚙️</span></button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <p class="crumbs">
+    <a href="index.html">Akademia 3D</a> ›
+    <a id="crumb-klasa" href="#">Klasa</a> ›
+    <span id="crumb-przedmiot">Przedmiot</span>
+  </p>
+
+  <section class="hero" style="padding-top:8px;">
+    <h1 id="tytul-przedmiotu"><span id="emoji-przedmiotu" aria-hidden="true"></span> Przedmiot</h1>
+    <p>Wybierz lekcję, aby rozpocząć naukę.</p>
+  </section>
+
+  <div class="lesson-list" id="lista-lekcji"></div>
+
+  <p id="brak-danych" class="panel center" style="display:none;">
+    Ten przedmiot nie ma jeszcze przygotowanych lekcji w tej wersji demo.
+    Wypróbuj <strong>Angielski — Klasa 1</strong>, żeby zobaczyć pełną lekcję z quizem.
+  </p>
+</main>
+
+<nav class="tabbar" aria-label="Nawigacja mobilna">
+  <button type="button" onclick="location.href='index.html'"><span class="emoji">🏠</span>Start</button>
+  <button type="button" onclick="location.href='osiagniecia.html'"><span class="emoji">🏆</span>Nagrody</button>
+  <button type="button" onclick="history.back()"><span class="emoji">↩️</span>Wstecz</button>
+  <button type="button" id="tab-ustawienia"><span class="emoji">⚙️</span>Ustawienia</button>
+</nav>
+
+<script src="js/app.js"></script>
+<script>
+  const EMOJI = { angielski:"🇬🇧", polski:"🇵🇱", matematyka:"➕", przyroda:"🌎", biologia:"🧫",
+    fizyka:"⚛️", chemia:"🧪", geografia:"🌍", historia:"🏰", informatyka:"💻", plastyka:"🎨", muzyka:"🎵" };
+  const NAZWY = { angielski:"Angielski", polski:"Polski", matematyka:"Matematyka", przyroda:"Przyroda",
+    biologia:"Biologia", fizyka:"Fizyka", chemia:"Chemia", geografia:"Geografia", historia:"Historia",
+    informatyka:"Informatyka", plastyka:"Plastyka", muzyka:"Muzyka" };
+
+  const params = new URLSearchParams(location.search);
+  const klasa = parseInt(params.get("klasa"), 10) || 1;
+  const przedmiot = params.get("przedmiot") || "angielski";
+
+  document.title = `${NAZWY[przedmiot]} — Klasa ${klasa} — Akademia 3D`;
+  document.getElementById("emoji-przedmiotu").textContent = EMOJI[przedmiot] || "📘";
+  document.getElementById("tytul-przedmiotu").append(` ${NAZWY[przedmiot] || przedmiot}`);
+  document.getElementById("crumb-klasa").textContent = `Klasa ${klasa}`;
+  document.getElementById("crumb-klasa").href = `klasa.html?klasa=${klasa}`;
+  document.getElementById("crumb-przedmiot").textContent = NAZWY[przedmiot] || przedmiot;
+
+  const stan = Akademia.get();
+  const listEl = document.getElementById("lista-lekcji");
+
+  fetch(`dane/klasa${klasa}-${przedmiot}.json`)
+    .then(r => { if (!r.ok) throw new Error("brak pliku"); return r.json(); })
+    .then(dane => {
+      dane.lekcje.forEach((lek, i) => {
+        const id = `klasa${klasa}/${przedmiot}/${lek.id}`;
+        const postep = stan.postepy[id];
+        const gwiazdki = postep ? "⭐".repeat(postep.gwiazdki) + "☆".repeat(3 - postep.gwiazdki) : "☆☆☆";
+        const a = document.createElement("a");
+        a.className = "lesson-card";
+        a.href = `lekcja.html?klasa=${klasa}&przedmiot=${przedmiot}&lekcja=${lek.id}`;
+        a.innerHTML = `
+          <span class="lesson-num">${i + 1}</span>
+          <span>
+            <span class="lesson-title">${lek.tytul}</span><br>
+            <span class="lesson-meta">${postep ? "Ukończono • " + postep.procent + "%" : "Nowa lekcja"}</span>
+          </span>
+          <span class="lesson-stars">${gwiazdki}</span>`;
+        listEl.appendChild(a);
+      });
+    })
+    .catch(() => { document.getElementById("brak-danych").style.display = "block"; });
+
+  document.getElementById("btn-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  document.getElementById("tab-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  Akademia.wlaczNawigacjeKlawiatura("#lista-lekcji");
+</script>
+</body>
+</html>
