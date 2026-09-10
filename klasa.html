@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Klasa — Akademia 3D</title>
+<meta name="theme-color" content="#6C5CE7">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="sr-only" href="#glowna-tresc">Przejdź do treści głównej</a>
+
+<header class="topbar">
+  <a class="brand" href="./index.html"><span class="logo-orb" aria-hidden="true">🚀</span> Akademia 3D</a>
+  <nav class="top-actions" aria-label="Nawigacja główna">
+    <a class="icon-btn" href="osiagniecia.html"><span class="emoji">🏆</span></a>
+    <button class="icon-btn" type="button"><span class="emoji">⭐</span><span data-stat="punkty">0</span></button>
+    <button class="icon-btn" id="btn-ustawienia" type="button"><span class="emoji">⚙️</span></button>
+  </nav>
+</header>
+
+<main id="glowna-tresc" class="wrap">
+  <p class="crumbs"><a href="index.html">Akademia 3D</a> › <span id="crumb-klasa">Klasa</span></p>
+
+  <section class="hero" style="padding-top:8px;">
+    <h1 id="tytul-klasy">Klasa</h1>
+    <p>Wybierz przedmiot, żeby zobaczyć listę lekcji.</p>
+  </section>
+
+  <section aria-labelledby="wybor-przedmiotu">
+    <h2 id="wybor-przedmiotu" class="sr-only">Wybierz przedmiot</h2>
+    <div class="tile-grid" id="grid-przedmiotow"></div>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Nawigacja mobilna">
+  <button type="button" onclick="location.href='index.html'"><span class="emoji">🏠</span>Start</button>
+  <button type="button" onclick="location.href='osiagniecia.html'"><span class="emoji">🏆</span>Nagrody</button>
+  <button type="button" onclick="history.back()"><span class="emoji">↩️</span>Wstecz</button>
+  <button type="button" id="tab-ustawienia"><span class="emoji">⚙️</span>Ustawienia</button>
+</nav>
+
+<script src="js/app.js"></script>
+<script>
+  const PRZEDMIOTY = [
+    { id: "angielski",     nazwa: "Angielski",    emoji: "🇬🇧" },
+    { id: "polski",        nazwa: "Polski",       emoji: "🇵🇱" },
+    { id: "matematyka",    nazwa: "Matematyka",   emoji: "➕" },
+    { id: "przyroda",      nazwa: "Przyroda",     emoji: "🌎" },
+    { id: "biologia",      nazwa: "Biologia",     emoji: "🧫" },
+    { id: "fizyka",        nazwa: "Fizyka",       emoji: "⚛️" },
+    { id: "chemia",        nazwa: "Chemia",       emoji: "🧪" },
+    { id: "geografia",     nazwa: "Geografia",    emoji: "🌍" },
+    { id: "historia",      nazwa: "Historia",     emoji: "🏰" },
+    { id: "informatyka",   nazwa: "Informatyka",  emoji: "💻" },
+    { id: "plastyka",      nazwa: "Plastyka",     emoji: "🎨" },
+    { id: "muzyka",        nazwa: "Muzyka",       emoji: "🎵" },
+  ];
+
+  // Przedmioty specjalistyczne (fizyka/chemia/biologia) dopiero od starszych klas
+  const OD_KLASY = { fizyka: 7, chemia: 7, biologia: 4 };
+
+  const params = new URLSearchParams(location.search);
+  const klasa = Math.min(8, Math.max(1, parseInt(params.get("klasa"), 10) || 1));
+  const band = "band-" + klasa;
+
+  document.title = `Klasa ${klasa} — Akademia 3D`;
+  document.getElementById("tytul-klasy").textContent = `Klasa ${klasa}`;
+  document.getElementById("crumb-klasa").textContent = `Klasa ${klasa}`;
+
+  const grid = document.getElementById("grid-przedmiotow");
+  PRZEDMIOTY
+    .filter(p => !(OD_KLASY[p.id] && klasa < OD_KLASY[p.id]))
+    .forEach(p => {
+      const a = document.createElement("a");
+      a.className = `tile ${band}`;
+      a.href = `przedmiot.html?klasa=${klasa}&przedmiot=${p.id}`;
+      a.innerHTML = `<span class="tile-emoji" aria-hidden="true">${p.emoji}</span><span class="tile-label">${p.nazwa}</span>`;
+      grid.appendChild(a);
+    });
+
+  document.getElementById("btn-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  document.getElementById("tab-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  Akademia.wlaczNawigacjeKlawiatura("#grid-przedmiotow");
+</script>
+</body>
+</html>
