@@ -1,0 +1,54 @@
+{
+  "klasa": 1,
+  "przedmiot": "angielski",
+  "nazwa": "Angielski — Klasa 1",
+  "lekcje": [
+    {
+      "id": "l1",
+      "tytul": "Kolory / Colours",
+      "wprowadzenie": "Poznajemy podstawowe kolory po angielsku: red, blue, yellow, green. Powtarzaj głośno każde słowo!",
+      "slowka": [
+        { "en": "red",    "pl": "czerwony", "emoji": "🔴" },
+        { "en": "blue",   "pl": "niebieski", "emoji": "🔵" },
+        { "en": "yellow", "pl": "żółty",     "emoji": "🟡" },
+        { "en": "green",  "pl": "zielony",   "emoji": "🟢" }
+      ],
+      "quiz": [
+        { "pytanie": "Jak powiedzieć 'czerwony' po angielsku?", "opcje": ["red", "blue", "green", "yellow"], "poprawna": 0 },
+        { "pytanie": "Co oznacza słowo 'blue'?", "opcje": ["żółty", "niebieski", "zielony", "czerwony"], "poprawna": 1 },
+        { "pytanie": "🟢 to po angielsku:", "opcje": ["red", "yellow", "green", "blue"], "poprawna": 2 }
+      ]
+    },
+    {
+      "id": "l2",
+      "tytul": "Zwierzęta / Animals",
+      "wprowadzenie": "Dziś poznamy zwierzęta: cat, dog, bird, fish.",
+      "slowka": [
+        { "en": "cat",  "pl": "kot",   "emoji": "🐱" },
+        { "en": "dog",  "pl": "pies",  "emoji": "🐶" },
+        { "en": "bird", "pl": "ptak",  "emoji": "🐦" },
+        { "en": "fish", "pl": "ryba",  "emoji": "🐟" }
+      ],
+      "quiz": [
+        { "pytanie": "🐶 to po angielsku:", "opcje": ["cat", "dog", "bird", "fish"], "poprawna": 1 },
+        { "pytanie": "Co oznacza słowo 'fish'?", "opcje": ["kot", "pies", "ptak", "ryba"], "poprawna": 3 }
+      ]
+    },
+    {
+      "id": "l3",
+      "tytul": "Liczby 1-5 / Numbers",
+      "wprowadzenie": "Liczymy po angielsku od jeden do pięciu: one, two, three, four, five.",
+      "slowka": [
+        { "en": "one",   "pl": "jeden",   "emoji": "1️⃣" },
+        { "en": "two",   "pl": "dwa",     "emoji": "2️⃣" },
+        { "en": "three", "pl": "trzy",    "emoji": "3️⃣" },
+        { "en": "four",  "pl": "cztery",  "emoji": "4️⃣" },
+        { "en": "five",  "pl": "pięć",    "emoji": "5️⃣" }
+      ],
+      "quiz": [
+        { "pytanie": "Jak powiedzieć 'trzy' po angielsku?", "opcje": ["two", "three", "four", "five"], "poprawna": 1 },
+        { "pytanie": "Co oznacza 'four'?", "opcje": ["dwa", "trzy", "cztery", "pięć"], "poprawna": 2 }
+      ]
+    }
+  ]
+}
