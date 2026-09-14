@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>test2 — Akademia 3D</title>
+<meta name="theme-color" content="#6C5CE7">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="sr-only" href="#glowna-tresc">Przejdź do treści głównej</a>
+
+<header class="topbar">
+  <a class="brand" href="./index.html"><span class="logo-orb" aria-hidden="true">🚀</span> Akademia 3D</a>
+  <nav class="top-actions" aria-label="Nawigacja główna">
+    <a class="icon-btn" href="osiagniecia.html"><span class="emoji">🏆</span></a>
+    <button class="icon-btn" type="button"><span class="emoji">⭐</span><span data-stat="punkty">0</span></button>
+    <button class="icon-btn" id="btn-ustawienia" type="button"><span class="emoji">⚙️</span></button>
+  </nav>
+</header>
+
+<main id="glowna-tresc" class="wrap">
+  <p class="crumbs"><a href="index.html">Akademia 3D</a> › <span>test2</span></p>
+
+  <section class="hero" style="padding-top:8px;">
+    <h1>test2</h1>
+    <p>test2</p>
+  </section>
+
+  <section>
+    <div class="tile-grid">
+    
+    <a class="tile" href="liczby1.html">
+      <span class="tile-emoji" aria-hidden="true">➕</span>
+      <span class="tile-label">Klasa 1 — Liczby</span>
+    </a>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" aria-label="Nawigacja mobilna">
+  <button type="button" onclick="location.href='index.html'"><span class="emoji">🏠</span>Start</button>
+  <button type="button" onclick="location.href='osiagniecia.html'"><span class="emoji">🏆</span>Nagrody</button>
+  <button type="button" onclick="location.href='klasa.html?klasa=1'"><span class="emoji">↩️</span>Wstecz</button>
+  <button type="button" id="tab-ustawienia"><span class="emoji">⚙️</span>Ustawienia</button>
+</nav>
+
+<script src="js/app.js"></script>
+<script>
+  document.getElementById("btn-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  document.getElementById("tab-ustawienia").addEventListener("click", Akademia.toggleTheme);
+  Akademia.wlaczNawigacjeKlawiatura(".tile-grid");
+</script>
+</body>
+</html>
